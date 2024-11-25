@@ -1,5 +1,11 @@
-controllers:
+user:
     resource:
-        path: ../src/Controller/
-        namespace: App\Controller
+        path: ../src/User/UI/Controller/
+        namespace: App\User\UI\Controller
     type: attribute
+
+api_login_check:
+    path: /api/login_check
+
+api_logout:
+    path: /api/logout

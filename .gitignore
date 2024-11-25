@@ -10,3 +10,7 @@
 ###< symfony/framework-bundle ###
 .idea
 etc/docker/volumes
+.env
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
