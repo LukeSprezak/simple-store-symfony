@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Shared\UI\Controller;
 
+use App\Shared\Domain\Enum\Routes;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,9 +15,9 @@ use Symfony\Component\Routing\Attribute\Route;
 final class MainController
 {
     #[Route(
-        path:'/',
-        name: 'main',
-        methods: [Request::METHOD_GET],
+        path:Routes::MAIN_PATH->value,
+        name: Routes::MAIN_NAME->value,
+        methods: [Request::METHOD_GET]
     )]
     public function main(): JsonResponse
     {
