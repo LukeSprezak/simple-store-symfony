@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use InvalidArgumentException;
 use LengthException;
+use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -27,6 +28,10 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 )]
 class CreateUserCommand extends Command
 {
+    private const string DEFAULT_EMAIL = 'luke@admin.com';
+    private const string DEFAULT_USERNAME = 'admin';
+    private const array DEFAULT_ROLES = [Role::ROLE_USER->value];
+
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
@@ -38,10 +43,38 @@ class CreateUserCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $email = $io->ask('Enter email:', 'luke@admin.com');
-        $username = $io->ask('Enter username:', 'admin');
 
-        $password = $io->askHidden('Enter password:', function (?string $password) {
+        try {
+            $email = $this->askEmail($io);
+            $username = $this->askUsername($io);
+            $password = $this->askPassword($io);
+            $roles = $this->askRoles($io);
+
+            $user = $this->createUser($email, $username, $password, $roles);
+            $this->validateUser($user, $io);
+            $this->saveUser($user, $io);
+
+            return Command::SUCCESS;
+        } catch (Exception $exception) {
+            $io->error($exception->getMessage());
+
+            return Command::FAILURE;
+        }
+    }
+
+    private function askEmail(SymfonyStyle $io): string
+    {
+        return $io->ask('Enter email:', self::DEFAULT_EMAIL);
+    }
+
+    private function askUsername(SymfonyStyle $io): string
+    {
+        return $io->ask('Enter username:', self::DEFAULT_USERNAME);
+    }
+
+    private function askPassword(SymfonyStyle $io): string
+    {
+        return $io->askHidden('Enter password:', function (?string $password) {
             if (null === $password || '' === trim($password)) {
                 throw new InvalidArgumentException('Password cannot be empty.');
             }
@@ -52,35 +85,44 @@ class CreateUserCommand extends Command
 
             return $password;
         });
+    }
 
-        $roles = $io->ask(
+    private function askRoles(SymfonyStyle $io): array
+    {
+        return $io->ask(
             'Specify the user roles (separated by commas, e.g. ROLE_USER,ROLE_ADMIN):',
             Role::ROLE_USER->value,
             function (?string $input) {
                 if (empty($input)) {
-                    return [Role::ROLE_USER->value];
+                    return self::DEFAULT_ROLES;
                 }
 
                 $rolesArray = array_map('trim', explode(',', $input));
-
                 $allowedRoles = array_map(static fn($role) => $role->value, Role::cases());
 
-                foreach ($rolesArray as $role) {
-                    if (! in_array($role, $allowedRoles, true)) {
-                        throw new InvalidArgumentException(
-                            sprintf(
-                                "Invalid role: '%s'. Allowed roles are: %s.",
-                                $role,
-                                implode(', ', $allowedRoles)
-                            )
-                        );
-                    }
+                $invalidRoles = array_diff($rolesArray, $allowedRoles);
+
+                if (! empty($invalidRoles)) {
+                    throw new InvalidArgumentException(
+                        sprintf(
+                            "Invalid role(s): '%s'. Allowed roles are: %s.",
+                            implode(', ', $invalidRoles),
+                            implode(', ', $allowedRoles)
+                        )
+                    );
                 }
 
-                return array_unique($rolesArray);
+                return array_values(array_unique([...$rolesArray, Role::ROLE_USER->value]));
             }
         );
+    }
 
+    private function createUser(
+        string $email,
+        string $username,
+        string $password,
+        array $roles
+    ): User {
         $user = new User();
         $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
         $user
@@ -92,15 +134,23 @@ class CreateUserCommand extends Command
             ->setRepeatPassword($hashedPassword)
             ->setEnabled(true);
 
+        return $user;
+    }
+
+    private function validateUser(User $user, SymfonyStyle $io): void
+    {
         $errors = $this->validator->validate($user);
-        if (count($errors) > 0) {
+        if (0 < count($errors)) {
             foreach ($errors as $error) {
                 $io->error($error->getPropertyPath() . ': ' . $error->getMessage());
             }
 
-            return Command::FAILURE;
+            throw new InvalidArgumentException('User validation failed.');
         }
+    }
 
+    private function saveUser(User $user, SymfonyStyle $io): void
+    {
         try {
             $this->entityManager->persist($user);
             $this->entityManager->flush();
@@ -109,13 +159,11 @@ class CreateUserCommand extends Command
             $io->text('ID: ' . $user->getId());
             $io->text('Email: ' . $user->getEmail());
             $io->text('Username: ' . $user->getUsername());
-            $io->text('Role: ' . implode(', ', $user->getRoles()));
+            $io->text('Roles: ' . implode(', ', $user->getRoles()));
         } catch (Exception $exception) {
-            $io->error('User not created');
+            $io->error('User not created: ' . $exception->getMessage());
 
-            return Command::FAILURE;
+            throw new RuntimeException('User creation failed.');
         }
-
-        return Command::SUCCESS;
     }
 }

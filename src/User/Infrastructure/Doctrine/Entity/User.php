@@ -87,12 +87,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        if (! in_array(needle: Role::ROLE_USER->value, haystack: $roles, strict: true)) {
-            $roles[] = Role::ROLE_USER->value;
-        }
-
-        return array_unique($roles);
+        return array_unique([...$this->roles, Role::ROLE_USER->value]);
     }
 
     public function setRoles(array $roles): self

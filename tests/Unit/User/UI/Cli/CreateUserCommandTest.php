@@ -1,0 +1,215 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Unit\User\UI\Cli;
+
+use App\User\Domain\Enum\Role;
+use App\User\Infrastructure\Doctrine\Entity\User;
+use App\User\UI\Cli\CreateUserCommand;
+use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ConstraintViolationList;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+#[CoversClass(CreateUserCommand::class)]
+class CreateUserCommandTest extends TestCase
+{
+    private const string COMMAND_NAME = 'app:create-user';
+    private const string VALID_EMAIL = 'luke@admin.com';
+    private const string VALID_USERNAME = 'admin';
+    private const string VALID_PASSWORD = 'Admin123';
+    private const string SHORT_PASSWORD = 'short';
+    private const string CUSTOM_ROLES = 'ROLE_ADMIN,ROLE_SUPER_ADMIN';
+
+    private EntityManagerInterface $entityManager;
+    private UserPasswordHasherInterface $passwordHasher;
+    private ValidatorInterface $validator;
+    private Application $application;
+
+    protected function setUp(): void
+    {
+        $this->entityManager = $this->createMock(EntityManagerInterface::class);
+        $this->passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
+        $this->validator = $this->createMock(ValidatorInterface::class);
+
+        $command = new CreateUserCommand($this->entityManager, $this->passwordHasher, $this->validator);
+        $this->application = new Application();
+        $this->application->add($command);
+    }
+
+    #[Test]
+    public function shouldSuccessfullyCreateUserWithDefaultValues(): void
+    {
+        $commandTester = $this->getCommandTester([
+            '',
+            '',
+            self::VALID_PASSWORD,
+            '',
+        ]);
+
+        $this->passwordHasher->expects($this->once())
+            ->method('hashPassword')
+            ->with($this->isInstanceOf(User::class), self::VALID_PASSWORD)
+            ->willReturn('hashed_Admin123');
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($this->isInstanceOf(User::class))
+            ->willReturn(new ConstraintViolationList());
+
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($this->isInstanceOf(User::class));
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $commandTester->execute([]);
+
+        $this->assertEquals(0, $commandTester->getStatusCode());
+        $output = $commandTester->getDisplay();
+
+        $this->assertStringContainsString('The user has been successfully created!', $output);
+        $this->assertStringContainsString('ID: ', $output);
+        $this->assertStringContainsString('Email: ' . self::VALID_EMAIL, $output);
+        $this->assertStringContainsString('Username: ' . self::VALID_USERNAME, $output);
+        $this->assertStringContainsString('Roles: ' . Role::ROLE_USER->value, $output);
+    }
+
+    #[Test]
+    public function shouldSuccessfullyCreateUserWithTheirOwnValues(): void
+    {
+        $commandTester = $this->getCommandTester([
+            self::VALID_EMAIL,
+            self::VALID_USERNAME,
+            self::VALID_PASSWORD,
+            self::CUSTOM_ROLES,
+        ]);
+
+        $this->passwordHasher->expects($this->once())
+            ->method('hashPassword')
+            ->with($this->isInstanceOf(User::class), self::VALID_PASSWORD)
+            ->willReturn('hashed_Luke1234');
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($this->isInstanceOf(User::class))
+            ->willReturn(new ConstraintViolationList());
+
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($this->callback(function (User $user) {
+
+                return Uuid::isValid($user->getId()) &&
+                    $user->getEmail() === self::VALID_EMAIL &&
+                    $user->getUsername() === self::VALID_USERNAME &&
+                    $user->getPassword() === 'hashed_Luke1234' &&
+                    $user->getRepeatPassword() === 'hashed_Luke1234' &&
+                    $user->getEnabled() === true &&
+                    $user->getRoles() === [
+                        Role::ROLE_ADMIN->value,
+                        Role::ROLE_SUPER_ADMIN->value,
+                        Role::ROLE_USER->value,
+                    ];
+            }));
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $commandTester->execute([]);
+        $this->assertEquals(0, $commandTester->getStatusCode());
+
+        $output = $commandTester->getDisplay();
+        $this->assertStringContainsString('The user has been successfully created!', $output);
+        $this->assertStringContainsString('ID: ', $output);
+        $this->assertStringContainsString('Email: ' . self::VALID_EMAIL, $output);
+        $this->assertStringContainsString('Username: ' . self::VALID_USERNAME, $output);
+        $this->assertStringContainsString('Roles: ' . implode(', ', [
+                Role::ROLE_ADMIN->value,
+                Role::ROLE_SUPER_ADMIN->value,
+                Role::ROLE_USER->value,
+            ]), $output);
+    }
+
+    #[Test]
+    public function shouldFailsWhenPasswordIsEmpty(): void
+    {
+        $commandTester = $this->getCommandTester([
+            '',
+            '',
+            '',
+            '',
+        ]);
+
+        $commandTester->execute([]);
+        $this->assertFailureWithMessage($commandTester, 'Password cannot be empty.');
+    }
+
+    #[Test]
+    public function shouldDisplayErrorIfPasswordIsTooShort(): void
+    {
+        $commandTester = $this->getCommandTester([
+            '',
+            '',
+            self::SHORT_PASSWORD,
+            '',
+        ]);
+
+        $commandTester->execute([]);
+        $this->assertFailureWithMessage($commandTester, 'Password needs to be at least 8 characters long.');
+    }
+
+    #[Test]
+    public function informsFailWhenValidatorFails(): void
+    {
+        $commandTester = $this->getCommandTester([
+            '',
+            '',
+            self::VALID_PASSWORD,
+            '',
+        ]);
+
+
+        $this->passwordHasher->expects($this->once())
+            ->method('hashPassword')
+            ->with($this->isInstanceOf(User::class), self::VALID_PASSWORD)
+            ->willReturn('hashed_password123');
+
+        $mockConstraintViolation = $this->createMock(ConstraintViolationInterface::class);
+        $mockConstraintViolation->method('getPropertyPath')->willReturn('email');
+        $mockConstraintViolation->method('getMessage')->willReturn('This value is not a valid email.');
+        $constraintViolationList = new ConstraintViolationList([$mockConstraintViolation]);
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($this->isInstanceOf(User::class))
+            ->willReturn($constraintViolationList);
+
+        $commandTester->execute([]);
+        $this->assertFailureWithMessage($commandTester, 'email: This value is not a valid email.');
+    }
+
+    private function getCommandTester(array $inputs = []): CommandTester
+    {
+        $commandTester = new CommandTester($this->application->find(self::COMMAND_NAME));
+        $commandTester->setInputs($inputs);
+
+        return $commandTester;
+    }
+
+    private function assertFailureWithMessage(CommandTester $commandTester, string $expectedMessage): void
+    {
+        $this->assertEquals(Command::FAILURE, $commandTester->getStatusCode());
+        $output = $commandTester->getDisplay();
+        $this->assertStringContainsString($expectedMessage, $output);
+    }
+}
