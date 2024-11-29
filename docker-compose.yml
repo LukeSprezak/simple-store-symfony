@@ -5,7 +5,7 @@ services:
     image: mariadb:10.4
     container_name: mariadb
     volumes:
-      - ./sql/images:/sql_images
+      - ./etc/docker/sql/images:/sql_images
       - database_storage:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=root
