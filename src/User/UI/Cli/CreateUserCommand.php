@@ -7,10 +7,6 @@ namespace App\User\UI\Cli;
 use App\User\Domain\Enum\Role;
 use App\User\Infrastructure\Doctrine\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
-use InvalidArgumentException;
-use LengthException;
-use RuntimeException;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -35,7 +31,7 @@ class CreateUserCommand extends Command
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly ValidatorInterface $validator
+        private readonly ValidatorInterface $validator,
     ) {
         parent::__construct();
     }
@@ -55,7 +51,7 @@ class CreateUserCommand extends Command
             $this->saveUser($user, $io);
 
             return Command::SUCCESS;
-        } catch (Exception $exception) {
+        } catch (\Exception $exception) {
             $io->error($exception->getMessage());
 
             return Command::FAILURE;
@@ -76,11 +72,11 @@ class CreateUserCommand extends Command
     {
         return $io->askHidden('Enter password:', function (?string $password) {
             if (null === $password || '' === trim($password)) {
-                throw new InvalidArgumentException('Password cannot be empty.');
+                throw new \InvalidArgumentException('Password cannot be empty.');
             }
 
             if (8 > mb_strlen($password)) {
-                throw new LengthException('Password needs to be at least 8 characters long.');
+                throw new \LengthException('Password needs to be at least 8 characters long.');
             }
 
             return $password;
@@ -98,18 +94,12 @@ class CreateUserCommand extends Command
                 }
 
                 $rolesArray = array_map('trim', explode(',', $input));
-                $allowedRoles = array_map(static fn($role) => $role->value, Role::cases());
+                $allowedRoles = array_map(static fn ($role) => $role->value, Role::cases());
 
                 $invalidRoles = array_diff($rolesArray, $allowedRoles);
 
-                if (! empty($invalidRoles)) {
-                    throw new InvalidArgumentException(
-                        sprintf(
-                            "Invalid role(s): '%s'. Allowed roles are: %s.",
-                            implode(', ', $invalidRoles),
-                            implode(', ', $allowedRoles)
-                        )
-                    );
+                if (!empty($invalidRoles)) {
+                    throw new \InvalidArgumentException(sprintf("Invalid role(s): '%s'. Allowed roles are: %s.", implode(', ', $invalidRoles), implode(', ', $allowedRoles)));
                 }
 
                 return array_values(array_unique([...$rolesArray, Role::ROLE_USER->value]));
@@ -121,7 +111,7 @@ class CreateUserCommand extends Command
         string $email,
         string $username,
         string $password,
-        array $roles
+        array $roles,
     ): User {
         $user = new User();
         $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
@@ -142,10 +132,10 @@ class CreateUserCommand extends Command
         $errors = $this->validator->validate($user);
         if (0 < count($errors)) {
             foreach ($errors as $error) {
-                $io->error($error->getPropertyPath() . ': ' . $error->getMessage());
+                $io->error($error->getPropertyPath().': '.$error->getMessage());
             }
 
-            throw new InvalidArgumentException('User validation failed.');
+            throw new \InvalidArgumentException('User validation failed.');
         }
     }
 
@@ -156,14 +146,14 @@ class CreateUserCommand extends Command
             $this->entityManager->flush();
 
             $io->success('The user has been successfully created!');
-            $io->text('ID: ' . $user->getId());
-            $io->text('Email: ' . $user->getEmail());
-            $io->text('Username: ' . $user->getUsername());
-            $io->text('Roles: ' . implode(', ', $user->getRoles()));
-        } catch (Exception $exception) {
-            $io->error('User not created: ' . $exception->getMessage());
+            $io->text('ID: '.$user->getId());
+            $io->text('Email: '.$user->getEmail());
+            $io->text('Username: '.$user->getUsername());
+            $io->text('Roles: '.implode(', ', $user->getRoles()));
+        } catch (\Exception $exception) {
+            $io->error('User not created: '.$exception->getMessage());
 
-            throw new RuntimeException('User creation failed.');
+            throw new \RuntimeException('User creation failed.');
         }
     }
 }

@@ -15,7 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class MainController
 {
     #[Route(
-        path:Routes::MAIN_PATH->value,
+        path: Routes::MAIN_PATH->value,
         name: Routes::MAIN_NAME->value,
         methods: [Request::METHOD_GET]
     )]

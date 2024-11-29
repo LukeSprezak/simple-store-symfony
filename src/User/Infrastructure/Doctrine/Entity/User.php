@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\User\Infrastructure\Doctrine\Entity;
 
 use App\User\Domain\Enum\Role;
-use DateTimeImmutable;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -48,7 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $resetPasswordToken;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private ?DateTimeImmutable $lastPasswordChange = null;
+    private ?\DateTimeImmutable $lastPasswordChange = null;
 
     public function getId(): string
     {
@@ -82,6 +81,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
         return $this;
     }
 
@@ -187,12 +187,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->resetPasswordToken = $resetPasswordToken;
     }
 
-    public function getLastPasswordChange(): ?DateTimeImmutable
+    public function getLastPasswordChange(): ?\DateTimeImmutable
     {
         return $this->lastPasswordChange;
     }
 
-    public function setLastPasswordChange(DateTimeImmutable $lastPasswordChange): static
+    public function setLastPasswordChange(\DateTimeImmutable $lastPasswordChange): static
     {
         $this->lastPasswordChange = $lastPasswordChange;
 
