@@ -1,0 +1,63 @@
+framework:
+    messenger:
+        default_bus: command.sync.bus
+        buses:
+            command.sync.bus:
+                middleware:
+                    - doctrine_close_connection
+                    - doctrine_transaction
+            command.async.bus:
+                middleware:
+                    - doctrine_close_connection
+                    - doctrine_transaction
+            event.bus:
+                default_middleware:
+                    enabled: true
+                    allow_no_handlers: true
+        serializer:
+            default_serializer: messenger.transport.symfony_serializer
+            symfony_serializer:
+                format: json
+                context: { }
+        transports:
+            sync:
+                dsn: 'sync://'
+            async:
+                dsn: '%env(MESSENGER_RABBITMQ_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: messages
+                        type: direct
+                        default_publish_routing_key: commands
+                    queues:
+                        commands:
+                            binding_keys:
+                                - commands
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1000
+                    multiplier: 2
+            event:
+                dsn: '%env(MESSENGER_RABBITMQ_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: messages
+                        type: direct
+                        default_publish_routing_key: events
+                    queues:
+                        events:
+                            binding_keys:
+                                - events
+                retry_strategy:
+                    max_retries: 3
+                    delay: 1000
+                    multiplier: 2
+            failed:
+                dsn: '%env(MESSENGER_DOCTRINE_TRANSPORT_DSN)%'
+                options:
+                    queue_name: failed
+                    auto_setup: false
+        failure_transport: failed
+        routing:
+            App\Shared\Application\Bus\Command\Sync\Command: sync
+            App\Shared\Application\Bus\Command\Async\Command: async
