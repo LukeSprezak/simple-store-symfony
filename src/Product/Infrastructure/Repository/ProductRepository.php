@@ -1,0 +1,72 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Product\Infrastructure\Repository;
+
+
+use App\Product\Domain\Model\Product;
+use App\Product\Domain\Repository\ProductRepositoryInterface as ProductDomainRepository;
+use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
+use App\Product\Infrastructure\Transformer\ProductTransformer;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Uid\Uuid;
+
+readonly class ProductRepository implements ProductDomainRepository
+{
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private ProductTransformer     $transformer
+    ) {
+    }
+
+    public function getNextId(): string
+    {
+        return (string) Uuid::v7();
+    }
+
+    public function findByIds(array $ids): array
+    {
+        $entities = $this->entityManager->getRepository(ProductEntity::class)
+            ->createQueryBuilder('p')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
+
+        return array_map(fn (ProductEntity $entity) => $this->transformer->toDomain($entity), $entities);
+    }
+
+    public function save(Product $product): void
+    {
+        $entity = $this->entityManager->getRepository(ProductEntity::class)->find($product->getId()) ?? new ProductEntity();
+        $this->transformer->fromDomain($product, $entity);
+
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
+    }
+
+    public function get(string $id): Product
+    {
+        $productEntity = $this->entityManager->getRepository(ProductEntity::class)->findOneBy(['id' => $id]);
+
+        if (!$productEntity) {
+            throw new NotFoundHttpException("Product with ID {$id} not found.");
+        }
+
+        return $this->transformer->toDomain($productEntity);
+    }
+
+    public function remove(Product $product): void
+    {
+        $productEntity = $this->entityManager->getRepository(ProductEntity::class)->find($product->getId());
+
+        if (!$productEntity) {
+            throw new NotFoundHttpException("Product with ID {$product->getId()} not found.");
+        }
+
+        $this->entityManager->remove($productEntity);
+        $this->entityManager->flush();
+    }
+}
