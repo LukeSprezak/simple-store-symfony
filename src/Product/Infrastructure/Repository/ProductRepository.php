@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Product\Infrastructure\Repository;
 
-
 use App\Product\Domain\Model\Product;
 use App\Product\Domain\Repository\ProductRepositoryInterface as ProductDomainRepository;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
@@ -17,7 +16,7 @@ readonly class ProductRepository implements ProductDomainRepository
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private ProductTransformer     $transformer
+        private ProductTransformer $transformer,
     ) {
     }
 
