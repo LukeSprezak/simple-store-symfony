@@ -4,6 +4,12 @@ api_login_check:
 api_logout:
     path: /api/logout
 
+product:
+    resource:
+        path: ../src/Product/UI/Controller/
+        namespace: App\Product\UI\Controller
+    type: attribute
+
 shared:
     resource:
         path: ../src/Shared/UI/Controller/

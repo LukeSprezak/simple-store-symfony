@@ -8,4 +8,8 @@ enum Routes: string
 {
     case MAIN_PATH = '/';
     case MAIN_NAME = 'main';
+    case PRODUCT_PATH = '/api/product';
+    case PRODUCT_NAME = 'api_product_';
+    case ADD_PRODUCT_PATH = '/add';
+    case ADD_PRODUCT_NAME = 'add';
 }
