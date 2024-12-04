@@ -75,14 +75,14 @@ class CreateUserCommandTest extends TestCase
 
         $commandTester->execute([]);
 
-        $this->assertEquals(0, $commandTester->getStatusCode());
+        $this->assertEquals(Command::SUCCESS, $commandTester->getStatusCode());
         $output = $commandTester->getDisplay();
 
         $this->assertStringContainsString('The user has been successfully created!', $output);
         $this->assertStringContainsString('ID: ', $output);
-        $this->assertStringContainsString('Email: ' . self::VALID_EMAIL, $output);
-        $this->assertStringContainsString('Username: ' . self::VALID_USERNAME, $output);
-        $this->assertStringContainsString('Roles: ' . Role::ROLE_USER->value, $output);
+        $this->assertStringContainsString('Email: '.self::VALID_EMAIL, $output);
+        $this->assertStringContainsString('Username: '.self::VALID_USERNAME, $output);
+        $this->assertStringContainsString('Roles: '.Role::ROLE_USER->value, $output);
     }
 
     #[Test]
@@ -108,14 +108,13 @@ class CreateUserCommandTest extends TestCase
         $this->entityManager->expects($this->once())
             ->method('persist')
             ->with($this->callback(function (User $user) {
-
-                return Uuid::isValid($user->getId()) &&
-                    $user->getEmail() === self::VALID_EMAIL &&
-                    $user->getUsername() === self::VALID_USERNAME &&
-                    $user->getPassword() === 'hashed_Luke1234' &&
-                    $user->getRepeatPassword() === 'hashed_Luke1234' &&
-                    $user->getEnabled() === true &&
-                    $user->getRoles() === [
+                return Uuid::isValid($user->getId())
+                    && self::VALID_EMAIL === $user->getEmail()
+                    && self::VALID_USERNAME === $user->getUsername()
+                    && 'hashed_Luke1234' === $user->getPassword()
+                    && 'hashed_Luke1234' === $user->getRepeatPassword()
+                    && true === $user->getEnabled()
+                    && $user->getRoles() === [
                         Role::ROLE_ADMIN->value,
                         Role::ROLE_SUPER_ADMIN->value,
                         Role::ROLE_USER->value,
@@ -126,18 +125,18 @@ class CreateUserCommandTest extends TestCase
             ->method('flush');
 
         $commandTester->execute([]);
-        $this->assertEquals(0, $commandTester->getStatusCode());
+        $this->assertEquals(Command::SUCCESS, $commandTester->getStatusCode());
 
         $output = $commandTester->getDisplay();
         $this->assertStringContainsString('The user has been successfully created!', $output);
         $this->assertStringContainsString('ID: ', $output);
-        $this->assertStringContainsString('Email: ' . self::VALID_EMAIL, $output);
-        $this->assertStringContainsString('Username: ' . self::VALID_USERNAME, $output);
-        $this->assertStringContainsString('Roles: ' . implode(', ', [
-                Role::ROLE_ADMIN->value,
-                Role::ROLE_SUPER_ADMIN->value,
-                Role::ROLE_USER->value,
-            ]), $output);
+        $this->assertStringContainsString('Email: '.self::VALID_EMAIL, $output);
+        $this->assertStringContainsString('Username: '.self::VALID_USERNAME, $output);
+        $this->assertStringContainsString('Roles: '.implode(', ', [
+            Role::ROLE_ADMIN->value,
+            Role::ROLE_SUPER_ADMIN->value,
+            Role::ROLE_USER->value,
+        ]), $output);
     }
 
     #[Test]
@@ -177,7 +176,6 @@ class CreateUserCommandTest extends TestCase
             self::VALID_PASSWORD,
             '',
         ]);
-
 
         $this->passwordHasher->expects($this->once())
             ->method('hashPassword')
