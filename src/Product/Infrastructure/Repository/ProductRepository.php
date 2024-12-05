@@ -12,7 +12,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Uid\Uuid;
 
-readonly class ProductRepository implements ProductDomainRepository
+final readonly class ProductRepository implements ProductDomainRepository
 {
     public function __construct(
         private EntityManagerInterface $entityManager,

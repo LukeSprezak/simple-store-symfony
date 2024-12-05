@@ -5,20 +5,19 @@ declare(strict_types=1);
 namespace App\Product\Domain\Model;
 
 use App\Product\Domain\Enum\StatusProduct;
-use App\User\Domain\Model\User;
-use InvalidArgumentException;
+use App\User\Domain\ValueObject\UserId;
 use Symfony\Component\Uid\Uuid;
 
 class Product
 {
-    public function __construct(
+    private function __construct(
         private readonly string $id,
         private readonly string $name,
         private readonly string $description,
         private readonly float $price,
         private int $stockQuantity,
-        private readonly User $user,
-        protected readonly StatusProduct $status = StatusProduct::ACTIVE,
+        private readonly UserId $userId,
+        private readonly StatusProduct $status = StatusProduct::ACTIVE,
     ) {
     }
 
@@ -27,10 +26,11 @@ class Product
         string $description,
         float $price,
         int $stockQuantity,
-        User $user
+        UserId $userId,
     ): self {
         $id = Uuid::v7()->toRfc4122();
-        return new self($id, $name, $description, $price, $stockQuantity, $user);
+
+        return new self($id, $name, $description, $price, $stockQuantity, $userId);
     }
 
     public static function fromPersistence(
@@ -39,10 +39,10 @@ class Product
         string $description,
         float $price,
         int $stockQuantity,
-        User $user,
+        UserId $userId,
         StatusProduct $status = StatusProduct::ACTIVE,
     ): self {
-        return new self($id, $name, $description, $price, $stockQuantity, $user, $status);
+        return new self($id, $name, $description, $price, $stockQuantity, $userId, $status);
     }
 
     public function getId(): string
@@ -75,9 +75,9 @@ class Product
         $this->stockQuantity += $quantity;
     }
 
-    public function getUser(): User
+    public function getUserId(): UserId
     {
-        return $this->user;
+        return $this->userId;
     }
 
     public function getStatus(): StatusProduct
@@ -88,7 +88,7 @@ class Product
     public function decreaseStock(int $quantity): void
     {
         if ($quantity > $this->stockQuantity) {
-            throw new InvalidArgumentException('The number of products is insufficient: ' . $this->name);
+            throw new \InvalidArgumentException('The number of products is insufficient: '.$this->name);
         }
 
         $this->stockQuantity -= $quantity;

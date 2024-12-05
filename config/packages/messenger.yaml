@@ -37,21 +37,6 @@ framework:
                     max_retries: 3
                     delay: 1000
                     multiplier: 2
-            event:
-                dsn: '%env(MESSENGER_RABBITMQ_TRANSPORT_DSN)%'
-                options:
-                    exchange:
-                        name: messages
-                        type: direct
-                        default_publish_routing_key: events
-                    queues:
-                        events:
-                            binding_keys:
-                                - events
-                retry_strategy:
-                    max_retries: 3
-                    delay: 1000
-                    multiplier: 2
             failed:
                 dsn: '%env(MESSENGER_DOCTRINE_TRANSPORT_DSN)%'
                 options:

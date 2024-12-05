@@ -1,0 +1,54 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Integration\Product\Application\Command\AddProduct;
+
+use App\Product\Application\Command\AddProduct\AddProductCommand;
+use App\User\Domain\ValueObject\UserId;
+use PHPUnit\Framework\Attributes\Test;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Symfony\Component\Messenger\Transport\TransportInterface;
+use Symfony\Component\Uid\Uuid;
+
+class AddProductCommandHandlerTest extends KernelTestCase
+{
+    private MessageBusInterface $messageBus;
+    private TransportInterface $transport;
+
+    protected function setUp(): void
+    {
+        self::bootKernel();
+
+        $this->messageBus = self::getContainer()->get(MessageBusInterface::class);
+        $this->transport = self::getContainer()->get('messenger.transport.async');
+    }
+
+    #[Test]
+    public function shouldSendMessageToBrokerWhenProductWillBeAddedSuccessfully(): void
+    {
+        $userId = Uuid::v7()->toRfc4122();
+        $message = new AddProductCommand(
+            'Test Product',
+            'Test Description',
+            100.00,
+            12,
+            new UserId($userId)
+        );
+
+        $this->messageBus->dispatch($message);
+
+        $this->assertEquals('Test Product', $message->name);
+        $this->assertEquals('Test Description', $message->description);
+        $this->assertEquals(100.00, $message->price);
+        $this->assertEquals(12, $message->stockQuantity);
+        $this->assertEquals($userId, $message->userId->equals(new UserId($userId)));
+
+        $messages = iterator_to_array($this->transport->get());
+        self::assertCount(1, $messages, 'Expected one message in the transport.');
+        $envelope = $messages[0];
+        $this->assertInstanceOf(AddProductCommand::class, $envelope->getMessage());
+        $this->transport->ack($envelope);
+    }
+}

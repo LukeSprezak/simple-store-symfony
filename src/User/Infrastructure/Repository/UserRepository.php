@@ -1,6 +1,8 @@
 <?php
 
-namespace App\User\Infrastructure\Doctrine\Repository;
+declare(strict_types=1);
+
+namespace App\User\Infrastructure\Repository;
 
 use App\User\Domain\Model\User;
 use App\User\Domain\Repository\UserRepositoryInterface;
@@ -8,11 +10,11 @@ use App\User\Infrastructure\Doctrine\Entity\User as UserEntity;
 use App\User\Infrastructure\Transformer\UserTransformer;
 use Doctrine\ORM\EntityManagerInterface;
 
-readonly class UserRepository implements UserRepositoryInterface
+class UserRepository implements UserRepositoryInterface
 {
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private UserTransformer $userTransformer,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UserTransformer $userTransformer,
     ) {
     }
 

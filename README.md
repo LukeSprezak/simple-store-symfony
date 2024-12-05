@@ -2,4 +2,5 @@
 - php bin/console lexik:jwt:generate-keypair
 - php bin/console d:s:u --force
 - php bin/console app:create-user
-
+- php bin/console doctrine:database:create --env=test
+- php bin/console doctrine:schema:update --env=test --force
