@@ -52,10 +52,6 @@ class Product
     #[JoinColumn(nullable: false)]
     private User $user;
 
-    public function __construct() {
-        $this->status = StatusProduct::ACTIVE;
-    }
-
     public function getId(): string
     {
         return $this->id;
