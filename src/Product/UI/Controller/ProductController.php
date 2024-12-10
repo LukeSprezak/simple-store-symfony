@@ -8,6 +8,9 @@ use App\Product\Application\Command\RemoveProduct\RemoveProductCommand;
 use App\Product\Infrastructure\Http\Request\AddProductRequest;
 use App\Shared\Domain\Enum\Routes;
 use App\Shared\Infrastructure\Bus\Messenger\AsyncCommandBus;
+use App\Shared\Infrastructure\Framework\Request\Resolver\JsonBodyResolver;
+use App\Shared\Infrastructure\Framework\Validator\Validator;
+use App\Shared\Infrastructure\Utils\Response\ResponseProvider;
 use App\User\Domain\Enum\Role;
 use App\User\Infrastructure\Doctrine\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -22,10 +25,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[AsController]
 #[Route(path: Routes::PRODUCT_PATH->value, name: 'api_product_')]
 #[IsGranted(attribute: Role::ROLE_SUPER_ADMIN->value, message: 'Lack of a suitable role.')]
-readonly class ProductController
+final readonly class ProductController
 {
     public function __construct(
         private AsyncCommandBus $asyncCommandBus,
+        private Validator $validator,
     ) {
     }
 
@@ -35,9 +39,17 @@ readonly class ProductController
         methods: [Request::METHOD_POST]
     )]
     public function add(
-        #[MapRequestPayload] AddProductRequest $addProductRequest,
+        #[MapRequestPayload(resolver: JsonBodyResolver::class)] AddProductRequest $addProductRequest,
         #[CurrentUser] User $user,
     ): JsonResponse {
+        $error = $this->validator->valid($addProductRequest);
+        if ([] !== $error) {
+            return new JsonResponse(
+                new ResponseProvider(Response::HTTP_BAD_REQUEST, 'Invalid.', null, $error),
+                Response::HTTP_BAD_REQUEST
+            );
+        }
+
         $this->asyncCommandBus->dispatch($addProductRequest->toCommand($user->getId()));
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);

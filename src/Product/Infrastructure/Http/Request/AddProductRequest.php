@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Product\Infrastructure\Http\Request;
 
 use App\Product\Application\Command\AddProduct\AddProductCommand;
+use App\Shared\Infrastructure\Utils\Request\RequestInterface;
 use App\User\Domain\ValueObject\UserId;
 use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Validator\Constraints\Length;
@@ -12,7 +13,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
 use Symfony\Component\Validator\Constraints\Type;
 
-final class AddProductRequest
+final class AddProductRequest implements RequestInterface
 {
     #[NotBlank]
     #[Length(min: 2, max: 255)]
