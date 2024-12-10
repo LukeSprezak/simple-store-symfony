@@ -6,47 +6,49 @@ namespace App\User\Infrastructure\Doctrine\Entity;
 
 use App\User\Domain\Enum\Role;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Id;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-#[ORM\Entity]
+#[Entity]
 #[UniqueEntity(fields: ['username', 'email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[ORM\Id]
-    #[ORM\Column(type: Types::GUID)]
+    #[Id]
+    #[Column(type: Types::GUID)]
     private string $id;
 
-    #[ORM\Column(type: Types::STRING, length: 32, unique: true)]
+    #[Column(type: Types::STRING, length: 32, unique: true)]
     private string $username;
 
-    #[ORM\Column(type: Types::STRING, length: 32, unique: true)]
+    #[Column(type: Types::STRING, length: 32, unique: true)]
     private string $email;
 
-    #[ORM\Column(type: Types::JSON)]
+    #[Column(type: Types::JSON)]
     private array $roles = [];
 
-    #[ORM\Column]
+    #[Column]
     private ?string $password;
 
-    #[ORM\Column]
+    #[Column]
     private string $repeatPassword;
 
-    #[ORM\Column(nullable: true)]
+    #[Column(nullable: true)]
     private ?string $plainPassword = null;
 
-    #[ORM\Column(type: Types::BOOLEAN)]
+    #[Column(type: Types::BOOLEAN)]
     private bool $enabled;
 
-    #[ORM\Column(type: Types::STRING, nullable: true)]
+    #[Column(type: Types::STRING, nullable: true)]
     private ?string $token;
 
-    #[ORM\Column(type: Types::STRING, nullable: true)]
+    #[Column(type: Types::STRING, nullable: true)]
     private ?string $resetPasswordToken;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $lastPasswordChange = null;
 
     public function getId(): string

@@ -85,26 +85,26 @@ class CreateUserCommand extends Command
 
     private function askRoles(SymfonyStyle $io): array
     {
-        return $io->ask(
+        $allowedRoles = array_map(static fn (Role $role) => $role->value, Role::cases());
+        $defaultRoles = implode(',', $allowedRoles);
+
+        $input = $io->ask(
             'Specify the user roles (separated by commas, e.g. ROLE_USER,ROLE_ADMIN):',
-            Role::ROLE_USER->value,
-            function (?string $input) {
-                if (empty($input)) {
-                    return self::DEFAULT_ROLES;
-                }
-
-                $rolesArray = array_map('trim', explode(',', $input));
-                $allowedRoles = array_map(static fn ($role) => $role->value, Role::cases());
-
-                $invalidRoles = array_diff($rolesArray, $allowedRoles);
-
-                if (!empty($invalidRoles)) {
-                    throw new \InvalidArgumentException(sprintf("Invalid role(s): '%s'. Allowed roles are: %s.", implode(', ', $invalidRoles), implode(', ', $allowedRoles)));
-                }
-
-                return array_values(array_unique([...$rolesArray, Role::ROLE_USER->value]));
-            }
+            $defaultRoles
         );
+
+        if (empty(trim($input))) {
+            return $allowedRoles;
+        }
+
+        $rolesArray = array_unique(array_map('trim', explode(',', $input)));
+        $invalidRoles = array_diff($rolesArray, $allowedRoles);
+
+        if (!empty($invalidRoles)) {
+            throw new \InvalidArgumentException(sprintf("Invalid role(s): '%s'. Allowed roles are: %s.", implode(', ', $invalidRoles), implode(', ', $allowedRoles)));
+        }
+
+        return array_values($rolesArray);
     }
 
     private function createUser(

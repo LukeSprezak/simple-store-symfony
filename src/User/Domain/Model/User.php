@@ -75,7 +75,7 @@ class User
     {
         $this->roles = array_filter(
             $this->roles,
-            static fn($existingRole) => $existingRole !== $role
+            static fn ($existingRole) => $existingRole !== $role
         );
     }
 }

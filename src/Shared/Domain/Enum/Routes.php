@@ -12,4 +12,6 @@ enum Routes: string
     case PRODUCT_NAME = 'api_product_';
     case ADD_PRODUCT_PATH = '/add';
     case ADD_PRODUCT_NAME = 'add';
+    case PRODUCT_REMOVE_PATH = '/remove/{id}';
+    case PRODUCT_REMOVE_NAME = 'remove';
 }

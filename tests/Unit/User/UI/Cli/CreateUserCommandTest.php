@@ -29,6 +29,9 @@ class CreateUserCommandTest extends TestCase
     private const string VALID_PASSWORD = 'Admin123';
     private const string SHORT_PASSWORD = 'short';
     private const string CUSTOM_ROLES = 'ROLE_ADMIN,ROLE_SUPER_ADMIN';
+    private const string DEFAULT_ROLES = 'ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_USER';
+    private const string INVALID_ROLES = 'ROLE_ADMIN,ROLE_INVALID';
+    private const string DUPLICATE_ROLES = 'ROLE_ADMIN,ROLE_ADMIN,ROLE_USER';
 
     private EntityManagerInterface $entityManager;
     private UserPasswordHasherInterface $passwordHasher;
@@ -82,7 +85,7 @@ class CreateUserCommandTest extends TestCase
         $this->assertStringContainsString('ID: ', $output);
         $this->assertStringContainsString('Email: '.self::VALID_EMAIL, $output);
         $this->assertStringContainsString('Username: '.self::VALID_USERNAME, $output);
-        $this->assertStringContainsString('Roles: '.Role::ROLE_USER->value, $output);
+        $this->assertStringContainsString('Roles: '.self::DEFAULT_ROLES, $output);
     }
 
     #[Test]
@@ -194,6 +197,85 @@ class CreateUserCommandTest extends TestCase
 
         $commandTester->execute([]);
         $this->assertFailureWithMessage($commandTester, 'email: This value is not a valid email.');
+    }
+
+    #[Test]
+    public function shouldFailIfIncorrectRolesAreSpecified(): void
+    {
+        $commandTester = $this->getCommandTester([
+            self::VALID_EMAIL,
+            self::VALID_USERNAME,
+            self::VALID_PASSWORD,
+            self::INVALID_ROLES,
+        ]);
+
+        $this->passwordHasher->expects($this->never())
+            ->method('hashPassword');
+
+        $this->validator->expects($this->never())
+            ->method('validate');
+
+        $this->entityManager->expects($this->never())
+            ->method('persist');
+
+        $this->entityManager->expects($this->never())
+            ->method('flush');
+
+        $commandTester->execute([]);
+
+        $this->assertFailureWithMessage($commandTester, "Invalid role(s): 'ROLE_INVALID'. Allowed roles are: ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_USER.");
+    }
+
+    #[Test]
+    public function shouldCreateUserWithUniqueRolesWhenYouEnterSameRoles(): void
+    {
+        $commandTester = $this->getCommandTester([
+            self::VALID_EMAIL,
+            self::VALID_USERNAME,
+            self::VALID_PASSWORD,
+            self::DUPLICATE_ROLES,
+        ]);
+
+        $this->passwordHasher->expects($this->once())
+            ->method('hashPassword')
+            ->with($this->isInstanceOf(User::class), self::VALID_PASSWORD)
+            ->willReturn('hashed_password');
+
+        $this->validator->expects($this->once())
+            ->method('validate')
+            ->with($this->isInstanceOf(User::class))
+            ->willReturn(new ConstraintViolationList());
+
+        $this->entityManager->expects($this->once())
+            ->method('persist')
+            ->with($this->callback(function (User $user) {
+                return Uuid::isValid($user->getId())
+                    && self::VALID_EMAIL === $user->getEmail()
+                    && self::VALID_USERNAME === $user->getUsername()
+                    && 'hashed_password' === $user->getPassword()
+                    && 'hashed_password' === $user->getRepeatPassword()
+                    && true === $user->getEnabled()
+                    && $user->getRoles() === [
+                        Role::ROLE_ADMIN->value,
+                        Role::ROLE_USER->value,
+                    ];
+            }));
+
+        $this->entityManager->expects($this->once())
+            ->method('flush');
+
+        $commandTester->execute([]);
+        $this->assertEquals(Command::SUCCESS, $commandTester->getStatusCode());
+
+        $output = $commandTester->getDisplay();
+        $this->assertStringContainsString('The user has been successfully created!', $output);
+        $this->assertStringContainsString('ID: ', $output);
+        $this->assertStringContainsString('Email: '.self::VALID_EMAIL, $output);
+        $this->assertStringContainsString('Username: '.self::VALID_USERNAME, $output);
+        $this->assertStringContainsString('Roles: '.implode(', ', [
+            Role::ROLE_ADMIN->value,
+            Role::ROLE_USER->value,
+        ]), $output);
     }
 
     private function getCommandTester(array $inputs = []): CommandTester

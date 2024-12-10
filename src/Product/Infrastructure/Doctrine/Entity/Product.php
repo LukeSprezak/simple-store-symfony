@@ -48,7 +48,7 @@ class Product
     #[Column(type: Types::STRING, length: 50, enumType: StatusProduct::class)]
     private StatusProduct $status;
 
-    #[ManyToOne(targetEntity: User::class, cascade: ['persist', 'remove'])]
+    #[ManyToOne(targetEntity: User::class, cascade: ['persist'])]
     #[JoinColumn(nullable: false)]
     private User $user;
 
