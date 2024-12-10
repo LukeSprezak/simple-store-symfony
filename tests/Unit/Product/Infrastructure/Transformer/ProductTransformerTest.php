@@ -46,13 +46,13 @@ class ProductTransformerTest extends TestCase
         $productEntity = $transformer->fromDomain($product);
 
         // Then
-        $this->assertEquals($product->getId(), $productEntity->getId());
-        $this->assertEquals($product->getName(), $productEntity->getName());
-        $this->assertEquals($product->getDescription(), $productEntity->getDescription());
-        $this->assertEquals($product->getPrice(), $productEntity->getPrice());
-        $this->assertEquals($product->getStockQuantity(), $productEntity->getStockQuantity());
-        $this->assertEquals($product->getStatus(), $productEntity->getStatus());
-        $this->assertEquals($userEntity, $productEntity->getUser());
+        self::assertEquals($product->getId(), $productEntity->getId());
+        self::assertEquals($product->getName(), $productEntity->getName());
+        self::assertEquals($product->getDescription(), $productEntity->getDescription());
+        self::assertEquals($product->getPrice(), $productEntity->getPrice());
+        self::assertEquals($product->getStockQuantity(), $productEntity->getStockQuantity());
+        self::assertEquals($product->getStatus(), $productEntity->getStatus());
+        self::assertEquals($userEntity, $productEntity->getUser());
     }
 
     #[Test]
@@ -80,13 +80,13 @@ class ProductTransformerTest extends TestCase
         $product = $transformer->toDomain($productEntity);
 
         // Then
-        $this->assertEquals($productEntity->getId(), $product->getId());
-        $this->assertEquals($productEntity->getName(), $product->getName());
-        $this->assertEquals($productEntity->getDescription(), $product->getDescription());
-        $this->assertEquals($productEntity->getPrice(), $product->getPrice());
-        $this->assertEquals($productEntity->getStockQuantity(), $product->getStockQuantity());
-        $this->assertEquals($productEntity->getStatus(), $product->getStatus());
-        $this->assertEquals($uuid, $product->getUserId()->getId());
+        self::assertEquals($productEntity->getId(), $product->getId());
+        self::assertEquals($productEntity->getName(), $product->getName());
+        self::assertEquals($productEntity->getDescription(), $product->getDescription());
+        self::assertEquals($productEntity->getPrice(), $product->getPrice());
+        self::assertEquals($productEntity->getStockQuantity(), $product->getStockQuantity());
+        self::assertEquals($productEntity->getStatus(), $product->getStatus());
+        self::assertEquals($uuid, $product->getUserId()->getId());
     }
 
     #[Test]

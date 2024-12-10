@@ -78,14 +78,14 @@ class CreateUserCommandTest extends TestCase
 
         $commandTester->execute([]);
 
-        $this->assertEquals(Command::SUCCESS, $commandTester->getStatusCode());
+        self::assertEquals(Command::SUCCESS, $commandTester->getStatusCode());
         $output = $commandTester->getDisplay();
 
-        $this->assertStringContainsString('The user has been successfully created!', $output);
-        $this->assertStringContainsString('ID: ', $output);
-        $this->assertStringContainsString('Email: '.self::VALID_EMAIL, $output);
-        $this->assertStringContainsString('Username: '.self::VALID_USERNAME, $output);
-        $this->assertStringContainsString('Roles: '.self::DEFAULT_ROLES, $output);
+        self::assertStringContainsString('The user has been successfully created!', $output);
+        self::assertStringContainsString('ID: ', $output);
+        self::assertStringContainsString('Email: '.self::VALID_EMAIL, $output);
+        self::assertStringContainsString('Username: '.self::VALID_USERNAME, $output);
+        self::assertStringContainsString('Roles: '.self::DEFAULT_ROLES, $output);
     }
 
     #[Test]
@@ -128,14 +128,14 @@ class CreateUserCommandTest extends TestCase
             ->method('flush');
 
         $commandTester->execute([]);
-        $this->assertEquals(Command::SUCCESS, $commandTester->getStatusCode());
+        self::assertEquals(Command::SUCCESS, $commandTester->getStatusCode());
 
         $output = $commandTester->getDisplay();
-        $this->assertStringContainsString('The user has been successfully created!', $output);
-        $this->assertStringContainsString('ID: ', $output);
-        $this->assertStringContainsString('Email: '.self::VALID_EMAIL, $output);
-        $this->assertStringContainsString('Username: '.self::VALID_USERNAME, $output);
-        $this->assertStringContainsString('Roles: '.implode(', ', [
+        self::assertStringContainsString('The user has been successfully created!', $output);
+        self::assertStringContainsString('ID: ', $output);
+        self::assertStringContainsString('Email: '.self::VALID_EMAIL, $output);
+        self::assertStringContainsString('Username: '.self::VALID_USERNAME, $output);
+        self::assertStringContainsString('Roles: '.implode(', ', [
             Role::ROLE_ADMIN->value,
             Role::ROLE_SUPER_ADMIN->value,
             Role::ROLE_USER->value,
@@ -265,14 +265,14 @@ class CreateUserCommandTest extends TestCase
             ->method('flush');
 
         $commandTester->execute([]);
-        $this->assertEquals(Command::SUCCESS, $commandTester->getStatusCode());
+        self::assertEquals(Command::SUCCESS, $commandTester->getStatusCode());
 
         $output = $commandTester->getDisplay();
-        $this->assertStringContainsString('The user has been successfully created!', $output);
-        $this->assertStringContainsString('ID: ', $output);
-        $this->assertStringContainsString('Email: '.self::VALID_EMAIL, $output);
-        $this->assertStringContainsString('Username: '.self::VALID_USERNAME, $output);
-        $this->assertStringContainsString('Roles: '.implode(', ', [
+        self::assertStringContainsString('The user has been successfully created!', $output);
+        self::assertStringContainsString('ID: ', $output);
+        self::assertStringContainsString('Email: '.self::VALID_EMAIL, $output);
+        self::assertStringContainsString('Username: '.self::VALID_USERNAME, $output);
+        self::assertStringContainsString('Roles: '.implode(', ', [
             Role::ROLE_ADMIN->value,
             Role::ROLE_USER->value,
         ]), $output);
@@ -288,8 +288,8 @@ class CreateUserCommandTest extends TestCase
 
     private function assertFailureWithMessage(CommandTester $commandTester, string $expectedMessage): void
     {
-        $this->assertEquals(Command::FAILURE, $commandTester->getStatusCode());
+        self::assertEquals(Command::FAILURE, $commandTester->getStatusCode());
         $output = $commandTester->getDisplay();
-        $this->assertStringContainsString($expectedMessage, $output);
+        self::assertStringContainsString($expectedMessage, $output);
     }
 }

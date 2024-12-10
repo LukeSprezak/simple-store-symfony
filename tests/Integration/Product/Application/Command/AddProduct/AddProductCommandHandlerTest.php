@@ -28,6 +28,7 @@ class AddProductCommandHandlerTest extends KernelTestCase
     #[Test]
     public function shouldSendMessageToBrokerWhenProductWillBeAddedSuccessfully(): void
     {
+        // Given
         $userId = Uuid::v7()->toRfc4122();
         $message = new AddProductCommand(
             'Test Product',
@@ -37,18 +38,21 @@ class AddProductCommandHandlerTest extends KernelTestCase
             new UserId($userId)
         );
 
+        // When
         $this->messageBus->dispatch($message);
 
-        $this->assertEquals('Test Product', $message->name);
-        $this->assertEquals('Test Description', $message->description);
-        $this->assertEquals(100.00, $message->price);
-        $this->assertEquals(12, $message->stockQuantity);
-        $this->assertEquals($userId, $message->userId->equals(new UserId($userId)));
+        // Then
+        self::assertNotNull($message);
+        self::assertEquals('Test Product', $message->name);
+        self::assertEquals('Test Description', $message->description);
+        self::assertEquals(100.00, $message->price);
+        self::assertEquals(12, $message->stockQuantity);
+        self::assertEquals($userId, $message->userId->equals(new UserId($userId)));
 
         $messages = iterator_to_array($this->transport->get());
         self::assertCount(1, $messages, 'Expected one message in the transport.');
         $envelope = $messages[0];
-        $this->assertInstanceOf(AddProductCommand::class, $envelope->getMessage());
+        self::assertInstanceOf(AddProductCommand::class, $envelope->getMessage());
         $this->transport->ack($envelope);
     }
 }

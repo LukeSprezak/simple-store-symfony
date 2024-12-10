@@ -9,7 +9,7 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Middleware\MiddlewareInterface;
 use Symfony\Component\Messenger\Middleware\StackInterface;
 
-readonly class TransactionMiddleware implements MiddlewareInterface
+final readonly class TransactionMiddleware implements MiddlewareInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
