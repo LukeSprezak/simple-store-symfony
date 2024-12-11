@@ -11,6 +11,7 @@ use App\Order\Infrastructure\Doctrine\Entity\Cart as CartEntity;
 use App\Order\Infrastructure\Doctrine\Entity\CartItem as CartItemEntity;
 use App\Product\Domain\Model\Product as ProductDomainModel;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
+use App\User\Domain\ValueObject\UserId;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class CartTransformer
@@ -64,12 +65,14 @@ final readonly class CartTransformer
         $domain = CartDomain::create($entity->getId());
 
         foreach ($entity->getItems() as $itemEntity) {
+            $product = $itemEntity->getProduct();
             $productDomain = ProductDomainModel::fromPersistence(
-                $itemEntity->getProduct()->getId(),
-                $itemEntity->getProduct()->getName(),
-                $itemEntity->getProduct()->getDescription(),
-                $itemEntity->getProduct()->getPrice(),
-                $itemEntity->getProduct()->getStockQuantity()
+                $product->getId(),
+                $product->getName(),
+                $product->getDescription(),
+                $product->getPrice(),
+                $product->getStockQuantity(),
+                new UserId($product->getUser()->getId())
             );
 
             $itemDomain = CartItemDomain::create(
@@ -82,16 +85,5 @@ final readonly class CartTransformer
         }
 
         return $domain;
-    }
-
-    public function modelToEntity(CartDomain $cartDomain): CartEntity
-    {
-        $cartEntity = $this->entityManager->getRepository(CartEntity::class)->find($cartDomain->getId());
-
-        if (!$cartEntity) {
-            $cartEntity = new CartEntity($cartEntity->getId());
-        }
-
-        return $cartEntity;
     }
 }

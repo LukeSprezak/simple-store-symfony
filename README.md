@@ -4,3 +4,5 @@
 - php bin/console app:create-user
 - php bin/console doctrine:database:create --env=test
 - php bin/console doctrine:schema:update --env=test --force
+- php bin/console messenger:consume async -vv --limit=50
+- php bin/console messenger:consume scheduler_expired_cart

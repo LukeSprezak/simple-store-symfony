@@ -80,7 +80,7 @@ class AddProductToCartCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function it_creates_new_cart_and_adds_product_successfully(): void
+    public function shouldCreatesNewCartAndAddsProductSuccessfully(): void
     {
         // Given
         $cartId = Uuid::v7()->toRfc4122();

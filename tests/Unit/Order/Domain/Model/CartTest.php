@@ -21,7 +21,7 @@ class CartTest extends TestCase
     public function shouldAddProductToEmptyCart(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7());
+        $cart = Cart::create(Uuid::v7()->toRfc4122());
         $product = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
 
         $product->expects($this->once())
@@ -42,7 +42,7 @@ class CartTest extends TestCase
     public function shouldAddProductToExistingCartItem(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7());
+        $cart = Cart::create(Uuid::v7()->toRfc4122());
 
         $product = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
 
@@ -69,7 +69,7 @@ class CartTest extends TestCase
     public function shouldAddProductWithInsufficientStockThrowsException(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7());
+        $cart = Cart::create(Uuid::v7()->toRfc4122());
         $product = $this->createProductMock('product-1', 30.0, 1, 'Product 1');
 
         $product->expects($this->never())
@@ -87,7 +87,7 @@ class CartTest extends TestCase
     public function shouldGetTotalAmount(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7());
+        $cart = Cart::create(Uuid::v7()->toRfc4122());
         $product1 = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
         $product2 = $this->createProductMock('product-2', 25.0, 10, 'Product 2');
 
@@ -116,7 +116,7 @@ class CartTest extends TestCase
         $expiresAt = (new \DateTimeImmutable())->modify('-1 hour');
 
         $cart = Cart::fromPersistence(
-            id: Uuid::v7(),
+            id: Uuid::v7()->toRfc4122(),
             status: StatusCart::ACTIVE,
             createdAt: $createdAt,
             expiresAt: $expiresAt,
@@ -134,7 +134,7 @@ class CartTest extends TestCase
     public function shouldExpireCart(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7());
+        $cart = Cart::create(Uuid::v7()->toRfc4122());
 
         // When
         $cart->expire();
