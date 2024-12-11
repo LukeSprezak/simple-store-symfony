@@ -105,14 +105,4 @@ class Cart
 
         return $this;
     }
-
-    public function getMarking(): string
-    {
-        return $this->status->value;
-    }
-
-    public function setMarking(string $marking): void
-    {
-        $this->status = StatusCart::from($marking);
-    }
 }
