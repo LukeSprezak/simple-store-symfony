@@ -49,6 +49,8 @@ final readonly class ConvertCartToOrderCommandHandler implements CommandHandler
 
             $this->orderRepository->save($order);
             $this->cartRepository->save($cart);
+        } catch (CartNotFoundException|AccessDeniedHttpException $exception) {
+            throw $exception;
         } catch (\Throwable $exception) {
             throw new OrderCreateException('Unable to create order from cart.', 0, $exception);
         }
