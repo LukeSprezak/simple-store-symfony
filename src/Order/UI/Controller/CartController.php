@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Order\UI\Controller;
 
+use App\Order\Application\Command\ConvertCartToOrder\ConvertCartToOrderCommand;
+use App\Order\Domain\Exception\CartNotFoundException;
+use App\Order\Infrastructure\Repository\CartRepository;
 use App\Order\Infrastructure\Request\AddProductToCartRequest;
 use App\Shared\Domain\Enum\Routes;
 use App\Shared\Infrastructure\Bus\Messenger\SyncCommandBus;
@@ -24,6 +27,7 @@ final readonly class CartController
 {
     public function __construct(
         private SyncCommandBus $syncCommandBus,
+        private CartRepository $cartRepository,
     ) {
     }
 
@@ -46,5 +50,23 @@ final readonly class CartController
         $this->syncCommandBus->dispatch($addProductToCartRequest->toCommand());
 
         return new JsonResponse(['cartId' => $cartId], Response::HTTP_OK);
+    }
+
+    #[Route(
+        path: Routes::CONVERT_PRODUCT_TO_ORDER_PATH->value,
+        name: Routes::CONVERT_PRODUCT_TO_ORDER_NAME->value,
+        methods: [Request::METHOD_POST]
+    )]
+    public function convertToOrder(string $cartId): JsonResponse
+    {
+        $cartDomain = $this->cartRepository->find($cartId);
+        if (!$cartDomain) {
+            throw new CartNotFoundException($cartId);
+        }
+
+        $command = new ConvertCartToOrderCommand($cartId);
+        $this->syncCommandBus->dispatch($command);
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 }

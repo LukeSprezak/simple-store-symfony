@@ -9,10 +9,14 @@ use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
 use App\Product\Domain\Model\Product;
+use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Workflow\Marking;
+use Symfony\Component\Workflow\WorkflowInterface;
 
 #[CoversClass(Cart::class)]
 class CartTest extends TestCase
@@ -21,7 +25,7 @@ class CartTest extends TestCase
     public function shouldAddProductToEmptyCart(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7()->toRfc4122());
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE);
         $product = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
 
         $product->expects($this->once())
@@ -42,7 +46,7 @@ class CartTest extends TestCase
     public function shouldAddProductToExistingCartItem(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7()->toRfc4122());
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE);
 
         $product = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
 
@@ -69,7 +73,7 @@ class CartTest extends TestCase
     public function shouldAddProductWithInsufficientStockThrowsException(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7()->toRfc4122());
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE);
         $product = $this->createProductMock('product-1', 30.0, 1, 'Product 1');
 
         $product->expects($this->never())
@@ -87,7 +91,7 @@ class CartTest extends TestCase
     public function shouldGetTotalAmount(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7()->toRfc4122());
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE);
         $product1 = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
         $product2 = $this->createProductMock('product-2', 25.0, 10, 'Product 2');
 
@@ -134,13 +138,108 @@ class CartTest extends TestCase
     public function shouldExpireCart(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7()->toRfc4122());
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE);
 
         // When
         $cart->expire();
 
         // Then
         self::assertSame(StatusCart::EXPIRED, $cart->getStatus(), 'Cart status should be EXPIRED.');
+    }
+
+    #[Test]
+    public function applyTransitionSuccess(): void
+    {
+        $now = new \DateTimeImmutable();
+        $cart = new Cart('cart123', StatusCart::ACTIVE, $now, $now);
+        $cart->setStatus(StatusCart::ACTIVE);
+
+        $workflow = $this->createMock(WorkflowInterface::class);
+        $workflow->expects($this->once())
+            ->method('can')
+            ->with($cart, 'convert')
+            ->willReturn(true);
+        $workflow->expects($this->once())
+            ->method('apply')
+            ->with($cart, 'convert');
+        $workflow->expects($this->once())
+            ->method('getMarking')
+            ->with($cart)
+            ->willReturn(new Marking(['converted_to_order' => 1]));
+
+        $cart->applyTransition('convert', $workflow);
+
+        $this->assertEquals(StatusCart::CONVERTED_TO_ORDER, $cart->getStatus());
+    }
+
+    #[Test]
+    public function applyTransitionNotAllowed(): void
+    {
+        $this->expectException(AccessDeniedHttpException::class);
+
+        $now = new \DateTimeImmutable();
+        $cart = new Cart('cart123', StatusCart::ACTIVE, $now, $now);
+        $cart->setStatus(StatusCart::ACTIVE);
+
+        $workflow = $this->createMock(WorkflowInterface::class);
+        $workflow->expects($this->once())
+            ->method('can')
+            ->with($cart, 'convert')
+            ->willReturn(false);
+
+        $cart->applyTransition('convert', $workflow);
+    }
+
+    #[Test]
+    public function applyTransitionMultipleActivePlaces(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cart should have exactly one active place.');
+
+        $now = new \DateTimeImmutable();
+        $cart = new Cart('cart123', StatusCart::ACTIVE, $now, $now);
+        $cart->setStatus(StatusCart::ACTIVE);
+
+        $workflow = $this->createMock(WorkflowInterface::class);
+        $workflow->expects($this->once())
+            ->method('can')
+            ->with($cart, 'convert')
+            ->willReturn(true);
+        $workflow->expects($this->once())
+            ->method('apply')
+            ->with($cart, 'convert');
+        $workflow->expects($this->once())
+            ->method('getMarking')
+            ->with($cart)
+            ->willReturn(new Marking(['converted_to_order' => 1, 'active' => 1]));
+
+        $cart->applyTransition('convert', $workflow);
+    }
+
+    #[Test]
+    public function applyTransitionInvalidPlace(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage("Invalid status value 'invalid_status'.");
+
+        $now = new \DateTimeImmutable();
+        $cart = new Cart('cart123', StatusCart::ACTIVE, $now, $now);
+        $cart->setStatus(StatusCart::ACTIVE);
+
+        $workflow = $this->createMock(WorkflowInterface::class);
+        $workflow->expects($this->once())
+            ->method('can')
+            ->with($cart, 'convert')
+            ->willReturn(true);
+        $workflow->expects($this->once())
+            ->method('apply')
+            ->with($cart, 'convert');
+        $workflow->expects($this->once())
+            ->method('getMarking')
+            ->with($cart)
+            ->willReturn(new Marking(['invalid_status' => 1]));
+
+        $cart->applyTransition('convert', $workflow);
     }
 
     private function createProductMock(string $productId, float $price, int $stockQuantity, string $name = 'Test Product'): Product

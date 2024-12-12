@@ -28,5 +28,8 @@ services:
             tags:
                 - { name: 'messenger.message_handler', bus: command.async.bus }
 
+    App\Order\Domain\Model\CartMarkingStore:
+        public: false
+        tags: [ 'workflow.marking_store' ]
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

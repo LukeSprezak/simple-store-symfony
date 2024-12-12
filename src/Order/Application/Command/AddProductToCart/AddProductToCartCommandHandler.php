@@ -25,7 +25,7 @@ final readonly class AddProductToCartCommandHandler implements CommandHandler
             $cart = $this->cartRepository->find($command->cartId);
 
             if (!$cart) {
-                $cart = Cart::create($command->cartId);
+                $cart = Cart::create($command->cartId, $command->status);
             }
 
             $product = $this->productRepository->get($command->productId);

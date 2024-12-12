@@ -41,7 +41,6 @@ class Cart
         $this->items = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
         $this->expiresAt = $this->createdAt->modify('+1 minute');
-        $this->status = StatusCart::ACTIVE;
     }
 
     public function getId(): string

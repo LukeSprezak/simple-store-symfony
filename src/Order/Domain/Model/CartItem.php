@@ -7,7 +7,7 @@ namespace App\Order\Domain\Model;
 use App\Order\Domain\Exception\InvalidQuantityException;
 use App\Product\Domain\Model\Product;
 
-class CartItem
+final class CartItem
 {
     private function __construct(
         private readonly string $id,
@@ -73,5 +73,14 @@ class CartItem
         if ($quantity < 0) {
             throw new InvalidQuantityException('The quantity cannot be negative.');
         }
+    }
+
+    public function toOrderItem(): OrderItem
+    {
+        return OrderItem::create(
+            $this->id,
+            $this->product,
+            $this->quantity
+        );
     }
 }

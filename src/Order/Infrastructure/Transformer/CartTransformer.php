@@ -89,15 +89,4 @@ final readonly class CartTransformer
 
         return $domain;
     }
-
-    public function modelToEntity(CartDomain $cartDomain): CartEntity
-    {
-        $cartEntity = $this->entityManager->getRepository(CartEntity::class)->find($cartDomain->getId());
-        if (!$cartEntity) {
-            $cartEntity = new CartEntity($cartDomain->getId());
-        }
-        $cartEntity->setStatus($cartDomain->getStatus());
-
-        return $cartEntity;
-    }
 }

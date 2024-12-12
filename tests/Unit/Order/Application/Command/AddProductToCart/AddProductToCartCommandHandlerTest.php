@@ -46,9 +46,9 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 2;
 
-        $command = new AddProductToCartCommand($cartId, $productId, $quantity);
+        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE);
 
-        $existingCart = Cart::create($cartId);
+        $existingCart = Cart::create($cartId, StatusCart::ACTIVE);
         $product = $this->createProductMock($productId, 10);
         $this->cartRepository->expects($this->once())
             ->method('find')
@@ -87,7 +87,7 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 1;
 
-        $command = new AddProductToCartCommand($cartId, $productId, $quantity);
+        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE);
 
         $product = $this->createProductMock($productId, 10);
 
@@ -144,9 +144,9 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 1;
 
-        $command = new AddProductToCartCommand($cartId, $productId, $quantity);
+        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE);
 
-        $existingCart = Cart::create($cartId);
+        $existingCart = Cart::create($cartId, StatusCart::ACTIVE);
         $this->cartRepository->expects($this->once())
             ->method('find')
             ->with($cartId)
@@ -179,9 +179,9 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 10;
 
-        $command = new AddProductToCartCommand($cartId, $productId, $quantity);
+        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE);
 
-        $existingCart = Cart::create($cartId);
+        $existingCart = Cart::create($cartId, StatusCart::ACTIVE);
         $product = $this->createProductMock($productId, 5, 'Test Product');
         $this->cartRepository->expects($this->once())
             ->method('find')
@@ -215,7 +215,7 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 2;
 
-        $command = new AddProductToCartCommand($cartId, $productId, $quantity);
+        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE);
 
         $product = $this->createProductMock($productId, 5);
 

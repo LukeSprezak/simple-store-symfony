@@ -15,7 +15,7 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 
-#[AsEventListener(event: KernelEvents::EXCEPTION, method: 'onKernelException')]
+//#[AsEventListener(event: KernelEvents::EXCEPTION, method: 'onKernelException')]
 final readonly class ExceptionListener
 {
     private bool $isProd;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Order\Infrastructure\Doctrine\Entity;
 
+use App\Order\Domain\Model\OrderItem;
 use App\Product\Infrastructure\Doctrine\Entity\Product;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -26,6 +27,11 @@ class CartItem
 
     #[Column(type: Types::INTEGER)]
     private int $quantity;
+
+    public function getProduct(): Product
+    {
+        return $this->product;
+    }
 
     public function setProduct(Product $product): void
     {
@@ -56,11 +62,6 @@ class CartItem
     public function setCart(?Cart $cart): void
     {
         $this->cart = $cart;
-    }
-
-    public function getProduct(): Product
-    {
-        return $this->product;
     }
 
     public function getQuantity(): int

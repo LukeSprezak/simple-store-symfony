@@ -10,9 +10,11 @@ use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Product\Domain\Model\Product;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Workflow\WorkflowInterface;
 
-class Cart
+final class Cart
 {
     private readonly string $id;
     private StatusCart $status;
@@ -34,11 +36,11 @@ class Cart
         $this->items = $items ?? new ArrayCollection();
     }
 
-    public static function create(string $id): self
+    public static function create(string $id, StatusCart $status): self
     {
         return new self(
             id: $id,
-            status: StatusCart::ACTIVE,
+            status: $status,
             createdAt: new \DateTimeImmutable(),
             expiresAt: (new \DateTimeImmutable())->modify('+24 hours')
         );
@@ -73,6 +75,16 @@ class Cart
     public function setStatus(StatusCart $status): void
     {
         $this->status = $status;
+    }
+
+    public function getMarking(): string
+    {
+        return $this->status->value;
+    }
+
+    public function setMarking(string $marking): void
+    {
+        $this->status = StatusCart::from($marking);
     }
 
     public function getCreatedAt(): \DateTimeImmutable
@@ -142,6 +154,35 @@ class Cart
             callback: static fn (float $total, CartItem $item) => $total + ($item->getProduct()->getPrice() * $item->getQuantity()),
             initial: 0.0
         );
+    }
+    public function applyTransition(string $transition, WorkflowInterface $workflow): void
+    {
+        if (!$workflow->can($this, $transition)) {
+            throw new AccessDeniedHttpException(sprintf("Transition '%s' not allowed from status '%s'.", $transition, $this->status->value));
+        }
+
+        $workflow->apply($this, $transition);
+
+        $marking = $workflow->getMarking($this);
+        $activePlaces = array_keys(array_filter($marking->getPlaces(), static fn ($value) => $value));
+
+        if (1 !== count($activePlaces)) {
+            throw new \LogicException('Cart should have exactly one active place.');
+        }
+
+        $currentPlace = $activePlaces[0];
+        $newStatus = StatusCart::tryFrom($currentPlace);
+
+        if (null === $newStatus) {
+            throw new \LogicException(sprintf("Invalid status value '%s'.", $currentPlace));
+        }
+
+        $this->status = $newStatus;
+    }
+
+    public function isEmpty(): bool
+    {
+        return empty($this->items);
     }
 
     public function isExpired(): bool

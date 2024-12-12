@@ -21,4 +21,6 @@ enum Routes: string
     case CART_NAME = 'api_cart_';
     case ADD_PRODUCT_TO_CART_PATH = '/add-product/{cartId}';
     case ADD_PRODUCT_TO_CART_NAME = 'add_product';
+    case CONVERT_PRODUCT_TO_ORDER_PATH = '/{cartId}/convert';
+    case CONVERT_PRODUCT_TO_ORDER_NAME = 'convert_to_order';
 }

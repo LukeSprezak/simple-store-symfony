@@ -10,21 +10,20 @@ framework:
                 - App\Order\Infrastructure\Doctrine\Entity\Order
             initial_marking: !php/enum App\Order\Domain\Enum\StatusOrder::CREATED->value
             places:
-                - !php/enum App\Order\Domain\Enum\StatusOrder::CREATED->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::PENDING_PAYMENT->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::PAID->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::PROCESSING->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::READY_FOR_SHIPMENT->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::SHIPPED->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::DELIVERED->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::AWAITING_RECEIPT->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::RETRIEVED->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::CANCELLED->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::RETURN_REQUESTED->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::RETURNED->value
-                - !php/enum App\Order\Domain\Enum\StatusOrder::FAILED->value
+                !php/enum App\Order\Domain\Enum\StatusOrder::CREATED->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::PENDING_PAYMENT->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::PAID->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::PROCESSING->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::READY_FOR_SHIPMENT->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::SHIPPED->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::DELIVERED->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::AWAITING_RECEIPT->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::RETRIEVED->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::CANCELLED->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::RETURN_REQUESTED->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::RETURNED->value: null
+                !php/enum App\Order\Domain\Enum\StatusOrder::FAILED->value: null
             transitions:
-                pay:
                 !php/enum App\Order\Domain\Enum\StatusOrderTransition::PAY->value:
                     from: !php/enum App\Order\Domain\Enum\StatusOrder::CREATED->value
                     to: !php/enum App\Order\Domain\Enum\StatusOrder::PENDING_PAYMENT->value
@@ -44,11 +43,13 @@ framework:
                     from: !php/enum App\Order\Domain\Enum\StatusOrder::SHIPPED->value
                     to: !php/enum App\Order\Domain\Enum\StatusOrder::DELIVERED->value
                 !php/enum App\Order\Domain\Enum\StatusOrderTransition::CANCEL->value:
-                    from: [!php/enum App\Order\Domain\Enum\StatusOrder::CREATED->value,
+                    from: [
+                        !php/enum App\Order\Domain\Enum\StatusOrder::CREATED->value,
                            !php/enum App\Order\Domain\Enum\StatusOrder::PENDING_PAYMENT->value,
                            !php/enum App\Order\Domain\Enum\StatusOrder::PAID->value,
                            !php/enum App\Order\Domain\Enum\StatusOrder::PROCESSING->value,
-                           !php/enum App\Order\Domain\Enum\StatusOrder::READY_FOR_SHIPMENT->value]
+                           !php/enum App\Order\Domain\Enum\StatusOrder::READY_FOR_SHIPMENT->value
+                    ]
                     to: !php/enum App\Order\Domain\Enum\StatusOrder::CANCELLED->value
                 !php/enum App\Order\Domain\Enum\StatusOrderTransition::REQUEST_RETURN->value:
                     from: !php/enum App\Order\Domain\Enum\StatusOrder::DELIVERED->value
@@ -68,9 +69,9 @@ framework:
             audit_trail:
                 enabled: false
             marking_store:
-                type: 'method'
+                service: App\Order\Domain\Model\CartMarkingStore
             supports:
-                - App\Order\Infrastructure\Doctrine\Entity\Cart
+                - App\Order\Domain\Model\Cart
             initial_marking: !php/enum App\Order\Domain\Enum\StatusCart::ACTIVE->value
             places:
                 !php/enum App\Order\Domain\Enum\StatusCart::ACTIVE->value: null
