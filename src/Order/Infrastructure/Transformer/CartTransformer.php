@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Order\Infrastructure\Transformer;
 
+use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\ProductNotFoundException;
 use App\Order\Domain\Model\Cart as CartDomain;
 use App\Order\Domain\Model\CartItem as CartItemDomain;
@@ -62,7 +63,9 @@ final readonly class CartTransformer
 
     public function toDomain(CartEntity $entity): CartDomain
     {
-        $domain = CartDomain::create($entity->getId());
+        $domain = CartDomain::create($entity->getId(), $entity->getStatus());
+        $statusEnum = StatusCart::from($domain->getStatus()->value);
+        $entity->setStatus($statusEnum);
 
         foreach ($entity->getItems() as $itemEntity) {
             $product = $itemEntity->getProduct();
@@ -85,5 +88,16 @@ final readonly class CartTransformer
         }
 
         return $domain;
+    }
+
+    public function modelToEntity(CartDomain $cartDomain): CartEntity
+    {
+        $cartEntity = $this->entityManager->getRepository(CartEntity::class)->find($cartDomain->getId());
+        if (!$cartEntity) {
+            $cartEntity = new CartEntity($cartDomain->getId());
+        }
+        $cartEntity->setStatus($cartDomain->getStatus());
+
+        return $cartEntity;
     }
 }
