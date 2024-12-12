@@ -7,38 +7,86 @@ namespace App\Tests\Unit\Order\Application\Command\RemoveExpiredCart;
 use App\Order\Application\Command\RemoveExpiredCart\RemoveExpiredCartCommand;
 use App\Order\Application\Command\RemoveExpiredCart\RemoveExpiredCartCommandHandler;
 use App\Order\Application\Service\RemoveExpiredCart\RemoveExpiredCartService;
+use App\Order\Domain\Exception\OrderCreateException;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Clock\MockClock;
+use Symfony\Component\Clock\ClockInterface;
 
-class RemoveExpiredCartCommandHandlerTest extends TestCase
+final class RemoveExpiredCartCommandHandlerTest extends TestCase
 {
-    private RemoveExpiredCartService|MockObject $service;
-    private MockClock $clock;
-
+    private RemoveExpiredCartService&MockObject $expireCartsService;
+    private ClockInterface&MockObject $clock;
     private RemoveExpiredCartCommandHandler $handler;
 
     protected function setUp(): void
     {
-        $this->service = $this->createMock(RemoveExpiredCartService::class);
-        $this->clock = new MockClock('2024-01-01 10:00:00');
+        $this->expireCartsService = $this->createMock(RemoveExpiredCartService::class);
+        $this->clock = $this->createMock(ClockInterface::class);
 
         $this->handler = new RemoveExpiredCartCommandHandler(
-            expireCartsService: $this->service,
+            expireCartsService: $this->expireCartsService,
             clock: $this->clock,
         );
     }
 
-    public function testHandleCommand(): void
+    #[Test]
+    public function handleWithNoExpiredCarts(): void
     {
-        $command = new RemoveExpiredCartCommand();
+        $now = new \DateTimeImmutable();
+        $this->clock
+            ->expects($this->once())
+            ->method('now')
+            ->willReturn($now);
 
-        $expectedTime = $this->clock->now();
-
-        $this->service->expects($this->once())
+        $this->expireCartsService
+            ->expects($this->once())
             ->method('expireCarts')
-            ->with($this->equalTo($expectedTime));
+            ->with($now);
 
+        $command = new RemoveExpiredCartCommand();
+        $this->handler->__invoke($command);
+    }
+
+    #[Test]
+    public function handleWithExpiredCarts(): void
+    {
+        $now = new \DateTimeImmutable();
+        $this->clock
+            ->expects($this->once())
+            ->method('now')
+            ->willReturn($now);
+
+        $this->expireCartsService
+            ->expects($this->once())
+            ->method('expireCarts')
+            ->with($now);
+
+        $command = new RemoveExpiredCartCommand();
+        $this->handler->__invoke($command);
+    }
+
+    #[Test]
+    public function handleWithExceptionDuringProcessing(): void
+    {
+        $now = new \DateTimeImmutable();
+        $exception = new OrderCreateException('Unable to create order from cart.');
+
+        $this->clock
+            ->expects($this->once())
+            ->method('now')
+            ->willReturn($now);
+
+        $this->expireCartsService
+            ->expects($this->once())
+            ->method('expireCarts')
+            ->with($now)
+            ->willThrowException($exception);
+
+        $this->expectException(OrderCreateException::class);
+        $this->expectExceptionMessage('Unable to create order from cart.');
+
+        $command = new RemoveExpiredCartCommand();
         $this->handler->__invoke($command);
     }
 }
