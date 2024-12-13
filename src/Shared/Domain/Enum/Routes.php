@@ -23,4 +23,6 @@ enum Routes: string
     case ADD_PRODUCT_TO_CART_NAME = 'add_product';
     case CONVERT_PRODUCT_TO_ORDER_PATH = '/{cartId}/convert';
     case CONVERT_PRODUCT_TO_ORDER_NAME = 'convert_to_order';
+    case REMOVE_PRODUCT_FROM_CART_PATH = '/remove-product';
+    case REMOVE_PRODUCT_FROM_CART_NAME = 'remove_product';
 }

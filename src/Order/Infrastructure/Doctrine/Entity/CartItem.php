@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Order\Infrastructure\Doctrine\Entity;
 
-use App\Order\Domain\Model\OrderItem;
 use App\Product\Infrastructure\Doctrine\Entity\Product;
+use App\Shared\Infrastructure\Doctrine\Entity\SoftDeleteTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
 use Doctrine\ORM\Mapping\Entity;
@@ -15,6 +15,8 @@ use Doctrine\ORM\Mapping\ManyToOne;
 #[Entity]
 class CartItem
 {
+    use SoftDeleteTrait;
+
     #[Id]
     #[Column(type: Types::GUID)]
     private string $id;
@@ -42,7 +44,6 @@ class CartItem
     {
         $this->quantity = $quantity;
     }
-
 
     public function getId(): string
     {

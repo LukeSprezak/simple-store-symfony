@@ -8,6 +8,7 @@ use App\Order\Application\Command\ConvertCartToOrder\ConvertCartToOrderCommand;
 use App\Order\Domain\Exception\CartNotFoundException;
 use App\Order\Infrastructure\Repository\CartRepository;
 use App\Order\Infrastructure\Request\AddProductToCartRequest;
+use App\Order\Infrastructure\Request\RemoveProductFromCartRequest;
 use App\Shared\Domain\Enum\Routes;
 use App\Shared\Infrastructure\Bus\Messenger\SyncCommandBus;
 use App\User\Domain\Enum\Role;
@@ -66,6 +67,19 @@ final readonly class CartController
 
         $command = new ConvertCartToOrderCommand($cartId);
         $this->syncCommandBus->dispatch($command);
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route(
+        path: Routes::REMOVE_PRODUCT_FROM_CART_PATH->value,
+        name: Routes::REMOVE_PRODUCT_FROM_CART_NAME->value,
+        methods: [Request::METHOD_DELETE]
+    )]
+    public function removeProductFromCart(
+        #[MapRequestPayload] RemoveProductFromCartRequest $removeProductFromCartRequest,
+    ): JsonResponse {
+        $this->syncCommandBus->dispatch($removeProductFromCartRequest->toCommand());
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }

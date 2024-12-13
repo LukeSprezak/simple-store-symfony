@@ -30,7 +30,7 @@ class RemoveProductCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function handleRemoveProductCommand(): void
+    public function shouldHandleRemoveProductCommand(): void
     {
         // Given
         $productId = Uuid::v7()->toRfc4122();
@@ -45,14 +45,13 @@ class RemoveProductCommandHandlerTest extends TestCase
             ->method('remove')
             ->with($this->equalTo($product));
 
-        $command = new RemoveProductCommand($productId);
-
         // When
+        $command = new RemoveProductCommand($productId);
         $this->handler->__invoke($command);
     }
 
     #[Test]
-    public function handleRemoveProductCommandGenericException(): void
+    public function shouldHandleRemoveProductCommandGenericException(): void
     {
         // Given
         $productId = Uuid::v7()->toRfc4122();

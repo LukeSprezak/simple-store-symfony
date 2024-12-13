@@ -8,11 +8,13 @@ use App\Order\Application\Command\RemoveExpiredCart\RemoveExpiredCartCommand;
 use App\Order\Application\Command\RemoveExpiredCart\RemoveExpiredCartCommandHandler;
 use App\Order\Application\Service\RemoveExpiredCart\RemoveExpiredCartService;
 use App\Order\Domain\Exception\OrderCreateException;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Clock\ClockInterface;
 
+#[CoversClass(RemoveExpiredCartCommandHandler::class)]
 final class RemoveExpiredCartCommandHandlerTest extends TestCase
 {
     private RemoveExpiredCartService&MockObject $expireCartsService;
@@ -31,8 +33,9 @@ final class RemoveExpiredCartCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function handleWithNoExpiredCarts(): void
+    public function shouldHandleWithNoExpiredCarts(): void
     {
+        // Given
         $now = new \DateTimeImmutable();
         $this->clock
             ->expects($this->once())
@@ -44,13 +47,15 @@ final class RemoveExpiredCartCommandHandlerTest extends TestCase
             ->method('expireCarts')
             ->with($now);
 
+        // When
         $command = new RemoveExpiredCartCommand();
         $this->handler->__invoke($command);
     }
 
     #[Test]
-    public function handleWithExpiredCarts(): void
+    public function shouldHandleWithExpiredCarts(): void
     {
+        // Given
         $now = new \DateTimeImmutable();
         $this->clock
             ->expects($this->once())
@@ -62,13 +67,15 @@ final class RemoveExpiredCartCommandHandlerTest extends TestCase
             ->method('expireCarts')
             ->with($now);
 
+        // When
         $command = new RemoveExpiredCartCommand();
         $this->handler->__invoke($command);
     }
 
     #[Test]
-    public function handleWithExceptionDuringProcessing(): void
+    public function shouldHandleWithExceptionDuringProcessing(): void
     {
+        // given
         $now = new \DateTimeImmutable();
         $exception = new OrderCreateException('Unable to create order from cart.');
 
@@ -83,9 +90,11 @@ final class RemoveExpiredCartCommandHandlerTest extends TestCase
             ->with($now)
             ->willThrowException($exception);
 
+        // then
         $this->expectException(OrderCreateException::class);
         $this->expectExceptionMessage('Unable to create order from cart.');
 
+        // when
         $command = new RemoveExpiredCartCommand();
         $this->handler->__invoke($command);
     }

@@ -24,7 +24,7 @@ use Symfony\Component\Uid\Uuid;
 class CartTransformerTest extends TestCase
 {
     #[Test]
-    public function toDomain(): void
+    public function shouldTransformToDomain(): void
     {
         // Given
         $entityManager = $this->createMock(EntityManagerInterface::class);

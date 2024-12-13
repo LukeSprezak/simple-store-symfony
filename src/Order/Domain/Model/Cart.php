@@ -8,14 +8,17 @@ use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\ProductNotInCartException;
 use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Product\Domain\Model\Product;
+use App\Shared\Infrastructure\Doctrine\Entity\SoftDeleteTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Workflow\WorkflowInterface;
 
-final class Cart
+class Cart
 {
+    use SoftDeleteTrait;
+
     private readonly string $id;
     private StatusCart $status;
     private readonly \DateTimeImmutable $createdAt;
@@ -118,7 +121,7 @@ final class Cart
         $item = $this->findItemByProductId($product->getId());
 
         if ($item) {
-            $this->items->removeElement($item);
+            $item->softDelete();
         } else {
             throw new ProductNotInCartException($product->getId());
         }
@@ -155,6 +158,7 @@ final class Cart
             initial: 0.0
         );
     }
+
     public function applyTransition(string $transition, WorkflowInterface $workflow): void
     {
         if (!$workflow->can($this, $transition)) {
@@ -210,7 +214,7 @@ final class Cart
     private function findItemByProductId(string $productId): ?CartItem
     {
         foreach ($this->items as $item) {
-            if ($item->getProduct()->getId() === $productId) {
+            if ($item->getProduct()->getId() === $productId && !$item->isDeleted()) {
                 return $item;
             }
         }

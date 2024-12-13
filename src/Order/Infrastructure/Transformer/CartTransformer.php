@@ -34,6 +34,8 @@ final readonly class CartTransformer
             if (isset($existingItems[$itemDomain->getId()])) {
                 $itemEntity = $existingItems[$itemDomain->getId()];
                 $itemEntity->setQuantity($itemDomain->getQuantity());
+                $itemEntity->setDeleted($itemDomain->isDeleted());
+                $itemEntity->setDeletedAt($itemDomain->getDeletedAt());
                 unset($existingItems[$itemDomain->getId()]);
             } else {
                 $productEntity = $this->entityManager->getRepository(ProductEntity::class)
@@ -48,6 +50,8 @@ final readonly class CartTransformer
                 $itemEntity->setProduct($productEntity);
                 $itemEntity->setQuantity($itemDomain->getQuantity());
                 $itemEntity->setCart($entity);
+                $itemEntity->setDeleted($domain->isDeleted());
+                $itemEntity->setDeletedAt($domain->getDeletedAt());
 
                 $entity->addItem($itemEntity);
             }
@@ -84,6 +88,8 @@ final readonly class CartTransformer
                 $itemEntity->getQuantity()
             );
 
+            $domain->setDeleted($itemEntity->isDeleted());
+            $domain->setDeletedAt($itemEntity->getDeletedAt());
             $domain->addItem($itemDomain);
         }
 

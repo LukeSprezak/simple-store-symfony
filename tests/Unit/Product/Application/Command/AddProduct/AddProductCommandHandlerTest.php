@@ -30,7 +30,7 @@ class AddProductCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function handleAddProductCommand(): void
+    public function shouldHandleAddProductCommand(): void
     {
         // Given
         $userId = Uuid::v7()->toRfc4122();
@@ -62,13 +62,10 @@ class AddProductCommandHandlerTest extends TestCase
     }
 
     #[Test]
-    public function handleAddProductCommandGenericException(): void
+    public function shouldHandleAddProductCommandGenericException(): void
     {
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('An unexpected error occurred while adding the product.');
-
+        // given
         $userId = Uuid::v7()->toRfc4122();
-
         $this->productRepository->expects($this->once())
             ->method('save')
             ->willThrowException(new \Exception('Database error'));
@@ -81,6 +78,11 @@ class AddProductCommandHandlerTest extends TestCase
             new UserId($userId)
         );
 
+        // then
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('An unexpected error occurred while adding the product.');
+
+        // when
         $this->handler->__invoke($command);
     }
 }

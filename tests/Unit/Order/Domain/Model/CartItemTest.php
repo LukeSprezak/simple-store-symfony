@@ -15,7 +15,8 @@ use Symfony\Component\Uid\Uuid;
 #[CoversClass(CartItem::class)]
 class CartItemTest extends TestCase
 {
-    public function testCreateCartItemSuccessfully(): void
+    #[Test]
+    public function shouldCreateCartItemSuccessfully(): void
     {
         // Given
         $itemId = Uuid::v7()->toRfc4122();

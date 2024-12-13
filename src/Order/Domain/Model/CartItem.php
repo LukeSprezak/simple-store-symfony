@@ -6,9 +6,12 @@ namespace App\Order\Domain\Model;
 
 use App\Order\Domain\Exception\InvalidQuantityException;
 use App\Product\Domain\Model\Product;
+use App\Shared\Infrastructure\Doctrine\Entity\SoftDeleteTrait;
 
-final class CartItem
+class CartItem
 {
+    use SoftDeleteTrait;
+
     private function __construct(
         private readonly string $id,
         private readonly Product $product,
