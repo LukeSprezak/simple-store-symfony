@@ -4,3 +4,10 @@ framework:
       policy: 'fixed_window'
       limit: 5
       interval: '1 minute'
+when@test:
+  framework:
+    rate_limiter:
+      anonymous_api:
+        policy: 'fixed_window'
+        limit: 5
+        interval: '10 seconds'

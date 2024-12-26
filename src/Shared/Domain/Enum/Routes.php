@@ -7,8 +7,8 @@ namespace App\Shared\Domain\Enum;
 enum Routes: string
 {
     // Main page
-    case MAIN_PATH = '/';
-    case MAIN_NAME = 'main';
+    case MAIN_PATH = '/api';
+    case MAIN_NAME = 'api_main';
     // Product
     case PRODUCT_PATH = '/api/product';
     case PRODUCT_NAME = 'api_product_';
