@@ -176,7 +176,7 @@ class CartTest extends TestCase
     {
         $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
 
-        self::assertEquals($cart->getCreatedAt()->modify('+24 hours'), $cart->getExpiresAt());
+        self::assertEquals($cart->getCreatedAt()->modify('+2 hours'), $cart->getExpiresAt());
     }
 
     private function createProductMock(string $productId, float $price, int $stockQuantity, string $name = 'Test Product'): ProductSnapshot

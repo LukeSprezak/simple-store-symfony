@@ -61,7 +61,7 @@ class Cart extends AggregateRoot
             status: $status,
             ownerId: $ownerId,
             createdAt: $createdAt,
-            expiresAt: $createdAt->modify('+24 hours')
+            expiresAt: $createdAt->modify('+2 hours')
         );
         $cart->recordThat(new CartCreated($id, $ownerId->getId()));
 

@@ -96,7 +96,7 @@ Both `active` and `abandoned` carts occupy an allowance slot, including empty
 carts and carts past their deadline whose reservations have not yet been
 released. Conversion or expiration by the scheduler frees a slot. Existing
 carts can still be edited when the owner has used the entire allowance.
-The reservation TTL remains 24 hours; keep the expiration worker running.
+The reservation TTL is 2 hours; keep the expiration worker running. Carts created before this change keep their 24-hour deadline.
 
 The API returns 422 for a request quantity outside 1–10 and 409 when an addition
 exceeds the accumulated product quantity or a new cart exceeds the owner's
