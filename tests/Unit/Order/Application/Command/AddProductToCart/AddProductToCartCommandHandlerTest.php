@@ -11,6 +11,7 @@ use App\Product\Domain\Exception\ProductNotFoundException;
 use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Repository\CartRepositoryInterface;
+use App\Product\Domain\Enum\StatusProduct;
 use App\Product\Domain\Model\Product;
 use App\Product\Domain\Repository\ProductRepositoryInterface;
 use App\User\Domain\ValueObject\UserId;
@@ -251,6 +252,7 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $product->method('getId')->willReturn($productId);
         $product->method('getStockQuantity')->willReturn($stockQuantity);
         $product->method('getName')->willReturn($name);
+        $product->method('getStatus')->willReturn(StatusProduct::ACTIVE);
 
         return $product;
     }
