@@ -78,7 +78,9 @@ final readonly class CartTransformer
                 $product->getDescription(),
                 $product->getPrice(),
                 $product->getStockQuantity(),
-                new UserId($product->getUser()->getId())
+                new UserId($product->getUser()->getId()),
+                $product->getStatus(),
+                $product->getVersion(),
             );
 
             $itemDomain = CartItemDomain::create(

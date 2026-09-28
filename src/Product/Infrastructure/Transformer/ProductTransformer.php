@@ -55,7 +55,8 @@ final readonly class ProductTransformer
             $productEntity->getPrice(),
             $productEntity->getStockQuantity(),
             $userId,
-            $productEntity->getStatus()
+            $productEntity->getStatus(),
+            $productEntity->getVersion(),
         );
     }
 }

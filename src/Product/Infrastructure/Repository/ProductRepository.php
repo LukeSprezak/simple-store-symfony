@@ -9,6 +9,7 @@ use App\Product\Domain\Model\Product;
 use App\Product\Domain\Repository\ProductRepositoryInterface as ProductDomainRepository;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
 use App\Product\Infrastructure\Transformer\ProductTransformer;
+use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
@@ -39,7 +40,7 @@ final readonly class ProductRepository implements ProductDomainRepository
 
     public function save(Product $product): void
     {
-        $entity = $this->entityManager->getRepository(ProductEntity::class)->find($product->getId()) ?? new ProductEntity();
+        $entity = $this->entityManager->find(ProductEntity::class, $product->getId(), LockMode::OPTIMISTIC, $product->getVersion()) ?? new ProductEntity();
         $this->transformer->fromDomain($product, $entity);
 
         $this->entityManager->persist($entity);

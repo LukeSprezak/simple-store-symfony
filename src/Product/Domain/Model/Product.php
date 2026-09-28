@@ -17,6 +17,7 @@ class Product
         private int $stockQuantity,
         private readonly UserId $userId,
         private StatusProduct $status = StatusProduct::ACTIVE,
+        private readonly ?int $version = null,
     ) {
     }
 
@@ -38,9 +39,10 @@ class Product
         float $price,
         int $stockQuantity,
         UserId $userId,
-        StatusProduct $status = StatusProduct::ACTIVE,
+        StatusProduct $status,
+        int $version,
     ): self {
-        return new self($id, $name, $description, $price, $stockQuantity, $userId, $status);
+        return new self($id, $name, $description, $price, $stockQuantity, $userId, $status, $version);
     }
 
     public function getId(): string
@@ -76,6 +78,11 @@ class Product
     public function getUserId(): UserId
     {
         return $this->userId;
+    }
+
+    public function getVersion(): ?int
+    {
+        return $this->version;
     }
 
     public function getStatus(): StatusProduct

@@ -86,6 +86,7 @@ final readonly class OrderTransformer
                     $product->getStockQuantity(),
                     new UserId($product->getUser()->getId()),
                     $product->getStatus(),
+                    $product->getVersion(),
                 ),
                 $itemEntity->getQuantity()
             );

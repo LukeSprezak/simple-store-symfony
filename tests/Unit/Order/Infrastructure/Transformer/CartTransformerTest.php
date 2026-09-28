@@ -9,6 +9,7 @@ use App\Order\Domain\Model\Cart as CartDomain;
 use App\Order\Infrastructure\Doctrine\Entity\Cart as CartEntity;
 use App\Order\Infrastructure\Doctrine\Entity\CartItem as CartItemEntity;
 use App\Order\Infrastructure\Transformer\CartTransformer;
+use App\Product\Domain\Enum\StatusProduct;
 use App\Product\Domain\Model\Product as ProductDomainModel;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
 use App\User\Infrastructure\Doctrine\Entity\User;
@@ -51,6 +52,7 @@ class CartTransformerTest extends TestCase
         $productEntity1->method('getName')->willReturn('Product 1');
         $productEntity1->method('getDescription')->willReturn('Description 1');
         $productEntity1->method('getPrice')->willReturn(100.0);
+        $productEntity1->method('getStatus')->willReturn(StatusProduct::ACTIVE);
         $productEntity1->method('getStockQuantity')->willReturn(12);
 
         $userEntity1 = $this->createMock(User::class);
@@ -70,6 +72,7 @@ class CartTransformerTest extends TestCase
         $productEntity2->method('getName')->willReturn('Product 2');
         $productEntity2->method('getDescription')->willReturn('Description 2');
         $productEntity2->method('getPrice')->willReturn(80.0);
+        $productEntity2->method('getStatus')->willReturn(StatusProduct::ACTIVE);
         $productEntity2->method('getStockQuantity')->willReturn(15);
 
         $userEntity2 = $this->createMock(User::class);
