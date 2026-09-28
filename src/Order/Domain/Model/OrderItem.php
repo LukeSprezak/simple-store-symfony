@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace App\Order\Domain\Model;
 
-use App\Product\Domain\Model\Product;
 
 class OrderItem
 {
     private string $id;
-    private Product $product;
+    private ProductSnapshot $product;
     private int $quantity;
 
     private function __construct(
         string $id,
-        Product $product,
+        ProductSnapshot $product,
         int $quantity,
     ) {
         $this->id = $id;
@@ -24,7 +23,7 @@ class OrderItem
 
     public static function create(
         string $id,
-        Product $product,
+        ProductSnapshot $product,
         int $quantity,
     ): self {
         return new self($id, $product, $quantity);
@@ -32,7 +31,7 @@ class OrderItem
 
     public static function fromPersistence(
         string $id,
-        Product $product,
+        ProductSnapshot $product,
         int $quantity,
     ): self {
         return new self($id, $product, $quantity);
@@ -43,7 +42,7 @@ class OrderItem
         return $this->id;
     }
 
-    public function getProduct(): Product
+    public function getProduct(): ProductSnapshot
     {
         return $this->product;
     }

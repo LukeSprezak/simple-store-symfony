@@ -12,9 +12,7 @@ use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Order\Domain\Service\StockReservation;
-use App\Product\Domain\Enum\StatusProduct;
-use App\Product\Domain\Model\Product;
-use App\Product\Domain\Repository\ProductRepositoryInterface;
+use App\Order\Domain\Model\ProductSnapshot;
 use App\User\Domain\ValueObject\UserId;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -26,7 +24,6 @@ use Symfony\Component\Uid\Uuid;
 class AddProductToCartCommandHandlerTest extends TestCase
 {
     private CartRepositoryInterface&MockObject $cartRepository;
-    private ProductRepositoryInterface&MockObject $productRepository;
     private StockReservation&MockObject $stockReservation;
     private AddProductToCartCommandHandler $handler;
     private UserId $userId;
@@ -38,11 +35,9 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $this->userId = UserId::generate();
 
         $this->cartRepository = $this->createMock(CartRepositoryInterface::class);
-        $this->productRepository = $this->createMock(ProductRepositoryInterface::class);
         $this->stockReservation = $this->createMock(StockReservation::class);
         $this->handler = new AddProductToCartCommandHandler(
             $this->cartRepository,
-            $this->productRepository,
             $this->stockReservation,
         );
     }
@@ -64,18 +59,14 @@ class AddProductToCartCommandHandlerTest extends TestCase
             ->with($cartId)
             ->willReturn($existingCart);
 
-        $this->productRepository->expects($this->once())
-            ->method('get')
-            ->with($productId)
-            ->willReturn($product);
-
         $this->cartRepository->expects($this->once())
             ->method('save')
             ->with($existingCart);
 
         $this->stockReservation->expects($this->once())
             ->method('reserve')
-            ->with($productId, $quantity);
+            ->with($productId, $quantity)
+            ->willReturn($product);
 
         // When
         $this->handler->__invoke($command);
@@ -102,11 +93,6 @@ class AddProductToCartCommandHandlerTest extends TestCase
 
         $this->cartRepository->expects($this->never())
             ->method('find');
-
-        $this->productRepository->expects($this->once())
-            ->method('get')
-            ->with($productId)
-            ->willReturn($product);
 
         $this->cartRepository->expects($this->once())
             ->method('save')
@@ -137,7 +123,8 @@ class AddProductToCartCommandHandlerTest extends TestCase
 
         $this->stockReservation->expects($this->once())
             ->method('reserve')
-            ->with($productId, $quantity);
+            ->with($productId, $quantity)
+            ->willReturn($product);
 
         // When
         $this->handler->__invoke($command);
@@ -159,16 +146,13 @@ class AddProductToCartCommandHandlerTest extends TestCase
             ->with($cartId)
             ->willReturn($existingCart);
 
-        $this->productRepository->expects($this->once())
-            ->method('get')
-            ->with($productId)
+        $this->stockReservation->expects($this->once())
+            ->method('reserve')
+            ->with($productId, $quantity)
             ->willThrowException(new ProductNotFoundException($productId));
 
         $this->cartRepository->expects($this->never())
             ->method('save');
-
-        $this->stockReservation->expects($this->never())
-            ->method('reserve');
 
         // Then
         $this->expectException(ProductNotFoundException::class);
@@ -194,11 +178,6 @@ class AddProductToCartCommandHandlerTest extends TestCase
             ->method('find')
             ->with($cartId)
             ->willReturn($existingCart);
-
-        $this->productRepository->expects($this->once())
-            ->method('get')
-            ->with($productId)
-            ->willReturn($product);
 
         $this->cartRepository->expects($this->never())
             ->method('save');
@@ -231,11 +210,6 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $this->cartRepository->expects($this->never())
             ->method('find');
 
-        $this->productRepository->expects($this->once())
-            ->method('get')
-            ->with($productId)
-            ->willReturn($product);
-
         $this->cartRepository->expects($this->once())
             ->method('save')
             ->with($this->isInstanceOf(Cart::class))
@@ -243,7 +217,8 @@ class AddProductToCartCommandHandlerTest extends TestCase
 
         $this->stockReservation->expects($this->once())
             ->method('reserve')
-            ->with($productId, $quantity);
+            ->with($productId, $quantity)
+            ->willReturn($product);
 
         // Then
         $this->expectException(\RuntimeException::class);
@@ -253,14 +228,8 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $this->handler->__invoke($command);
     }
 
-    private function createProductMock(string $productId, int $stockQuantity, string $name = 'Test Product'): Product
+    private function createProductMock(string $productId, int $stockQuantity, string $name = 'Test Product'): ProductSnapshot
     {
-        $product = $this->createMock(Product::class);
-        $product->method('getId')->willReturn($productId);
-        $product->method('getStockQuantity')->willReturn($stockQuantity);
-        $product->method('getName')->willReturn($name);
-        $product->method('getStatus')->willReturn(StatusProduct::ACTIVE);
-
-        return $product;
+        return new ProductSnapshot($productId, $name, 10.0);
     }
 }

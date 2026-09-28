@@ -6,7 +6,7 @@ namespace App\Tests\Unit\Order\Domain\Model;
 
 use App\Order\Domain\Exception\InvalidQuantityException;
 use App\Order\Domain\Model\CartItem;
-use App\Product\Domain\Model\Product;
+use App\Order\Domain\Model\ProductSnapshot;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -23,8 +23,7 @@ class CartItemTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 2;
 
-        $product = $this->createMock(Product::class);
-        $product->method('getId')->willReturn($productId);
+        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
 
         // When
         $cartItem = CartItem::create($itemId, $product, $quantity);
@@ -43,8 +42,7 @@ class CartItemTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = -1;
 
-        $product = $this->createMock(Product::class);
-        $product->method('getId')->willReturn($productId);
+        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
 
         // Then
         $this->expectException(InvalidQuantityException::class);
@@ -63,8 +61,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 1;
         $increaseAmount = 2;
 
-        $product = $this->createMock(Product::class);
-        $product->method('getId')->willReturn($productId);
+        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 
@@ -84,8 +81,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 1;
         $increaseAmount = 0;
 
-        $product = $this->createMock(Product::class);
-        $product->method('getId')->willReturn($productId);
+        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 
@@ -106,8 +102,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 5;
         $decreaseAmount = 3;
 
-        $product = $this->createMock(Product::class);
-        $product->method('getId')->willReturn($productId);
+        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 
@@ -127,8 +122,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 2;
         $decreaseAmount = 3;
 
-        $product = $this->createMock(Product::class);
-        $product->method('getId')->willReturn($productId);
+        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 
@@ -149,8 +143,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 4;
         $newQuantity = 2;
 
-        $product = $this->createMock(Product::class);
-        $product->method('getId')->willReturn($productId);
+        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 
@@ -170,8 +163,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 3;
         $newQuantity = -2;
 
-        $product = $this->createMock(Product::class);
-        $product->method('getId')->willReturn($productId);
+        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 

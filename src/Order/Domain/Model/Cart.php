@@ -8,7 +8,6 @@ use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\CartNotActiveException;
 use App\Order\Domain\Exception\CartTransitionNotAllowedException;
 use App\Order\Domain\Exception\ProductNotInCartException;
-use App\Product\Domain\Model\Product;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -132,7 +131,7 @@ class Cart
         return $item->getQuantity();
     }
 
-    public function addProduct(Product $product, int $quantity): void
+    public function addProduct(ProductSnapshot $product, int $quantity): void
     {
         if (StatusCart::ACTIVE !== $this->status || $this->isExpired()) {
             throw new CartNotActiveException($this->id);

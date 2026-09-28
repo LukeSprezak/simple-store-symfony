@@ -10,7 +10,7 @@ use App\Order\Infrastructure\Doctrine\Entity\Cart as CartEntity;
 use App\Order\Infrastructure\Doctrine\Entity\CartItem as CartItemEntity;
 use App\Order\Infrastructure\Transformer\CartTransformer;
 use App\Product\Domain\Enum\StatusProduct;
-use App\Product\Domain\Model\Product as ProductDomainModel;
+use App\Order\Domain\Model\ProductSnapshot;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
 use App\User\Infrastructure\Doctrine\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -107,25 +107,19 @@ class CartTransformerTest extends TestCase
         self::assertSame(3, $itemDomain1->getQuantity());
 
         $productDomain1 = $itemDomain1->getProduct();
-        self::assertInstanceOf(ProductDomainModel::class, $productDomain1);
+        self::assertInstanceOf(ProductSnapshot::class, $productDomain1);
         self::assertSame($productId1, $productDomain1->getId());
         self::assertSame('Product 1', $productDomain1->getName());
-        self::assertSame('Description 1', $productDomain1->getDescription());
         self::assertSame(100.0, $productDomain1->getPrice());
-        self::assertSame(12, $productDomain1->getStockQuantity());
-        self::assertSame($userId1, $productDomain1->getUserId()->getId());
 
         $itemDomain2 = $items->last();
         self::assertSame($cartItemId2, $itemDomain2->getId());
         self::assertSame(5, $itemDomain2->getQuantity());
 
         $productDomain2 = $itemDomain2->getProduct();
-        self::assertInstanceOf(ProductDomainModel::class, $productDomain2);
+        self::assertInstanceOf(ProductSnapshot::class, $productDomain2);
         self::assertSame($productId2, $productDomain2->getId());
         self::assertSame('Product 2', $productDomain2->getName());
-        self::assertSame('Description 2', $productDomain2->getDescription());
         self::assertSame(80.0, $productDomain2->getPrice());
-        self::assertSame(15, $productDomain2->getStockQuantity());
-        self::assertSame($userId2, $productDomain2->getUserId()->getId());
     }
 }

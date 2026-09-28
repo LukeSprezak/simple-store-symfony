@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace App\Order\Domain\Model;
 
 use App\Order\Domain\Exception\InvalidQuantityException;
-use App\Product\Domain\Model\Product;
 use Symfony\Component\Uid\Uuid;
 
 class CartItem
 {
     private function __construct(
         private readonly string $id,
-        private readonly Product $product,
+        private readonly ProductSnapshot $product,
         private int $quantity,
         private ?\DateTimeImmutable $deletedAt = null,
     ) {
@@ -21,7 +20,7 @@ class CartItem
 
     public static function create(
         string $id,
-        Product $product,
+        ProductSnapshot $product,
         int $quantity,
     ): self {
         return new self($id, $product, $quantity);
@@ -29,7 +28,7 @@ class CartItem
 
     public static function fromPersistence(
         string $id,
-        Product $product,
+        ProductSnapshot $product,
         int $quantity,
         ?\DateTimeImmutable $deletedAt,
     ): self {
@@ -56,7 +55,7 @@ class CartItem
         return $this->id;
     }
 
-    public function getProduct(): Product
+    public function getProduct(): ProductSnapshot
     {
         return $this->product;
     }

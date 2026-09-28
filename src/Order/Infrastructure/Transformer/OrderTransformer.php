@@ -7,9 +7,9 @@ namespace App\Order\Infrastructure\Transformer;
 use App\Order\Domain\Enum\StatusOrder;
 use App\Order\Domain\Model\Order as DomainOrder;
 use App\Order\Domain\Model\OrderItem as DomainOrderItem;
+use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Infrastructure\Doctrine\Entity\Order as EntityOrder;
 use App\Order\Infrastructure\Doctrine\Entity\OrderItem as EntityOrderItem;
-use App\Product\Domain\Model\Product as ProductDomainModel;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\ORM\EntityManagerInterface;
@@ -78,16 +78,7 @@ final readonly class OrderTransformer
             $product = $itemEntity->getProduct();
             $domainOrderItem = DomainOrderItem::fromPersistence(
                 $itemEntity->getId(),
-                ProductDomainModel::fromPersistence(
-                    $product->getId(),
-                    $product->getName(),
-                    $product->getDescription(),
-                    $product->getPrice(),
-                    $product->getStockQuantity(),
-                    new UserId($product->getUser()->getId()),
-                    $product->getStatus(),
-                    $product->getVersion(),
-                ),
+                new ProductSnapshot($product->getId(), $product->getName(), $product->getPrice()),
                 $itemEntity->getQuantity()
             );
             $domainOrder->addItem($domainOrderItem);

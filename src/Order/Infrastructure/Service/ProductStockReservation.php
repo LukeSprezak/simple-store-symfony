@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Order\Infrastructure\Service;
 
 use App\Order\Domain\Exception\ProductUnavailableException;
+use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Domain\Service\StockReservation;
 use App\Product\Domain\Enum\StatusProduct;
 use App\Product\Domain\Repository\ProductRepositoryInterface;
@@ -16,7 +17,7 @@ final readonly class ProductStockReservation implements StockReservation
     ) {
     }
 
-    public function reserve(string $productId, int $quantity): void
+    public function reserve(string $productId, int $quantity): ProductSnapshot
     {
         $product = $this->productRepository->get($productId);
 
@@ -26,6 +27,8 @@ final readonly class ProductStockReservation implements StockReservation
 
         $product->decreaseStock($quantity);
         $this->productRepository->save($product);
+
+        return new ProductSnapshot($product->getId(), $product->getName(), $product->getPrice());
     }
 
     public function release(string $productId, int $quantity): void

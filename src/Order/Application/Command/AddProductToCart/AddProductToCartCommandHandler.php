@@ -8,7 +8,6 @@ use App\Order\Domain\Exception\CartNotFoundException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Order\Domain\Service\StockReservation;
-use App\Product\Domain\Repository\ProductRepositoryInterface;
 use App\Shared\Application\Bus\Command\Sync\CommandHandler;
 use App\Shared\Domain\Exception\ConflictException;
 use App\Shared\Domain\Exception\NotFoundException;
@@ -18,7 +17,6 @@ final readonly class AddProductToCartCommandHandler implements CommandHandler
 {
     public function __construct(
         private CartRepositoryInterface $cartRepository,
-        private ProductRepositoryInterface $productRepository,
         private StockReservation $stockReservation,
     ) {
     }
@@ -34,9 +32,8 @@ final readonly class AddProductToCartCommandHandler implements CommandHandler
                 throw new CartNotFoundException($command->cartId);
             }
 
-            $product = $this->productRepository->get($command->productId);
+            $product = $this->stockReservation->reserve($command->productId, $command->quantity);
             $cart->addProduct($product, $command->quantity);
-            $this->stockReservation->reserve($command->productId, $command->quantity);
 
             $this->cartRepository->save($cart);
         } catch (NotFoundException|ConflictException|OptimisticLockException $exception) {

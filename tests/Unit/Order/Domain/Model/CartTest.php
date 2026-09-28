@@ -8,8 +8,7 @@ use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\CartTransitionNotAllowedException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
-use App\Product\Domain\Enum\StatusProduct;
-use App\Product\Domain\Model\Product;
+use App\Order\Domain\Model\ProductSnapshot;
 use App\User\Domain\ValueObject\UserId;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -134,15 +133,8 @@ class CartTest extends TestCase
         $cart->convert();
     }
 
-    private function createProductMock(string $productId, float $price, int $stockQuantity, string $name = 'Test Product'): Product
+    private function createProductMock(string $productId, float $price, int $stockQuantity, string $name = 'Test Product'): ProductSnapshot
     {
-        $product = $this->createMock(Product::class);
-        $product->method('getId')->willReturn($productId);
-        $product->method('getPrice')->willReturn($price);
-        $product->method('getStockQuantity')->willReturn($stockQuantity);
-        $product->method('getName')->willReturn($name);
-        $product->method('getStatus')->willReturn(StatusProduct::ACTIVE);
-
-        return $product;
+        return new ProductSnapshot($productId, $name, $price);
     }
 }

@@ -8,7 +8,7 @@ use App\Order\Application\Service\RemoveExpiredCart\RemoveExpiredCartService;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
 use App\Order\Domain\Repository\CartRepositoryInterface;
-use App\Product\Domain\Model\Product;
+use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Domain\Service\StockReservation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -62,14 +62,8 @@ final class RemoveExpiredCartServiceTest extends TestCase
         // given
         $now = new \DateTimeImmutable();
 
-        $product1 = $this->createConfiguredMock(Product::class, [
-            'getId' => 'prod-1',
-            'getStockQuantity' => 10,
-        ]);
-        $product2 = $this->createConfiguredMock(Product::class, [
-            'getId' => 'prod-2',
-            'getStockQuantity' => 20,
-        ]);
+        $product1 = new ProductSnapshot('prod-1', 'Product 1', 10.0);
+        $product2 = new ProductSnapshot('prod-2', 'Product 2', 20.0);
 
         $cartItem1 = $this->createConfiguredMock(CartItem::class, [
             'getProduct' => $product1,

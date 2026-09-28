@@ -7,9 +7,9 @@ namespace App\Order\Infrastructure\Transformer;
 use App\Product\Domain\Exception\ProductNotFoundException;
 use App\Order\Domain\Model\Cart as CartDomain;
 use App\Order\Domain\Model\CartItem as CartItemDomain;
+use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Infrastructure\Doctrine\Entity\Cart as CartEntity;
 use App\Order\Infrastructure\Doctrine\Entity\CartItem as CartItemEntity;
-use App\Product\Domain\Model\Product as ProductDomainModel;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\ORM\EntityManagerInterface;
@@ -72,20 +72,9 @@ final readonly class CartTransformer
         $items = [];
         foreach ($entity->getItems() as $itemEntity) {
             $product = $itemEntity->getProduct();
-            $productDomain = ProductDomainModel::fromPersistence(
-                $product->getId(),
-                $product->getName(),
-                $product->getDescription(),
-                $product->getPrice(),
-                $product->getStockQuantity(),
-                new UserId($product->getUser()->getId()),
-                $product->getStatus(),
-                $product->getVersion(),
-            );
-
             $items[] = CartItemDomain::fromPersistence(
                 $itemEntity->getId(),
-                $productDomain,
+                new ProductSnapshot($product->getId(), $product->getName(), $product->getPrice()),
                 $itemEntity->getQuantity(),
                 $itemEntity->getDeletedAt(),
             );
