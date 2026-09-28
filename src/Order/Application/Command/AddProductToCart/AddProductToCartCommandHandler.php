@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Order\Application\Command\AddProductToCart;
 
+use App\Order\Domain\Exception\CartNotActiveException;
 use App\Order\Domain\Exception\CartNotFoundException;
 use App\Order\Domain\Exception\ProductNotFoundException;
 use App\Order\Domain\Exception\ProductUnavailableException;
@@ -36,7 +37,7 @@ final readonly class AddProductToCartCommandHandler implements CommandHandler
 
             $this->cartRepository->save($cart);
             $this->productRepository->save($product);
-        } catch (CartNotFoundException|ProductNotFoundException|ProductUnavailableException $exception) {
+        } catch (CartNotActiveException|CartNotFoundException|ProductNotFoundException|ProductUnavailableException $exception) {
             throw $exception;
         } catch (\Exception $exception) {
             throw new \RuntimeException('An unexpected error occurred while adding a product to the cart.', 0, $exception);

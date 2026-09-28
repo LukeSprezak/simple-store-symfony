@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Order\Domain\Model;
 
 use App\Order\Domain\Enum\StatusCart;
+use App\Order\Domain\Exception\CartNotActiveException;
 use App\Order\Domain\Exception\ProductNotInCartException;
 use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Product\Domain\Model\Product;
@@ -47,7 +48,7 @@ class Cart
             status: $status,
             ownerId: $ownerId,
             createdAt: new \DateTimeImmutable(),
-            expiresAt: (new \DateTimeImmutable())->modify('+24 hours')
+            expiresAt: new \DateTimeImmutable()->modify('+24 hours')
         );
     }
 
@@ -148,6 +149,10 @@ class Cart
 
     public function addProduct(Product $product, int $quantity): void
     {
+        if (StatusCart::ACTIVE !== $this->status || $this->isExpired()) {
+            throw new CartNotActiveException($this->id);
+        }
+
         if ($quantity <= 0) {
             throw new \InvalidArgumentException('The quantity must be a positive number.');
         }
