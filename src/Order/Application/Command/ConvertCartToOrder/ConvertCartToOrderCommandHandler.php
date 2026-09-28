@@ -42,7 +42,7 @@ final readonly class ConvertCartToOrderCommandHandler implements CommandHandler
 
             $order = Order::create(Uuid::v7()->toRfc4122(), StatusOrder::CREATED->value, $cart->getOwnerId(), new \DateTimeImmutable());
             foreach ($cart->getActiveItems() as $cartItem) {
-                $orderItem = $cartItem->toOrderItem($order);
+                $orderItem = $cartItem->toOrderItem();
                 $order->addItem($orderItem);
             }
 

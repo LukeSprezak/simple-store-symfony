@@ -93,11 +93,10 @@ class CartItem
         }
     }
 
-    public function toOrderItem(Order $order): OrderItem
+    public function toOrderItem(): OrderItem
     {
         return OrderItem::create(
             Uuid::v7()->toRfc4122(),
-            $order,
             $this->product,
             $this->quantity
         );
