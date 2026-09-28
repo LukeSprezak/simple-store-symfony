@@ -117,6 +117,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): self
     {
         $this->password = $password;
+        $now = new \DateTimeImmutable();
+        // Whole seconds: DATETIME drops fractions by rounding up, which would revoke a token issued in the same second.
+        $this->lastPasswordChange = $now->setTime((int) $now->format('G'), (int) $now->format('i'), (int) $now->format('s'));
 
         return $this;
     }
