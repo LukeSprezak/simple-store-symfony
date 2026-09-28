@@ -45,7 +45,6 @@ services:
       XDEBUG_CLIENT_HOST: host.docker.internal
       XDEBUG_CLIENT_PORT: 9003
       PHP_IDE_CONFIG: serverName=Docker
-      XDEBUG_CONFIG: "idekey=PHPSTORM"
     volumes:
       - .:/var/www
       - ./etc/docker/php-fpm/php.ini:/usr/local/etc/php/conf.d/99-overrides.ini

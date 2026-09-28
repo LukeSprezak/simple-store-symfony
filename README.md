@@ -77,10 +77,10 @@ one SQL statement. These reads neither hydrate ORM aggregates nor flush pending
 ORM changes. Queries have no transport routing or Doctrine transaction
 middleware.
 
-No additional database migration is required for these read models. Changes
-become visible after they are stored; asynchronous product commands become
-visible after the worker processes them. Event-driven projections and a
-transactional outbox remain separate work.
+The product and cart-detail read models use existing tables. Changes become
+visible after they are stored; asynchronous product commands become visible
+after the worker processes them. Cart activity uses the event projection
+described below and is eventually consistent.
 
 The API uses stateless JWT authentication with sessions disabled. Exception
 details and traces are included only when `kernel.debug` is true; use
@@ -138,7 +138,76 @@ the migration command in the setup section (`--env=test` for the test database).
 ```sh
 docker compose exec php85 php bin/console messenger:consume async -vv --limit=50
 docker compose exec php85 php bin/console messenger:consume scheduler_expired_cart
+docker compose exec php85 php bin/console messenger:consume events --time-limit=3600 --memory-limit=128M
 ```
+
+## Transactional outbox and cart activity
+
+Apply migration `Version20260928190000` before deploying this code to an existing
+environment. It creates `domain_event_outbox` and `cart_activity`. It has no
+automatic rollback because dropping the tables would discard pending events
+and recorded history. Both tables are covered by Doctrine schema validation.
+
+Cart and order repositories persist events through `DoctrineOutboxEventBus`.
+The ORM flush writes the aggregate and its outbox entries in the same database
+transaction. A command rollback discards both. The command does not contact
+RabbitMQ. Event names are stable strings such as `cart.created`; messages carry
+an event UUID, UTC recording time, JSON payload and schema version (currently 1).
+
+Run the publisher periodically using a timer or process supervisor:
+
+```sh
+docker compose exec -T php85 php bin/console app:outbox:publish --limit=100
+```
+
+Each invocation processes at most one batch (limit 1–1000). Repeat it to drain
+the backlog, and run the `events` consumer alongside it. Multiple publishers
+can run concurrently: each locks one committed row with `FOR UPDATE SKIP LOCKED`
+until publication finishes. The RabbitMQ transport uses a durable
+`domain_events` exchange/queue, persistent messages and publisher confirmations.
+An event is marked published only after confirmation. Failed sends retain the
+event and retry with backoff from 2 seconds up to 5 minutes; a batch with failures
+exits with status 1. Inspect `published_at`, `available_at`, `attempts` and
+`last_error` to monitor the backlog. Error storage contains the exception class,
+without connection details.
+
+Delivery is at least once: a crash after broker confirmation and before the
+database commit can resend the same event UUID. The cart-activity projector
+uses that UUID as its primary key, so duplicate or reordered delivery does not
+duplicate activity. Projection handling runs in a transaction on `event.bus`;
+consumer failures use Messenger retries and the existing failure transport.
+
+`GET /api/cart/{cartId}/activity?limit=50&after=<eventId>` requires the cart owner
+and a JWT. It returns `{ "items": [...], "nextCursor": null }`. Each item has
+`eventId`, `eventName`, `recordedAt`, nullable `productId` and nullable `quantity`.
+`limit` defaults to 50 and must be 1–100; `after` is an optional UUID cursor.
+Invalid pagination returns 422; foreign or missing carts return 404. Pass the
+returned `nextCursor` as `after` to read the next page.
+
+History is ordered by the original event UUID and can lag behind cart details.
+Restart pagination to see older events delivered late. The projection records
+cart creation, additions, removals, expiration and conversion. `order.placed`
+is published for other consumers. History begins with this deployment; past
+actions are not reconstructed from current cart state. Published outbox rows
+are retained; archival/retention and replay tooling remain operational follow-up
+work. A consumer of a new event schema needs an explicit compatible handler.
+
+The tests exercise real RabbitMQ using an isolated queue that is removed after
+the test, transaction rollback, publication retries and concurrent publishers.
+
+## Local infrastructure limits
+
+Compose publishes service ports only on `127.0.0.1`; PHP-FPM has no host port.
+Recreate existing containers with `docker compose up -d --wait` to apply port
+changes. The existing named MySQL and RabbitMQ volumes are reused.
+
+PHP has a 256 MB memory limit. nginx and PHP accept request bodies up to 1 MB.
+Xdebug starts on an explicit trigger (`XDEBUG_TRIGGER`); enable coverage for a
+CLI run with `XDEBUG_MODE=coverage`. The Compose configuration does not set the
+legacy global `XDEBUG_CONFIG` trigger. PHP and nginx hide their versions. nginx sends
+`X-Content-Type-Options: nosniff` and `Referrer-Policy: no-referrer`; JSON responses
+also receive a restrictive Content Security Policy. TLS/HSTS and production
+image hardening still require deployment-specific configuration.
 
 ## Existing development data
 
