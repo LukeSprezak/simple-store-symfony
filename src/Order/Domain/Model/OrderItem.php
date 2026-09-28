@@ -28,14 +28,6 @@ class OrderItem
         return new self($id, $product, $quantity);
     }
 
-    public static function fromPersistence(
-        string $id,
-        ProductSnapshot $product,
-        int $quantity,
-    ): self {
-        return new self($id, $product, $quantity);
-    }
-
     public function getId(): string
     {
         return $this->id;

@@ -8,7 +8,9 @@ use App\Order\Domain\Enum\StatusOrder;
 use App\Order\Domain\Exception\CartNotFoundException;
 use App\Order\Domain\Exception\EmptyCartException;
 use App\Order\Domain\Exception\OrderCreateException;
+use App\Order\Domain\Model\CartItem;
 use App\Order\Domain\Model\Order;
+use App\Order\Domain\Model\OrderItem;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Order\Domain\Repository\OrderRepositoryInterface;
 use App\Shared\Application\Bus\Command\Sync\CommandHandler;
@@ -40,11 +42,13 @@ final readonly class ConvertCartToOrderCommandHandler implements CommandHandler
 
             $cart->convert();
 
-            $order = Order::create(Uuid::v7()->toRfc4122(), StatusOrder::CREATED->value, $cart->getOwnerId(), new \DateTimeImmutable());
-            foreach ($cart->getActiveItems() as $cartItem) {
-                $orderItem = $cartItem->toOrderItem();
-                $order->addItem($orderItem);
-            }
+            $order = Order::create(
+                Uuid::v7()->toRfc4122(),
+                StatusOrder::CREATED->value,
+                $cart->getOwnerId(),
+                new \DateTimeImmutable(),
+                $cart->getActiveItems()->map(static fn (CartItem $cartItem): OrderItem => $cartItem->toOrderItem())->getValues(),
+            );
 
             $this->orderRepository->save($order);
             $this->cartRepository->save($cart);

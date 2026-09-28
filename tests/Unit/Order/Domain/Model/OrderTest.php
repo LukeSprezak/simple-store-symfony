@@ -38,7 +38,7 @@ class OrderTest extends TestCase
         $order = $this->createOrder($from);
 
         // When
-        $order->apply($transition);
+        $order->changeStatus($transition);
 
         // Then
         self::assertSame($transition->target()->value, $order->getStatus());
@@ -51,9 +51,9 @@ class OrderTest extends TestCase
         $order = $this->createOrder(StatusOrder::DELIVERED);
 
         // When
-        $order->apply(StatusOrderTransition::REQUEST_RETURN);
-        $order->apply(StatusOrderTransition::RETRIEVED);
-        $order->apply(StatusOrderTransition::COMPLETE_RETURN);
+        $order->changeStatus(StatusOrderTransition::REQUEST_RETURN);
+        $order->changeStatus(StatusOrderTransition::RETRIEVED);
+        $order->changeStatus(StatusOrderTransition::COMPLETE_RETURN);
 
         // Then
         self::assertSame(StatusOrder::RETURNED->value, $order->getStatus());
@@ -69,11 +69,11 @@ class OrderTest extends TestCase
         $this->expectException(OrderTransitionNotAllowedException::class);
 
         // When
-        $order->apply(StatusOrderTransition::SHIP);
+        $order->changeStatus(StatusOrderTransition::SHIP);
     }
 
     private function createOrder(StatusOrder $status): Order
     {
-        return Order::create(Uuid::v7()->toRfc4122(), $status->value, UserId::generate(), new \DateTimeImmutable());
+        return Order::create(Uuid::v7()->toRfc4122(), $status->value, UserId::generate(), new \DateTimeImmutable(), []);
     }
 }

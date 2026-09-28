@@ -6,34 +6,41 @@ namespace App\Order\Infrastructure\Repository;
 
 use App\Order\Domain\Model\Order;
 use App\Order\Domain\Repository\OrderRepositoryInterface;
-use App\Order\Infrastructure\Doctrine\Entity\Order as EntityOrder;
-use App\Order\Infrastructure\Transformer\OrderTransformer;
+use App\Order\Domain\ValueObject\OrderId;
+use App\Order\Infrastructure\EventSourcing\OrderTableProjector;
+use App\Order\Infrastructure\EventSourcing\OutboxRelay;
 use App\Shared\Application\Bus\Event\EventBus;
-use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\DBAL\Connection;
+use EventSauce\EventSourcing\EventSourcedAggregateRootRepository;
+use EventSauce\EventSourcing\Serialization\ConstructingMessageSerializer;
+use EventSauce\EventSourcing\SynchronousMessageDispatcher;
+use EventSauce\IdEncoding\StringIdEncoder;
+use EventSauce\MessageRepository\DoctrineMessageRepository\DoctrineMessageRepository;
 
 final readonly class OrderRepository implements OrderRepositoryInterface
 {
-    public function __construct(
-        private EntityManagerInterface $entityManager,
-        private EventBus $eventBus,
-        private OrderTransformer $orderTransformer,
-    ) {
+    /** @var EventSourcedAggregateRootRepository<Order> */
+    private EventSourcedAggregateRootRepository $repository;
+
+    public function __construct(Connection $connection, EventBus $eventBus)
+    {
+        $this->repository = new EventSourcedAggregateRootRepository(
+            Order::class,
+            new DoctrineMessageRepository($connection, 'order_event', new ConstructingMessageSerializer(), aggregateRootIdEncoder: new StringIdEncoder()),
+            new SynchronousMessageDispatcher(new OrderTableProjector($connection), new OutboxRelay($eventBus)),
+        );
     }
 
     public function find(string $id): ?Order
     {
-        $entityOrder = $this->entityManager->getRepository(EntityOrder::class)->find($id);
+        $order = $this->repository->retrieve(OrderId::fromString($id));
 
-        return $entityOrder ? $this->orderTransformer->toDomain($entityOrder) : null;
+        // EventSauce returns an empty aggregate for an unknown stream.
+        return 0 === $order->aggregateRootVersion() ? null : $order;
     }
 
     public function save(Order $order): void
     {
-        $entityOrder = $this->entityManager->getRepository(EntityOrder::class)->find($order->getId()) ?? new EntityOrder($order->getId());
-        $this->orderTransformer->fromDomain($order, $entityOrder);
-
-        $this->entityManager->persist($entityOrder);
-
-        $this->eventBus->publish(...$order->pullDomainEvents());
+        $this->repository->persist($order);
     }
 }

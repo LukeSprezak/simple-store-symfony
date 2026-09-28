@@ -64,7 +64,7 @@ final class ConvertCartToOrderCommandHandlerTest extends TestCase
             $item = $order->getItems()->first();
             self::assertInstanceOf(OrderItem::class, $item);
             self::assertNotSame($cartItem->getId(), $item->getId());
-            self::assertSame($snapshot, $item->getProduct());
+            self::assertEquals($snapshot, $item->getProduct());
             self::assertSame(2, $item->getQuantity());
 
             return true;

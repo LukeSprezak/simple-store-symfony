@@ -15,9 +15,15 @@ final readonly class OrderPlaced implements DomainEvent
         return self::NAME;
     }
 
+    /**
+     * @param list<array{id: string, productId: string, productName: string, unitPrice: int, quantity: int}> $items
+     */
     public function __construct(
         public string $orderId,
         public string $ownerId,
+        public string $status,
+        public \DateTimeImmutable $createdAt,
+        public array $items,
     ) {
     }
 }

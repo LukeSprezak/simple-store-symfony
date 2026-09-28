@@ -9,66 +9,60 @@ use App\Order\Domain\Enum\StatusOrderTransition;
 use App\Order\Domain\Event\OrderPlaced;
 use App\Order\Domain\Event\OrderStatusChanged;
 use App\Order\Domain\Exception\OrderTransitionNotAllowedException;
-use App\Shared\Domain\Aggregate\AggregateRoot;
+use App\Order\Domain\ValueObject\OrderId;
+use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use EventSauce\EventSourcing\AggregateRoot;
+use EventSauce\EventSourcing\AggregateRootBehaviour;
 
-class Order extends AggregateRoot
+/**
+ * @implements AggregateRoot<OrderId>
+ */
+class Order implements AggregateRoot
 {
-    private string $id;
+    /** @use AggregateRootBehaviour<OrderId> */
+    use AggregateRootBehaviour;
+
     private string $status;
     private UserId $ownerId;
     private \DateTimeImmutable $createdAt;
     /** @var Collection<int, OrderItem> */
     private Collection $items;
 
-    private function __construct(
-        string $id,
-        string $status,
-        UserId $ownerId,
-        \DateTimeImmutable $createdAt,
-    ) {
-        $this->id = $id;
-        $this->status = $status;
-        $this->ownerId = $ownerId;
-        $this->createdAt = $createdAt;
-        $this->items = new ArrayCollection();
-    }
-
-    public static function create(
-        string $id,
-        string $status,
-        UserId $ownerId,
-        \DateTimeImmutable $createdAt,
-    ): self {
-        $order = new self($id, $status, $ownerId, $createdAt);
-        $order->recordThat(new OrderPlaced($id, $ownerId->getId()));
-
-        return $order;
-    }
-
     /**
-     * @param array<OrderItem> $items
+     * @param non-empty-string $id
+     * @param list<OrderItem>  $items
      */
-    public static function fromPersistence(
+    public static function create(
         string $id,
         string $status,
         UserId $ownerId,
         \DateTimeImmutable $createdAt,
         array $items,
     ): self {
-        $order = new self($id, $status, $ownerId, $createdAt);
-        foreach ($items as $item) {
-            $order->addItem($item);
-        }
+        $order = new self(OrderId::fromString($id));
+        $order->recordThat(new OrderPlaced($id, $ownerId->getId(), $status, $createdAt, array_map(
+            static fn (OrderItem $item): array => [
+                'id' => $item->getId(),
+                'productId' => $item->getProduct()->getId(),
+                'productName' => $item->getProduct()->getName(),
+                'unitPrice' => $item->getProduct()->getPrice()->getAmount(),
+                'quantity' => $item->getQuantity(),
+            ],
+            $items
+        )));
 
         return $order;
     }
 
+    /**
+     * @return non-empty-string
+     */
     public function getId(): string
     {
-        return $this->id;
+        return $this->aggregateRootId->toString();
     }
 
     public function getOwnerId(): UserId
@@ -81,15 +75,13 @@ class Order extends AggregateRoot
         return $this->status;
     }
 
-    public function apply(StatusOrderTransition $transition): void
+    public function changeStatus(StatusOrderTransition $transition): void
     {
         if (!in_array(StatusOrder::from($this->status), $transition->allowedFrom(), true)) {
             throw new OrderTransitionNotAllowedException($transition->value, $this->status);
         }
 
-        $fromStatus = $this->status;
-        $this->status = $transition->target()->value;
-        $this->recordThat(new OrderStatusChanged($this->id, $transition->value, $fromStatus, $this->status));
+        $this->recordThat(new OrderStatusChanged($this->getId(), $transition->value, $this->status, $transition->target()->value));
     }
 
     public function getCreatedAt(): \DateTimeImmutable
@@ -105,15 +97,19 @@ class Order extends AggregateRoot
         return $this->items;
     }
 
-    public function addItem(OrderItem $orderItem): void
+    protected function applyOrderPlaced(OrderPlaced $event): void
     {
-        if (!$this->items->contains($orderItem)) {
-            $this->items->add($orderItem);
-        }
+        $this->status = $event->status;
+        $this->ownerId = new UserId($event->ownerId);
+        $this->createdAt = $event->createdAt;
+        $this->items = new ArrayCollection(array_map(
+            static fn (array $item): OrderItem => OrderItem::create($item['id'], new ProductSnapshot($item['productId'], $item['productName'], new Money($item['unitPrice'])), $item['quantity']),
+            $event->items
+        ));
     }
 
-    public function removeItem(OrderItem $orderItem): void
+    protected function applyOrderStatusChanged(OrderStatusChanged $event): void
     {
-        $this->items->removeElement($orderItem);
+        $this->status = $event->toStatus;
     }
 }
