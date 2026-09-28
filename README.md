@@ -13,7 +13,7 @@ iteration; the 8.4.12 image was not yet available.
 Requires Docker Desktop / Docker Engine with Docker Compose v2 or newer.
 
 ```sh
-cp .env .env.local
+cp .env.dist .env.local
 docker compose build --pull php85
 docker compose up -d --wait mysql redis rabbit php85
 docker compose exec php85 composer install
@@ -24,7 +24,7 @@ docker compose up -d nginx phpmyadmin
 ```
 
 Set a local `APP_SECRET` in `.env.local`. Existing `.env.local` files must use
-the new MySQL URL and Messenger variables from `.env`.
+the new MySQL URL and Messenger variables from `.env.dist`.
 
 The API is available at http://localhost:8080, phpMyAdmin at
 http://localhost:8883 and RabbitMQ management at http://localhost:15672.

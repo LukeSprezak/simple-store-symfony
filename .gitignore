@@ -1,22 +1,28 @@
 
 ###> symfony/framework-bundle ###
+/.env
 /.env.local
 /.env.local.php
 /.env.*.local
-/config/secrets/prod/prod.decrypt.private.php
+/config/secrets/*/*.decrypt.private.php
 /public/bundles/
 /var/
 /vendor/
 /config/reference.php
 ###< symfony/framework-bundle ###
-.idea
-etc/docker/volumes
-/etc/docker/sql/*
+
 /.env.test
 /.env.test.php
 /.env.*.test
-.env.test
-/.env
+
+###> Docker ###
+etc/docker/volumes
+/etc/docker/sql/*
+!/etc/docker/sql/init/
+docker-compose.override.yml
+compose.override.yaml
+###< Docker ###
+
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
@@ -24,18 +30,36 @@ etc/docker/volumes
 ###> phpunit/phpunit ###
 /phpunit.xml
 .phpunit.result.cache
+/.phpunit.cache/
+/coverage/
 ###< phpunit/phpunit ###
-
-###> symfony/phpunit-bridge ###
-.phpunit.result.cache
-/phpunit.xml
-###< symfony/phpunit-bridge ###
 
 ###> friendsofphp/php-cs-fixer ###
 /.php-cs-fixer.php
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
 
+###> phpstan/phpstan ###
+/phpstan.neon
+###< phpstan/phpstan ###
+
 ###> deptrac/deptrac ###
 /.deptrac.cache
 ###< deptrac/deptrac ###
+
+###> OS / editors ###
+.idea
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+###< OS / editors ###
+
+###> Node ###
+node_modules/
+/public/build/
+###< Node ###
+
+###> Claude Code ###
+.claude/settings.local.json
+###< Claude Code ###
