@@ -7,4 +7,6 @@ namespace App\Product\Application\ReadModel;
 interface ProductReader
 {
     public function findActive(string $id): ?ProductView;
+
+    public function findActivePage(int $limit, ?string $after): ProductPage;
 }

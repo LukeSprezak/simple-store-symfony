@@ -4,6 +4,9 @@
     CQRS Shop
   </a>
   @if (auth.token()) {
+    <nav class="menu">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Products</a>
+    </nav>
     <button class="btn" type="button" (click)="logout()">Log out</button>
   }
 </header>

@@ -1,7 +1,7 @@
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 32px;
   height: 72px;
   padding: 0 24px;
   background: var(--surface);
@@ -15,6 +15,29 @@
   color: var(--text);
   font: 500 26px Ubuntu, sans-serif;
   text-decoration: none;
+}
+
+.menu {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+}
+
+.menu a {
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.menu a:hover {
+  background: var(--primary-soft);
+}
+
+.menu a.active {
+  background: var(--primary-soft);
+  color: var(--primary);
 }
 
 .logo-mark {
