@@ -21,6 +21,7 @@ use App\Shared\Domain\ValueObject\Money;
 use App\Shared\Infrastructure\Bus\Messenger\SyncCommandBus;
 use App\User\Domain\ValueObject\UserId;
 use App\User\Infrastructure\Doctrine\Entity\User;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Exception\LockWaitTimeoutException;
 use Doctrine\DBAL\TransactionIsolationLevel;
@@ -30,6 +31,9 @@ use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Uid\Uuid;
 
+/**
+ * @phpstan-import-type Params from DriverManager
+ */
 final class CartLimitsTest extends KernelTestCase
 {
     private EntityManagerInterface $entityManager;
@@ -205,12 +209,12 @@ final class CartLimitsTest extends KernelTestCase
         $this->committedFixtures = true;
         $connection->commit();
 
-        $competingConnection = DriverManager::getConnection($connection->getParams());
+        /** @var Params $connectionParameters */
+        $connectionParameters = $connection->getParams();
+        $competingConnection = DriverManager::getConnection($connectionParameters);
         $competingConnection->setTransactionIsolation(TransactionIsolationLevel::REPEATABLE_READ);
         $competingConnection->executeStatement('SET SESSION innodb_lock_wait_timeout = 1');
         $guard = new DoctrineCartCreationGuard($competingConnection);
-        $countSql = 'SELECT COUNT(*) FROM cart WHERE owner_id = :owner';
-        $parameters = ['owner' => $this->ownerId->getId()];
 
         try {
             // Keep the first creation uncommitted after the command handler returns.
@@ -218,7 +222,7 @@ final class CartLimitsTest extends KernelTestCase
             $this->addProduct(Uuid::v7()->toRfc4122(), 1, true);
 
             $competingConnection->beginTransaction();
-            self::assertSame(CartLimits::MAX_ACTIVE_CARTS_PER_OWNER - 1, (int) $competingConnection->fetchOne($countSql, $parameters));
+            self::assertSame(CartLimits::MAX_ACTIVE_CARTS_PER_OWNER - 1, $this->countCarts($competingConnection));
 
             try {
                 $guard->assertCanCreate($this->ownerId);
@@ -229,13 +233,13 @@ final class CartLimitsTest extends KernelTestCase
 
             $connection->commit();
             // A normal SELECT still sees the older snapshot; the guard must not use it.
-            self::assertSame(CartLimits::MAX_ACTIVE_CARTS_PER_OWNER - 1, (int) $competingConnection->fetchOne($countSql, $parameters));
+            self::assertSame(CartLimits::MAX_ACTIVE_CARTS_PER_OWNER - 1, $this->countCarts($competingConnection));
 
             try {
                 $guard->assertCanCreate($this->ownerId);
                 self::fail('The newly committed cart must exhaust the remaining allowance.');
             } catch (ActiveCartLimitExceededException) {
-                self::assertSame(CartLimits::MAX_ACTIVE_CARTS_PER_OWNER, (int) $connection->fetchOne($countSql, $parameters));
+                self::assertSame(CartLimits::MAX_ACTIVE_CARTS_PER_OWNER, $this->countCarts($connection));
                 self::assertSame(1000 - CartLimits::MAX_ACTIVE_CARTS_PER_OWNER, $this->stock());
             }
         } finally {
@@ -254,6 +258,14 @@ final class CartLimitsTest extends KernelTestCase
         $this->expectException(\LogicException::class);
 
         new DoctrineCartCreationGuard($connection)->assertCanCreate($this->ownerId);
+    }
+
+    private function countCarts(Connection $connection): int
+    {
+        $count = $connection->fetchOne('SELECT COUNT(*) FROM cart WHERE owner_id = :owner', ['owner' => $this->ownerId->getId()]);
+        self::assertIsNumeric($count);
+
+        return (int) $count;
     }
 
     private function createOwner(): UserId

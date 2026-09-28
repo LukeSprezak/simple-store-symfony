@@ -48,6 +48,32 @@ docker compose exec php85 php bin/console lint:yaml config
 The integration suite requires MySQL, RabbitMQ and generated JWT keys.
 Unit tests can also be run separately with `php bin/phpunit tests/Unit` on PHP 8.5.
 
+## Cart limits
+
+`src/Order/Domain/Policy/CartLimits.php` defines the limits: 10 units of each
+product per cart and 3 active carts per owner. Repeated additions count toward
+the same quantity limit. A removed item no longer contributes to that quantity.
+
+Both `active` and `abandoned` carts occupy an allowance slot, including empty
+carts and carts past their deadline whose reservations have not yet been
+released. Conversion or expiration by the scheduler frees a slot. Existing
+carts can still be edited when the owner has used the entire allowance.
+The reservation TTL remains 24 hours; keep the expiration worker running.
+
+The API returns 422 for a request quantity outside 1–10 and 409 when an addition
+exceeds the accumulated product quantity or a new cart exceeds the owner's
+allowance. Rejected operations do not reserve stock. Existing data is not
+automatically reduced or deleted when these limits are introduced.
+
+Creation is checked inside the command transaction. The guard locks the owner
+row until commit and checks occupied slots using a locking read, including when
+the transaction already has an older snapshot. See the
+[MySQL locking-read semantics](https://dev.mysql.com/doc/refman/8.4/en/innodb-locking-reads.html).
+Call creation commands through the command bus so the check and cart persistence
+share the same transaction. Migration `Version20260928180000` adds the
+`cart(owner_id, status)` index; apply pending migrations when updating an existing
+environment using the setup command above.
+
 ## Workers
 
 ```sh
