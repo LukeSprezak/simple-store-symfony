@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Order\Application\Command\ConvertCartToOrder;
 
-use App\Order\Domain\Enum\StatusCartTransition;
 use App\Order\Domain\Enum\StatusOrder;
 use App\Order\Domain\Exception\CartNotFoundException;
 use App\Order\Domain\Exception\EmptyCartException;
@@ -16,17 +15,13 @@ use App\Shared\Application\Bus\Command\Sync\CommandHandler;
 use App\Shared\Domain\Exception\ConflictException;
 use App\Shared\Domain\Exception\NotFoundException;
 use Doctrine\ORM\OptimisticLockException;
-use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Workflow\WorkflowInterface;
 
 final readonly class ConvertCartToOrderCommandHandler implements CommandHandler
 {
     public function __construct(
         private CartRepositoryInterface $cartRepository,
         private OrderRepositoryInterface $orderRepository,
-        #[Target('cart_state')]
-        private WorkflowInterface $cartStateWorkflow,
     ) {
     }
 
@@ -43,7 +38,7 @@ final readonly class ConvertCartToOrderCommandHandler implements CommandHandler
                 throw new EmptyCartException($cart->getId());
             }
 
-            $cart->applyTransition(StatusCartTransition::CONVERT->value, $this->cartStateWorkflow);
+            $cart->convert();
 
             $order = Order::create(Uuid::v7()->toRfc4122(), StatusOrder::CREATED->value, $cart->getOwnerId(), new \DateTimeImmutable());
             foreach ($cart->getActiveItems() as $cartItem) {

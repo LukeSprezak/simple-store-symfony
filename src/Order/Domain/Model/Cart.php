@@ -15,7 +15,6 @@ use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Workflow\WorkflowInterface;
 
 class Cart
 {
@@ -89,21 +88,6 @@ class Cart
     public function getStatus(): StatusCart
     {
         return $this->status;
-    }
-
-    public function setStatus(StatusCart $status): void
-    {
-        $this->status = $status;
-    }
-
-    public function getMarking(): string
-    {
-        return $this->status->value;
-    }
-
-    public function setMarking(string $marking): void
-    {
-        $this->status = StatusCart::from($marking);
     }
 
     public function getCreatedAt(): \DateTimeImmutable
@@ -185,29 +169,13 @@ class Cart
         );
     }
 
-    public function applyTransition(string $transition, WorkflowInterface $workflow): void
+    public function convert(): void
     {
-        if (!$workflow->can($this, $transition)) {
-            throw new CartTransitionNotAllowedException($transition, $this->status->value);
+        if (!in_array($this->status, [StatusCart::ACTIVE, StatusCart::ABANDONED], true)) {
+            throw new CartTransitionNotAllowedException('convert', $this->status->value);
         }
 
-        $workflow->apply($this, $transition);
-
-        $marking = $workflow->getMarking($this);
-        $activePlaces = array_keys(array_filter($marking->getPlaces(), static fn ($value) => $value));
-
-        if (1 !== count($activePlaces)) {
-            throw new \LogicException('Cart should have exactly one active place.');
-        }
-
-        $currentPlace = $activePlaces[0];
-        $newStatus = StatusCart::tryFrom($currentPlace);
-
-        if (null === $newStatus) {
-            throw new \LogicException(sprintf("Invalid status value '%s'.", $currentPlace));
-        }
-
-        $this->status = $newStatus;
+        $this->status = StatusCart::CONVERTED_TO_ORDER;
     }
 
     public function isEmpty(): bool

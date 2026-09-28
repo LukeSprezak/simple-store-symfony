@@ -12,13 +12,10 @@ use App\Order\Domain\Model\CartItem;
 use App\Product\Domain\Enum\StatusProduct;
 use App\Product\Domain\Model\Product;
 use App\User\Domain\ValueObject\UserId;
-use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Workflow\Marking;
-use Symfony\Component\Workflow\WorkflowInterface;
 
 #[CoversClass(Cart::class)]
 class CartTest extends TestCase
@@ -151,98 +148,29 @@ class CartTest extends TestCase
     }
 
     #[Test]
-    public function applyTransitionSuccess(): void
+    public function shouldConvertActiveCart(): void
     {
-        $now = new \DateTimeImmutable();
-        $cart = new Cart('cart123', StatusCart::ACTIVE, UserId::generate(), $now, $now);
-        $cart->setStatus(StatusCart::ACTIVE);
+        // Given
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
 
-        $workflow = $this->createMock(WorkflowInterface::class);
-        $workflow->expects($this->once())
-            ->method('can')
-            ->with($cart, 'convert')
-            ->willReturn(true);
-        $workflow->expects($this->once())
-            ->method('apply')
-            ->with($cart, 'convert');
-        $workflow->expects($this->once())
-            ->method('getMarking')
-            ->with($cart)
-            ->willReturn(new Marking(['converted_to_order' => 1]));
+        // When
+        $cart->convert();
 
-        $cart->applyTransition('convert', $workflow);
-
-        $this->assertEquals(StatusCart::CONVERTED_TO_ORDER, $cart->getStatus());
+        // Then
+        self::assertSame(StatusCart::CONVERTED_TO_ORDER, $cart->getStatus());
     }
 
     #[Test]
-    public function applyTransitionNotAllowed(): void
+    public function shouldNotConvertConvertedCart(): void
     {
+        // Given
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::CONVERTED_TO_ORDER, UserId::generate());
+
+        // Then
         $this->expectException(CartTransitionNotAllowedException::class);
 
-        $now = new \DateTimeImmutable();
-        $cart = new Cart('cart123', StatusCart::ACTIVE, UserId::generate(), $now, $now);
-        $cart->setStatus(StatusCart::ACTIVE);
-
-        $workflow = $this->createMock(WorkflowInterface::class);
-        $workflow->expects($this->once())
-            ->method('can')
-            ->with($cart, 'convert')
-            ->willReturn(false);
-
-        $cart->applyTransition('convert', $workflow);
-    }
-
-    #[Test]
-    public function applyTransitionMultipleActivePlaces(): void
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Cart should have exactly one active place.');
-
-        $now = new \DateTimeImmutable();
-        $cart = new Cart('cart123', StatusCart::ACTIVE, UserId::generate(), $now, $now);
-        $cart->setStatus(StatusCart::ACTIVE);
-
-        $workflow = $this->createMock(WorkflowInterface::class);
-        $workflow->expects($this->once())
-            ->method('can')
-            ->with($cart, 'convert')
-            ->willReturn(true);
-        $workflow->expects($this->once())
-            ->method('apply')
-            ->with($cart, 'convert');
-        $workflow->expects($this->once())
-            ->method('getMarking')
-            ->with($cart)
-            ->willReturn(new Marking(['converted_to_order' => 1, 'active' => 1]));
-
-        $cart->applyTransition('convert', $workflow);
-    }
-
-    #[Test]
-    public function applyTransitionInvalidPlace(): void
-    {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage("Invalid status value 'invalid_status'.");
-
-        $now = new \DateTimeImmutable();
-        $cart = new Cart('cart123', StatusCart::ACTIVE, UserId::generate(), $now, $now);
-        $cart->setStatus(StatusCart::ACTIVE);
-
-        $workflow = $this->createMock(WorkflowInterface::class);
-        $workflow->expects($this->once())
-            ->method('can')
-            ->with($cart, 'convert')
-            ->willReturn(true);
-        $workflow->expects($this->once())
-            ->method('apply')
-            ->with($cart, 'convert');
-        $workflow->expects($this->once())
-            ->method('getMarking')
-            ->with($cart)
-            ->willReturn(new Marking(['invalid_status' => 1]));
-
-        $cart->applyTransition('convert', $workflow);
+        // When
+        $cart->convert();
     }
 
     private function createProductMock(string $productId, float $price, int $stockQuantity, string $name = 'Test Product'): Product

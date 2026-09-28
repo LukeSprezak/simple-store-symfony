@@ -64,27 +64,3 @@ framework:
                     from: !php/enum App\Order\Domain\Enum\StatusOrder::PENDING_PAYMENT->value
                     to: !php/enum App\Order\Domain\Enum\StatusOrder::FAILED->value
 
-        cart_state:
-            type: state_machine
-            audit_trail:
-                enabled: false
-            marking_store:
-                service: App\Order\Domain\Model\CartMarkingStore
-            supports:
-                - App\Order\Domain\Model\Cart
-            initial_marking: !php/enum App\Order\Domain\Enum\StatusCart::ACTIVE->value
-            places:
-                !php/enum App\Order\Domain\Enum\StatusCart::ACTIVE->value: null
-                !php/enum App\Order\Domain\Enum\StatusCart::EXPIRED->value: null
-                !php/enum App\Order\Domain\Enum\StatusCart::ABANDONED->value: null
-                !php/enum App\Order\Domain\Enum\StatusCart::CONVERTED_TO_ORDER->value: null
-            transitions:
-                !php/enum App\Order\Domain\Enum\StatusCartTransition::EXPIRE->value:
-                    from: !php/enum App\Order\Domain\Enum\StatusCart::ACTIVE->value
-                    to: !php/enum App\Order\Domain\Enum\StatusCart::EXPIRED->value
-                !php/enum App\Order\Domain\Enum\StatusCartTransition::ABANDON->value:
-                    from: !php/enum App\Order\Domain\Enum\StatusCart::ACTIVE->value
-                    to: !php/enum App\Order\Domain\Enum\StatusCart::ABANDONED->value
-                !php/enum App\Order\Domain\Enum\StatusCartTransition::CONVERT->value:
-                    from: [ !php/enum App\Order\Domain\Enum\StatusCart::ACTIVE->value, !php/enum App\Order\Domain\Enum\StatusCart::ABANDONED->value ]
-                    to: !php/enum App\Order\Domain\Enum\StatusCart::CONVERTED_TO_ORDER->value
