@@ -38,6 +38,19 @@ Use `app:create-user` to add further users interactively.
 
 The API is available at http://localhost:8080 and RabbitMQ management at
 http://localhost:15672.
+
+## Frontend
+
+The Angular 22 application lives in `frontend/`. The `frontend` service
+(Node 24) installs dependencies and runs `ng serve` at http://localhost:4200,
+proxying `/api` to nginx (`frontend/proxy.conf.json`). Log in with a fixture
+account; the JWT is kept in `localStorage` and sent as a Bearer token.
+
+Run Angular CLI commands inside the container:
+
+```sh
+docker compose exec frontend npx ng build
+```
 MySQL is exposed on port 13306; inside Docker its hostname is `mysql`.
 The supplied credentials are for local development.
 

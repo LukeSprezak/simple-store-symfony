@@ -1,7 +1,7 @@
-import { HttpClient, HttpInterceptorFn } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { map, Observable } from 'rxjs';
+import { catchError, map, Observable, throwError } from 'rxjs';
 
 const TOKEN_KEY = 'token';
 
@@ -26,9 +26,20 @@ export class AuthService {
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = inject(AuthService).token();
+  const auth = inject(AuthService);
+  const router = inject(Router);
+  const token = auth.token();
 
-  return next(token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req);
+  return next(token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req).pipe(
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
+        auth.logout();
+        router.navigateByUrl('/login');
+      }
+
+      return throwError(() => error);
+    }),
+  );
 };
 
 export const authGuard: CanActivateFn = () =>
