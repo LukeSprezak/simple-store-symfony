@@ -7,6 +7,7 @@ namespace App\Order\Domain\Model;
 use App\Order\Domain\Enum\StatusOrder;
 use App\Order\Domain\Enum\StatusOrderTransition;
 use App\Order\Domain\Event\OrderPlaced;
+use App\Order\Domain\Event\OrderStatusChanged;
 use App\Order\Domain\Exception\OrderTransitionNotAllowedException;
 use App\Shared\Domain\Aggregate\AggregateRoot;
 use App\User\Domain\ValueObject\UserId;
@@ -86,7 +87,9 @@ class Order extends AggregateRoot
             throw new OrderTransitionNotAllowedException($transition->value, $this->status);
         }
 
+        $fromStatus = $this->status;
         $this->status = $transition->target()->value;
+        $this->recordThat(new OrderStatusChanged($this->id, $transition->value, $fromStatus, $this->status));
     }
 
     public function getCreatedAt(): \DateTimeImmutable

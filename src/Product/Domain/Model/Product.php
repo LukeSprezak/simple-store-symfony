@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace App\Product\Domain\Model;
 
 use App\Product\Domain\Enum\StatusProduct;
+use App\Product\Domain\Event\StockReleased;
+use App\Product\Domain\Event\StockReserved;
+use App\Shared\Domain\Aggregate\AggregateRoot;
 use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 
-class Product
+class Product extends AggregateRoot
 {
     private int $version = 1;
 
@@ -62,6 +65,7 @@ class Product
     public function increaseStock(int $quantity): void
     {
         $this->stockQuantity += $quantity;
+        $this->recordThat(new StockReleased($this->id, $quantity));
     }
 
     public function getUserId(): UserId
@@ -86,5 +90,6 @@ class Product
         }
 
         $this->stockQuantity -= $quantity;
+        $this->recordThat(new StockReserved($this->id, $quantity));
     }
 }
