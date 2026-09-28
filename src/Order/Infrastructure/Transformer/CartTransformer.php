@@ -51,8 +51,8 @@ final readonly class CartTransformer
                 $itemEntity->setProduct($productEntity);
                 $itemEntity->setQuantity($itemDomain->getQuantity());
                 $itemEntity->setCart($entity);
-                $itemEntity->setDeleted($domain->isDeleted());
-                $itemEntity->setDeletedAt($domain->getDeletedAt());
+                $itemEntity->setDeleted($itemDomain->isDeleted());
+                $itemEntity->setDeletedAt($itemDomain->getDeletedAt());
 
                 $entity->addItem($itemEntity);
             }
@@ -89,9 +89,10 @@ final readonly class CartTransformer
                 $itemEntity->getQuantity()
             );
 
-            $domain->setDeleted($itemEntity->isDeleted());
-            $domain->setDeletedAt($itemEntity->getDeletedAt());
-            $domain->addItem($itemDomain);
+            $itemDomain->setDeleted($itemEntity->isDeleted());
+            $itemDomain->setDeletedAt($itemEntity->getDeletedAt());
+            // bypasses Cart::addItem(), which would merge a removed item into an active one of the same product
+            $domain->getItems()->add($itemDomain);
         }
 
         return $domain;

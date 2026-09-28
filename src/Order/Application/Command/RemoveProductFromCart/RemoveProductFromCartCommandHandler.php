@@ -10,7 +10,6 @@ use App\Order\Domain\Exception\ProductRemoveFromCartException;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Product\Domain\Repository\ProductRepositoryInterface;
 use App\Shared\Application\Bus\Command\Sync\CommandHandler;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 final readonly class RemoveProductFromCartCommandHandler implements CommandHandler
 {
@@ -25,10 +24,6 @@ final readonly class RemoveProductFromCartCommandHandler implements CommandHandl
         $cart = $this->cartRepository->find($command->cartId);
         if (!$cart || !$cart->isOwnedBy($command->userId)) {
             throw new CartNotFoundException($command->cartId);
-        }
-
-        if ($cart->isDeleted()) {
-            throw new AccessDeniedHttpException('Access to this resource is locked.');
         }
 
         try {

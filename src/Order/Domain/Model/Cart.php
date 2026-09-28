@@ -8,7 +8,6 @@ use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\ProductNotInCartException;
 use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Product\Domain\Model\Product;
-use App\Shared\Infrastructure\Doctrine\Entity\SoftDeleteTrait;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -18,8 +17,6 @@ use Symfony\Component\Workflow\WorkflowInterface;
 
 class Cart
 {
-    use SoftDeleteTrait;
-
     private readonly string $id;
     private StatusCart $status;
     private readonly UserId $ownerId;
