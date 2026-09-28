@@ -8,8 +8,6 @@ use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\CartNotActiveException;
 use App\Order\Domain\Exception\CartTransitionNotAllowedException;
 use App\Order\Domain\Exception\ProductNotInCartException;
-use App\Order\Domain\Exception\ProductUnavailableException;
-use App\Product\Domain\Enum\StatusProduct;
 use App\Product\Domain\Model\Product;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -121,16 +119,17 @@ class Cart
         }
     }
 
-    public function removeProduct(Product $product): void
+    public function removeProduct(string $productId): int
     {
-        $item = $this->findItemByProductId($product->getId());
+        $item = $this->findItemByProductId($productId);
 
-        if ($item) {
-            $item->softDelete();
-            $product->increaseStock($item->getQuantity());
-        } else {
-            throw new ProductNotInCartException($product->getId());
+        if (!$item) {
+            throw new ProductNotInCartException($productId);
         }
+
+        $item->softDelete();
+
+        return $item->getQuantity();
     }
 
     public function addProduct(Product $product, int $quantity): void
@@ -143,10 +142,6 @@ class Cart
             throw new \InvalidArgumentException('The quantity must be a positive number.');
         }
 
-        if (StatusProduct::ACTIVE !== $product->getStatus() || $product->getStockQuantity() < $quantity) {
-            throw new ProductUnavailableException($product->getId());
-        }
-
         $existingItem = $this->findItemByProductId($product->getId());
 
         if ($existingItem) {
@@ -156,8 +151,6 @@ class Cart
             $cartItem = CartItem::create($itemId, $product, $quantity);
             $this->items->add($cartItem);
         }
-
-        $product->decreaseStock($quantity);
     }
 
     public function getTotalAmount(): float

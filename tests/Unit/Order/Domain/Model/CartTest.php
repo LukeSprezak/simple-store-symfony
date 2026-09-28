@@ -6,7 +6,6 @@ namespace App\Tests\Unit\Order\Domain\Model;
 
 use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\CartTransitionNotAllowedException;
-use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
 use App\Product\Domain\Enum\StatusProduct;
@@ -27,10 +26,6 @@ class CartTest extends TestCase
         $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
         $product = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
 
-        $product->expects($this->once())
-            ->method('decreaseStock')
-            ->with(2);
-
         // When
         $cart->addProduct($product, 2);
 
@@ -49,15 +44,6 @@ class CartTest extends TestCase
 
         $product = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
 
-        $expectedCalls = [2, 3];
-        $callIndex = 0;
-        $product->expects($this->exactly(2))
-            ->method('decreaseStock')
-            ->willReturnCallback(function ($quantity) use (&$expectedCalls, &$callIndex) {
-                self::assertSame($expectedCalls[$callIndex], $quantity, 'decreaseStock called with unexpected quantity.');
-                ++$callIndex;
-            });
-
         // When
         $cart->addProduct($product, 2);
         $cart->addProduct($product, 3);
@@ -69,37 +55,12 @@ class CartTest extends TestCase
     }
 
     #[Test]
-    public function shouldAddProductWithInsufficientStockThrowsException(): void
-    {
-        // Given
-        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
-        $product = $this->createProductMock('product-1', 30.0, 1, 'Product 1');
-
-        $product->expects($this->never())
-            ->method('decreaseStock');
-
-        // Then
-        $this->expectException(ProductUnavailableException::class);
-        $this->expectExceptionMessage('The product with the ID "product-1" is not available.');
-
-        // When
-        $cart->addProduct($product, 2);
-    }
-
-    #[Test]
     public function shouldGetTotalAmount(): void
     {
         // Given
         $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
         $product1 = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
         $product2 = $this->createProductMock('product-2', 25.0, 10, 'Product 2');
-
-        $product1->expects($this->once())
-            ->method('decreaseStock')
-            ->with(2);
-        $product2->expects($this->once())
-            ->method('decreaseStock')
-            ->with(4);
 
         $cart->addProduct($product1, 2);
         $cart->addProduct($product2, 4);

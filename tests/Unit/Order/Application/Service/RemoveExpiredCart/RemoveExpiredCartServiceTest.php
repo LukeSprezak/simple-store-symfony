@@ -9,7 +9,7 @@ use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Product\Domain\Model\Product;
-use App\Product\Domain\Repository\ProductRepositoryInterface;
+use App\Order\Domain\Service\StockReservation;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
@@ -21,19 +21,19 @@ use PHPUnit\Framework\TestCase;
 final class RemoveExpiredCartServiceTest extends TestCase
 {
     private CartRepositoryInterface&MockObject $cartRepository;
-    private ProductRepositoryInterface&MockObject $productRepository;
+    private StockReservation&MockObject $stockReservation;
     private EntityManagerInterface&MockObject $entityManager;
     private RemoveExpiredCartService $service;
 
     protected function setUp(): void
     {
         $this->cartRepository = $this->createMock(CartRepositoryInterface::class);
-        $this->productRepository = $this->createMock(ProductRepositoryInterface::class);
+        $this->stockReservation = $this->createMock(StockReservation::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
 
         $this->service = new RemoveExpiredCartService(
             cartRepository: $this->cartRepository,
-            productRepository: $this->productRepository,
+            stockReservation: $this->stockReservation,
             entityManager: $this->entityManager,
         );
     }
@@ -101,37 +101,12 @@ final class RemoveExpiredCartServiceTest extends TestCase
             ->method('save')
             ->with($cart);
 
-        $this->productRepository
-            ->expects($this->once())
-            ->method('findByIds')
-            ->with(['prod-1', 'prod-2'])
-            ->willReturn([$product1, $product2]);
-
-        $product1
-            ->expects($this->once())
-            ->method('increaseStock')
-            ->with(2);
-
-        $product2
-            ->expects($this->once())
-            ->method('increaseStock')
-            ->with(3);
-
-        $this->productRepository
-            ->expects($this->once())
-            ->method('findByIds')
-            ->with(['prod-1', 'prod-2'])
-            ->willReturn([$product1, $product2]);
-
-        $savedProducts = [];
-        $this->productRepository
+        $released = [];
+        $this->stockReservation
             ->expects($this->exactly(2))
-            ->method('save')
-            ->with($this->callback(function ($product) use ($product1, $product2) {
-                return $product === $product1 || $product === $product2;
-            }))
-            ->willReturnCallback(function ($product) use (&$savedProducts) {
-                $savedProducts[] = $product;
+            ->method('release')
+            ->willReturnCallback(function (string $productId, int $quantity) use (&$released) {
+                $released[$productId] = $quantity;
             });
 
         $this->entityManager
@@ -142,8 +117,7 @@ final class RemoveExpiredCartServiceTest extends TestCase
         $this->service->expireCarts($now);
 
         // then
-        $this->assertContains($product1, $savedProducts);
-        $this->assertContains($product2, $savedProducts);
+        $this->assertSame(['prod-1' => 2, 'prod-2' => 3], $released);
     }
 
     #[Test]

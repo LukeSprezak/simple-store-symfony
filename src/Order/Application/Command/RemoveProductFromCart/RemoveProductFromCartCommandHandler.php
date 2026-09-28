@@ -7,7 +7,7 @@ namespace App\Order\Application\Command\RemoveProductFromCart;
 use App\Order\Domain\Exception\CartNotFoundException;
 use App\Order\Domain\Exception\ProductRemoveFromCartException;
 use App\Order\Domain\Repository\CartRepositoryInterface;
-use App\Product\Domain\Repository\ProductRepositoryInterface;
+use App\Order\Domain\Service\StockReservation;
 use App\Shared\Application\Bus\Command\Sync\CommandHandler;
 use App\Shared\Domain\Exception\NotFoundException;
 
@@ -15,7 +15,7 @@ final readonly class RemoveProductFromCartCommandHandler implements CommandHandl
 {
     public function __construct(
         private CartRepositoryInterface $cartRepository,
-        private ProductRepositoryInterface $productRepository,
+        private StockReservation $stockReservation,
     ) {
     }
 
@@ -27,8 +27,7 @@ final readonly class RemoveProductFromCartCommandHandler implements CommandHandl
         }
 
         try {
-            $product = $this->productRepository->get($command->productId);
-            $cart->removeProduct($product);
+            $quantity = $cart->removeProduct($command->productId);
         } catch (NotFoundException $exception) {
             throw $exception;
         } catch (\Exception $exception) {
@@ -36,6 +35,6 @@ final readonly class RemoveProductFromCartCommandHandler implements CommandHandl
         }
 
         $this->cartRepository->save($cart);
-        $this->productRepository->save($product);
+        $this->stockReservation->release($command->productId, $quantity);
     }
 }
