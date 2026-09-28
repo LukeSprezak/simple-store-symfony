@@ -1,0 +1,961 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Cannot call method toOrderItem\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Application/Command/ConvertCartToOrder/ConvertCartToOrderCommandHandler.php
+
+		-
+			message: '#^Parameter \#1 \$orderItem of method App\\Order\\Domain\\Model\\Order\:\:addItem\(\) expects App\\Order\\Domain\\Model\\OrderItem, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Application/Command/ConvertCartToOrder/ConvertCartToOrderCommandHandler.php
+
+		-
+			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
+			identifier: foreach.nonIterable
+			count: 1
+			path: src/Order/Application/Service/RemoveExpiredCart/RemoveExpiredCartService.php
+
+		-
+			message: '#^Cannot call method clearItemQuantities\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Application/Service/RemoveExpiredCart/RemoveExpiredCartService.php
+
+		-
+			message: '#^Cannot call method expire\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Application/Service/RemoveExpiredCart/RemoveExpiredCartService.php
+
+		-
+			message: '#^Cannot call method getActiveItems\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Application/Service/RemoveExpiredCart/RemoveExpiredCartService.php
+
+		-
+			message: '#^Cannot call method getId\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Application/Service/RemoveExpiredCart/RemoveExpiredCartService.php
+
+		-
+			message: '#^Cannot call method getProduct\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Application/Service/RemoveExpiredCart/RemoveExpiredCartService.php
+
+		-
+			message: '#^Cannot call method getQuantity\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Application/Service/RemoveExpiredCart/RemoveExpiredCartService.php
+
+		-
+			message: '#^Parameter \#1 \$cart of method App\\Order\\Domain\\Repository\\CartRepositoryInterface\:\:save\(\) expects App\\Order\\Domain\\Model\\Cart, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Application/Service/RemoveExpiredCart/RemoveExpiredCartService.php
+
+		-
+			message: '#^Parameter \#1 \$productId of method App\\Order\\Domain\\Service\\StockReservation\:\:release\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Application/Service/RemoveExpiredCart/RemoveExpiredCartService.php
+
+		-
+			message: '#^Parameter \#2 \$quantity of method App\\Order\\Domain\\Service\\StockReservation\:\:release\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Application/Service/RemoveExpiredCart/RemoveExpiredCartService.php
+
+		-
+			message: '#^Cannot call method getId\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Cannot call method getProduct\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Cannot call method isDeleted\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Cannot call method setQuantity\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:__construct\(\) has parameter \$items with generic interface Doctrine\\Common\\Collections\\Collection but does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:findItemByProductId\(\) should return App\\Order\\Domain\\Model\\CartItem\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:fromPersistence\(\) has parameter \$items with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:getActiveItems\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:getItemById\(\) should return App\\Order\\Domain\\Model\\CartItem\|null but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:getItems\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Parameter \#1 \$p of method Doctrine\\Common\\Collections\\Collection\<\(int\|string\),mixed\>\:\:filter\(\) expects Closure\(mixed, int\|string\)\: bool, Closure\(App\\Order\\Domain\\Model\\CartItem\)\: bool given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Parameter \$callback of function array_reduce expects callable\(App\\Shared\\Domain\\ValueObject\\Money, mixed\)\: App\\Shared\\Domain\\ValueObject\\Money, Closure\(App\\Shared\\Domain\\ValueObject\\Money, App\\Order\\Domain\\Model\\CartItem\)\: App\\Shared\\Domain\\ValueObject\\Money given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Property App\\Order\\Domain\\Model\\Cart\:\:\$items with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Order/Domain/Model/Cart.php
+
+		-
+			message: '#^Method App\\Order\\Domain\\Model\\Order\:\:fromPersistence\(\) has parameter \$items with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Order/Domain/Model/Order.php
+
+		-
+			message: '#^Method App\\Order\\Domain\\Model\\Order\:\:getItems\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Order/Domain/Model/Order.php
+
+		-
+			message: '#^Parameter \#1 \$orderItem of method App\\Order\\Domain\\Model\\Order\:\:addItem\(\) expects App\\Order\\Domain\\Model\\OrderItem, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Domain/Model/Order.php
+
+		-
+			message: '#^Property App\\Order\\Domain\\Model\\Order\:\:\$items with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Order/Domain/Model/Order.php
+
+		-
+			message: '#^Method App\\Order\\Domain\\Repository\\CartRepositoryInterface\:\:findExpiredCarts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Order/Domain/Repository/CartRepositoryInterface.php
+
+		-
+			message: '#^Method App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\:\:getItems\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Order/Infrastructure/Doctrine/Entity/Cart.php
+
+		-
+			message: '#^Property App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\:\:\$items type mapping mismatch\: property can contain Doctrine\\Common\\Collections\\Collection but database expects Doctrine\\Common\\Collections\\Collection&iterable\<App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\>\.$#'
+			identifier: doctrine.associationType
+			count: 1
+			path: src/Order/Infrastructure/Doctrine/Entity/Cart.php
+
+		-
+			message: '#^Property App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\:\:\$items with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Order/Infrastructure/Doctrine/Entity/Cart.php
+
+		-
+			message: '#^Method App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:getCart\(\) should return App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart but returns App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Order/Infrastructure/Doctrine/Entity/CartItem.php
+
+		-
+			message: '#^Property App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:\$product type mapping mismatch\: database can contain App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\|null but property expects App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\.$#'
+			identifier: doctrine.associationType
+			count: 1
+			path: src/Order/Infrastructure/Doctrine/Entity/CartItem.php
+
+		-
+			message: '#^Method App\\Order\\Infrastructure\\Doctrine\\Entity\\Order\:\:getItems\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Order/Infrastructure/Doctrine/Entity/Order.php
+
+		-
+			message: '#^Property App\\Order\\Infrastructure\\Doctrine\\Entity\\Order\:\:\$items type mapping mismatch\: property can contain Doctrine\\Common\\Collections\\Collection but database expects Doctrine\\Common\\Collections\\Collection&iterable\<App\\Order\\Infrastructure\\Doctrine\\Entity\\OrderItem\>\.$#'
+			identifier: doctrine.associationType
+			count: 1
+			path: src/Order/Infrastructure/Doctrine/Entity/Order.php
+
+		-
+			message: '#^Property App\\Order\\Infrastructure\\Doctrine\\Entity\\Order\:\:\$items with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Order/Infrastructure/Doctrine/Entity/Order.php
+
+		-
+			message: '#^Property App\\Order\\Infrastructure\\Doctrine\\Entity\\OrderItem\:\:\$order \(App\\Order\\Infrastructure\\Doctrine\\Entity\\Order\) does not accept App\\Order\\Infrastructure\\Doctrine\\Entity\\Order\|null\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Order/Infrastructure/Doctrine/Entity/OrderItem.php
+
+		-
+			message: '#^Method App\\Order\\Infrastructure\\Repository\\CartRepository\:\:findExpiredCarts\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Order/Infrastructure/Repository/CartRepository.php
+
+		-
+			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(mixed\)\: mixed\)\|null, Closure\(App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\)\: App\\Order\\Domain\\Model\\Cart given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Repository/CartRepository.php
+
+		-
+			message: '#^Parameter \#2 \$array of function array_map expects array, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Repository/CartRepository.php
+
+		-
+			message: '#^Cannot call method getDeletedAt\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Cannot call method getId\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 10
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Cannot call method getName\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Cannot call method getPrice\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Cannot call method getProduct\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Cannot call method getQuantity\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 3
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Cannot call method isDeleted\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Cannot call method setDeleted\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Cannot call method setDeletedAt\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Cannot call method setQuantity\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$amount of class App\\Shared\\Domain\\ValueObject\\Money constructor expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$deleted of method App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:setDeleted\(\) expects bool, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$deletedAt of method App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:setDeletedAt\(\) expects DateTimeImmutable\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$id of class App\\Order\\Domain\\Model\\ProductSnapshot constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$id of method App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:setId\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$id of static method App\\Order\\Domain\\Model\\CartItem\:\:fromPersistence\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$item of method App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\:\:removeItem\(\) expects App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$itemId of method App\\Order\\Domain\\Model\\Cart\:\:getItemById\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$productId of class App\\Product\\Domain\\Exception\\ProductNotFoundException constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$quantity of method App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:setQuantity\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#2 \$name of class App\\Order\\Domain\\Model\\ProductSnapshot constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#3 \$quantity of static method App\\Order\\Domain\\Model\\CartItem\:\:fromPersistence\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#4 \$deletedAt of static method App\\Order\\Domain\\Model\\CartItem\:\:fromPersistence\(\) expects DateTimeImmutable\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 4
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Cannot call method getAmount\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Cannot call method getId\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 10
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Cannot call method getName\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Cannot call method getPrice\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Cannot call method getProduct\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 5
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Cannot call method getQuantity\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 4
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Cannot call method getUnitPrice\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Cannot call method setProduct\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Cannot call method setQuantity\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$amount of class App\\Shared\\Domain\\ValueObject\\Money constructor expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$id of class App\\Order\\Domain\\Model\\ProductSnapshot constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$id of class App\\Order\\Infrastructure\\Doctrine\\Entity\\OrderItem constructor expects string\|null, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$id of static method App\\Order\\Domain\\Model\\OrderItem\:\:fromPersistence\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$item of method App\\Order\\Infrastructure\\Doctrine\\Entity\\Order\:\:removeItem\(\) expects App\\Order\\Infrastructure\\Doctrine\\Entity\\OrderItem, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$object of method Doctrine\\Persistence\\ObjectManager\:\:remove\(\) expects object, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$quantity of method App\\Order\\Infrastructure\\Doctrine\\Entity\\OrderItem\:\:setQuantity\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Parameter \#1 \$unitPrice of method App\\Order\\Infrastructure\\Doctrine\\Entity\\OrderItem\:\:setUnitPrice\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Parameter \#2 \$name of class App\\Order\\Domain\\Model\\ProductSnapshot constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Parameter \#2 \$quantity of class App\\Order\\Infrastructure\\Doctrine\\Entity\\OrderItem constructor expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Parameter \#3 \$quantity of static method App\\Order\\Domain\\Model\\OrderItem\:\:fromPersistence\(\) expects int, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Part \$itemDomain\-\>getProduct\(\)\-\>getId\(\) \(mixed\) of encapsed string cannot be cast to string\.$#'
+			identifier: encapsedStringPart.nonString
+			count: 1
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Possibly invalid array key type mixed\.$#'
+			identifier: offsetAccess.invalidOffset
+			count: 4
+			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
+
+		-
+			message: '#^Method App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:getDescription\(\) should return string but returns string\|null\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
+
+		-
+			message: '#^Method App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:getReviews\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
+
+		-
+			message: '#^Property App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:\$description type mapping mismatch\: property can contain string\|null but database expects string\.$#'
+			identifier: doctrine.columnType
+			count: 1
+			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
+
+		-
+			message: '#^Property App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:\$reviews is never written, only read\.$#'
+			identifier: property.onlyRead
+			count: 1
+			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
+
+		-
+			message: '#^Property App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:\$reviews type mapping mismatch\: property can contain Doctrine\\Common\\Collections\\Collection but database expects Doctrine\\Common\\Collections\\Collection&iterable\<App\\Product\\Infrastructure\\Doctrine\\Entity\\Review\>\.$#'
+			identifier: doctrine.associationType
+			count: 1
+			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
+
+		-
+			message: '#^Property App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:\$reviews with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
+			identifier: missingType.generics
+			count: 1
+			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
+
+		-
+			message: '#^Access to an undefined property App\\Shared\\Domain\\ValueObject\\UuidValueObject\|App\\Shared\\Domain\\ValueObject\\UuidValueObjectInterface\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: src/Shared/Domain/ValueObject/UuidValueObject.php
+
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Shared/Domain/ValueObject/UuidValueObject.php
+
+		-
+			message: '#^Method App\\Shared\\Infrastructure\\Framework\\Event\\Listener\\ExceptionListener\:\:prepareGeneralErrorResponse\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Event/Listener/ExceptionListener.php
+
+		-
+			message: '#^Method App\\Shared\\Infrastructure\\Framework\\Event\\Listener\\ExceptionListener\:\:prepareSimpleErrorResponse\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Event/Listener/ExceptionListener.php
+
+		-
+			message: '#^Method App\\Shared\\Infrastructure\\Framework\\Event\\Listener\\ExceptionListener\:\:prepareValidationErrorResponse\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Event/Listener/ExceptionListener.php
+
+		-
+			message: '#^Parameter \#1 \$haystack of function str_starts_with expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Event/Subscriber/RateLimiterSubscriber.php
+
+		-
+			message: '#^Class App\\Shared\\Infrastructure\\Framework\\Validator\\ValidationError constructor invoked with 2 parameters, 1 required\.$#'
+			identifier: arguments.count
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Request/Resolver/JsonBodyResolver.php
+
+		-
+			message: '#^Method App\\Shared\\Infrastructure\\Framework\\Request\\Resolver\\JsonBodyResolver\:\:resolve\(\) return type has no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Request/Resolver/JsonBodyResolver.php
+
+		-
+			message: '#^Parameter \#2 \$type of method Symfony\\Component\\Serializer\\SerializerInterface\:\:deserialize\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Request/Resolver/JsonBodyResolver.php
+
+		-
+			message: '#^Method App\\Shared\\Infrastructure\\Framework\\Validator\\ValidationError\:\:__construct\(\) has parameter \$errors with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Validator/ValidationError.php
+
+		-
+			message: '#^Method App\\Shared\\Infrastructure\\Framework\\Validator\\ValidationError\:\:getErrors\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Validator/ValidationError.php
+
+		-
+			message: '#^Property App\\Shared\\Infrastructure\\Framework\\Validator\\ValidationError\:\:\$errors type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Validator/ValidationError.php
+
+		-
+			message: '#^Anonymous function should return string but returns string\|Stringable\.$#'
+			identifier: return.type
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Validator/Validator.php
+
+		-
+			message: '#^Method App\\Shared\\Infrastructure\\Framework\\Validator\\Validator\:\:valid\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Infrastructure/Framework/Validator/Validator.php
+
+		-
+			message: '#^Method App\\Shared\\Infrastructure\\Utils\\Response\\ResponseProvider\:\:__construct\(\) has parameter \$data with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Infrastructure/Utils/Response/ResponseProvider.php
+
+		-
+			message: '#^Method App\\Shared\\Infrastructure\\Utils\\Response\\ResponseProvider\:\:__construct\(\) has parameter \$error with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/Shared/Infrastructure/Utils/Response/ResponseProvider.php
+
+		-
+			message: '#^Method App\\User\\Domain\\Model\\User\:\:__construct\(\) has parameter \$roles with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/User/Domain/Model/User.php
+
+		-
+			message: '#^Method App\\User\\Domain\\Model\\User\:\:create\(\) has parameter \$roles with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/User/Domain/Model/User.php
+
+		-
+			message: '#^Method App\\User\\Domain\\Model\\User\:\:fromPersistence\(\) has parameter \$roles with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/User/Domain/Model/User.php
+
+		-
+			message: '#^Method App\\User\\Domain\\Model\\User\:\:getRoles\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/User/Domain/Model/User.php
+
+		-
+			message: '#^Method App\\User\\Domain\\Model\\User\:\:setEmail\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/User/Domain/Model/User.php
+
+		-
+			message: '#^Method App\\User\\Domain\\Model\\User\:\:setId\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/User/Domain/Model/User.php
+
+		-
+			message: '#^Method App\\User\\Domain\\Model\\User\:\:setRoles\(\) has parameter \$roles with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/User/Domain/Model/User.php
+
+		-
+			message: '#^Method App\\User\\Domain\\Model\\User\:\:setRoles\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/User/Domain/Model/User.php
+
+		-
+			message: '#^Method App\\User\\Domain\\Model\\User\:\:setUsername\(\) is unused\.$#'
+			identifier: method.unused
+			count: 1
+			path: src/User/Domain/Model/User.php
+
+		-
+			message: '#^Method App\\User\\Infrastructure\\Doctrine\\Entity\\User\:\:getRoles\(\) should return array\<string\> but returns array\.$#'
+			identifier: return.type
+			count: 1
+			path: src/User/Infrastructure/Doctrine/Entity/User.php
+
+		-
+			message: '#^Method App\\User\\Infrastructure\\Doctrine\\Entity\\User\:\:getUserIdentifier\(\) should return non\-empty\-string but returns string\.$#'
+			identifier: return.type
+			count: 1
+			path: src/User/Infrastructure/Doctrine/Entity/User.php
+
+		-
+			message: '#^Method App\\User\\Infrastructure\\Doctrine\\Entity\\User\:\:setRoles\(\) has parameter \$roles with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/User/Infrastructure/Doctrine/Entity/User.php
+
+		-
+			message: '#^Parameter \#1 \$array of function array_unique expects an array of values castable to string, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/User/Infrastructure/Doctrine/Entity/User.php
+
+		-
+			message: '#^Property App\\User\\Infrastructure\\Doctrine\\Entity\\User\:\:\$password type mapping mismatch\: property can contain string\|null but database expects string\.$#'
+			identifier: doctrine.columnType
+			count: 1
+			path: src/User/Infrastructure/Doctrine/Entity/User.php
+
+		-
+			message: '#^Property App\\User\\Infrastructure\\Doctrine\\Entity\\User\:\:\$roles type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/User/Infrastructure/Doctrine/Entity/User.php
+
+		-
+			message: '#^Constant App\\User\\UI\\Cli\\CreateUserCommand\:\:DEFAULT_ROLES is unused\.$#'
+			identifier: classConstant.unused
+			count: 1
+			path: src/User/UI/Cli/CreateUserCommand.php
+
+		-
+			message: '#^Method App\\User\\UI\\Cli\\CreateUserCommand\:\:askEmail\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/User/UI/Cli/CreateUserCommand.php
+
+		-
+			message: '#^Method App\\User\\UI\\Cli\\CreateUserCommand\:\:askPassword\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/User/UI/Cli/CreateUserCommand.php
+
+		-
+			message: '#^Method App\\User\\UI\\Cli\\CreateUserCommand\:\:askRoles\(\) return type has no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/User/UI/Cli/CreateUserCommand.php
+
+		-
+			message: '#^Method App\\User\\UI\\Cli\\CreateUserCommand\:\:askUsername\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: src/User/UI/Cli/CreateUserCommand.php
+
+		-
+			message: '#^Method App\\User\\UI\\Cli\\CreateUserCommand\:\:createUser\(\) has parameter \$roles with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: src/User/UI/Cli/CreateUserCommand.php
+
+		-
+			message: '#^Parameter \#1 \$string of function trim expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/User/UI/Cli/CreateUserCommand.php
+
+		-
+			message: '#^Parameter \#1 \$validator of method Symfony\\Component\\Console\\Question\\Question\:\:setValidator\(\) expects \(callable\(mixed\)\: mixed\)\|null, Closure\(string\|null\)\: non\-falsy\-string given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/User/UI/Cli/CreateUserCommand.php
+
+		-
+			message: '#^Parameter \#2 \$string of function explode expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/User/UI/Cli/CreateUserCommand.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertNotNull\(\) with App\\Product\\Application\\Command\\AddProduct\\AddProductCommand will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Integration/Product/Application/Command/AddProduct/AddProductCommandHandlerTest.php
+
+		-
+			message: '#^Method App\\Tests\\Integration\\Shared\\Infrastructure\\Framework\\Event\\Subscriber\\RateLimiterSubscriberTest\:\:getJwtToken\(\) should return string but returns mixed\.$#'
+			identifier: return.type
+			count: 1
+			path: tests/Integration/Shared/Infrastructure/Framework/Event/Subscriber/RateLimiterSubscriberTest.php
+
+		-
+			message: '#^Parameter \#1 \$json of function json_decode expects string, string\|false given\.$#'
+			identifier: argument.type
+			count: 2
+			path: tests/Integration/Shared/Infrastructure/Framework/Event/Subscriber/RateLimiterSubscriberTest.php
+
+		-
+			message: '#^Parameter \#2 \$array of method PHPUnit\\Framework\\Assert\:\:assertArrayHasKey\(\) expects array\<mixed\>\|ArrayAccess\<\(int\|string\), covariant mixed\>, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/Integration/Shared/Infrastructure/Framework/Event/Subscriber/RateLimiterSubscriberTest.php
+
+		-
+			message: '#^Cannot call method getId\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: tests/Unit/Order/Application/Command/AddProductToCart/AddProductToCartCommandHandlerTest.php
+
+		-
+			message: '#^Cannot call method getProduct\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Unit/Order/Application/Command/AddProductToCart/AddProductToCartCommandHandlerTest.php
+
+		-
+			message: '#^Cannot call method getQuantity\(\) on App\\Order\\Domain\\Model\\CartItem\|null\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Unit/Order/Application/Command/AddProductToCart/AddProductToCartCommandHandlerTest.php
+
+		-
+			message: '#^Cannot call method getQuantity\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Unit/Order/Application/Command/AddProductToCart/AddProductToCartCommandHandlerTest.php
+
+		-
+			message: '#^Parameter \#1 \$itemId of method App\\Order\\Domain\\Model\\Cart\:\:getItemById\(\) expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/Unit/Order/Application/Command/AddProductToCart/AddProductToCartCommandHandlerTest.php
+
+		-
+			message: '#^Cannot call method getQuantity\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Unit/Order/Domain/Model/CartTest.php
+
+		-
+			message: '#^Method App\\Tests\\Unit\\Order\\Domain\\Model\\OrderTest\:\:allowedTransitions\(\) return type has no value type specified in iterable type iterable\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Unit/Order/Domain/Model/OrderTest.php
+
+		-
+			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''App\\\\Order\\\\Domain\\\\Model\\\\Cart'' and App\\Order\\Domain\\Model\\Cart will always evaluate to true\.$#'
+			identifier: staticMethod.alreadyNarrowedType
+			count: 1
+			path: tests/Unit/Order/Infrastructure/Transformer/CartTransformerTest.php
+
+		-
+			message: '#^Cannot call method getId\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: tests/Unit/Order/Infrastructure/Transformer/CartTransformerTest.php
+
+		-
+			message: '#^Cannot call method getProduct\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: tests/Unit/Order/Infrastructure/Transformer/CartTransformerTest.php
+
+		-
+			message: '#^Cannot call method getQuantity\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 2
+			path: tests/Unit/Order/Infrastructure/Transformer/CartTransformerTest.php
+
+		-
+			message: '#^Call to an undefined method App\\Product\\Domain\\Repository\\ProductRepositoryInterface\|PHPUnit\\Framework\\MockObject\\MockObject\:\:expects\(\)\.$#'
+			identifier: method.notFound
+			count: 2
+			path: tests/Unit/Product/Application/Command/AddProduct/AddProductCommandHandlerTest.php
+
+		-
+			message: '#^Call to an undefined method App\\Product\\Domain\\Repository\\ProductRepositoryInterface\|PHPUnit\\Framework\\MockObject\\MockObject\:\:expects\(\)\.$#'
+			identifier: method.notFound
+			count: 4
+			path: tests/Unit/Product/Application/Command/RemoveProduct/RemoveProductCommandHandlerTest.php
+
+		-
+			message: '#^Call to an undefined method Doctrine\\ORM\\EntityManagerInterface\:\:expects\(\)\.$#'
+			identifier: method.notFound
+			count: 8
+			path: tests/Unit/User/UI/Cli/CreateUserCommandTest.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\PasswordHasher\\Hasher\\UserPasswordHasherInterface\:\:expects\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: tests/Unit/User/UI/Cli/CreateUserCommandTest.php
+
+		-
+			message: '#^Call to an undefined method Symfony\\Component\\Validator\\Validator\\ValidatorInterface\:\:expects\(\)\.$#'
+			identifier: method.notFound
+			count: 5
+			path: tests/Unit/User/UI/Cli/CreateUserCommandTest.php
+
+		-
+			message: '#^Cannot call method method\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 18
+			path: tests/Unit/User/UI/Cli/CreateUserCommandTest.php
+
+		-
+			message: '#^Cannot call method willReturn\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 8
+			path: tests/Unit/User/UI/Cli/CreateUserCommandTest.php
+
+		-
+			message: '#^Cannot call method with\(\) on mixed\.$#'
+			identifier: method.nonObject
+			count: 11
+			path: tests/Unit/User/UI/Cli/CreateUserCommandTest.php
+
+		-
+			message: '#^Method App\\Tests\\Unit\\User\\UI\\Cli\\CreateUserCommandTest\:\:getCommandTester\(\) has parameter \$inputs with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: tests/Unit/User/UI/Cli/CreateUserCommandTest.php
+
+		-
+			message: '#^Parameter \#1 \$inputs of method Symfony\\Component\\Console\\Tester\\CommandTester\:\:setInputs\(\) expects list\<string\>, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/Unit/User/UI/Cli/CreateUserCommandTest.php
+
+		-
+			message: '#^Parameter \#2 \$haystack of static method PHPUnit\\Framework\\Assert\:\:assertStringContainsString\(\) expects string, string\|null given\.$#'
+			identifier: argument.type
+			count: 1
+			path: tests/Unit/User/UI/Cli/CreateUserCommandTest.php
