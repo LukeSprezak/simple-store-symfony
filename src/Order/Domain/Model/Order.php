@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Order\Domain\Model;
 
+use App\Order\Domain\Enum\StatusOrder;
+use App\Order\Domain\Enum\StatusOrderTransition;
 use App\Order\Domain\Event\OrderPlaced;
+use App\Order\Domain\Exception\OrderTransitionNotAllowedException;
 use App\Shared\Domain\Aggregate\AggregateRoot;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -71,6 +74,15 @@ class Order extends AggregateRoot
     public function getStatus(): string
     {
         return $this->status;
+    }
+
+    public function apply(StatusOrderTransition $transition): void
+    {
+        if (!in_array(StatusOrder::from($this->status), $transition->allowedFrom(), true)) {
+            throw new OrderTransitionNotAllowedException($transition->value, $this->status);
+        }
+
+        $this->status = $transition->target()->value;
     }
 
     public function getCreatedAt(): \DateTimeImmutable

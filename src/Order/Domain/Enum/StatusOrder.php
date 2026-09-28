@@ -14,7 +14,6 @@ enum StatusOrder: string
     case SHIPPED = 'shipped';
     case DELIVERED = 'delivered';
     case AWAITING_RECEIPT = 'awaiting_receipt';
-    case RETRIEVED = 'retrieved';
     case CANCELLED = 'cancelled';
     case RETURN_REQUESTED = 'return_requested';
     case RETURNED = 'returned';
