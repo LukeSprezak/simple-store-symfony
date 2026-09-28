@@ -11,6 +11,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Uid\Uuid;
@@ -70,7 +71,10 @@ class CreateUserCommand extends Command
 
     private function askPassword(SymfonyStyle $io): string
     {
-        return $io->askHidden('Enter password:', function (?string $password) {
+        $question = new Question('Enter password:');
+        $question->setHidden(true);
+        $question->setMaxAttempts(3);
+        $question->setValidator(function (?string $password) {
             if (null === $password || '' === trim($password)) {
                 throw new \InvalidArgumentException('Password cannot be empty.');
             }
@@ -81,6 +85,8 @@ class CreateUserCommand extends Command
 
             return $password;
         });
+
+        return $io->askQuestion($question);
     }
 
     private function askRoles(SymfonyStyle $io): array

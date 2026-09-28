@@ -50,7 +50,7 @@ class RateLimiterSubscriberTest extends WebTestCase
     private function getJwtToken(): string
     {
         $this->client->request('POST', self::LOGIN_CHECK_URI, [], [], ['CONTENT_TYPE' => 'application/json'], json_encode([
-            'email' => 'testuser@example.com',
+            'email' => 'test@example.com',
             'password' => 'testpassword',
         ], JSON_THROW_ON_ERROR));
 
@@ -67,7 +67,9 @@ class RateLimiterSubscriberTest extends WebTestCase
     #[Test]
     public function rateLimiterBlocksExcessiveRequests(): void
     {
+        static::getContainer()->get('limiter.anonymous_api')->create('127.0.0.1')->reset();
         $token = $this->getJwtToken();
+        static::getContainer()->get('limiter.anonymous_api')->create('127.0.0.1')->reset();
 
         $limit = 5;
         $route = '/api';

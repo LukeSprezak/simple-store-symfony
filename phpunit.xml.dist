@@ -11,12 +11,12 @@
         <ini name="display_errors" value="1" />
         <ini name="error_reporting" value="-1" />
         <server name="APP_ENV" value="test" force="true" />
+        <server name="KERNEL_CLASS" value="App\Kernel" />
+        <server name="APP_SECRET" value="test-secret" />
         <server name="SHELL_VERBOSITY" value="-1" />
-        <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
-        <server name="SYMFONY_PHPUNIT_VERSION" value="9.5" />
         <env name="SYMFONY_DEPRECATIONS_HELPER" value="disabled" />
-        <env name="DATABASE_URL" value="mysql://root:root@mariadb:3306/dbname"/>
-        <env name="MESSENGER_RABBITMQ_TRANSPORT_DSN" value="amqp://user:password@rabbitmq:5672/%2f/messages"/>
+        <env name="DATABASE_URL" value="mysql://app:app@mysql:3306/dbname?serverVersion=8.4.11&amp;charset=utf8mb4"/>
+        <env name="MESSENGER_RABBITMQ_TRANSPORT_DSN" value="amqp://user:password@rabbit:5672/%2f/messages"/>
         <env name="MESSENGER_DOCTRINE_TRANSPORT_DSN" value="doctrine://default?table_name=async_command_queue"/>
     </php>
 

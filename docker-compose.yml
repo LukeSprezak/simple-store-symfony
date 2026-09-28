@@ -1,15 +1,22 @@
-version: '3.8'
-
 services:
-  mariadb:
-    image: mariadb:10.4
-    container_name: mariadb
+  mysql:
+    image: mysql:8.4.11
+    container_name: mysql
     volumes:
       - ./etc/docker/sql/images:/sql_images
-      - database_storage:/var/lib/mysql
+      - ./etc/docker/sql/init:/docker-entrypoint-initdb.d:ro
+      - mysql_storage:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=dbname
+      - MYSQL_USER=app
+      - MYSQL_PASSWORD=app
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_PASSWORD mysql -h 127.0.0.1 -u$$MYSQL_USER -D $$MYSQL_DATABASE -e 'SELECT 1'"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
     ports:
       - "13306:3306"
     networks:
@@ -28,11 +35,11 @@ services:
     networks:
       - app
 
-  php83:
+  php85:
     build:
       context: .
       dockerfile: ./etc/docker/php-fpm/Dockerfile
-    container_name: php83
+    container_name: php85
     working_dir: /var/www
     environment:
       XDEBUG_CLIENT_HOST: host.docker.internal
@@ -41,12 +48,13 @@ services:
       XDEBUG_CONFIG: "idekey=PHPSTORM"
     volumes:
       - .:/var/www
-      - ./etc/docker/php-fpm/php.ini:/etc/php/8.3/fpm/conf.d/99-overrides.ini
+      - ./etc/docker/php-fpm/php.ini:/usr/local/etc/php/conf.d/99-overrides.ini
       - ./etc/docker/php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
     ports:
       - "9001:9000"
     depends_on:
-      - mariadb
+      mysql:
+        condition: service_healthy
     networks:
       - app
 
@@ -56,7 +64,7 @@ services:
     volumes:
       - /sessions
     environment:
-      PMA_HOST: mariadb
+      PMA_HOST: mysql
       PMA_PORT: 3306
     ports:
       - "8883:80"
@@ -64,23 +72,35 @@ services:
       - app
 
   redis:
-    image: redis:7-alpine
+    image: redis:8.10.2-alpine
     container_name: redis
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     ports:
       - "6379:6379"
     networks:
       - app
 
   rabbit:
-    image: rabbitmq:3.8.2-management
+    image: rabbitmq:4.3.6-management
     container_name: rabbitmq
+    hostname: rabbit
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
     ports:
       - '15672:15672'
     environment:
       RABBITMQ_DEFAULT_USER: 'user'
       RABBITMQ_DEFAULT_PASS: 'password'
     volumes:
-      - ./etc/docker/volumes/rabbitmq:/var/lib/rabbitmq/mnesia
+      - rabbitmq_storage:/var/lib/rabbitmq
     networks:
       - app
 
@@ -157,4 +177,5 @@ volumes:
     driver: local
   kibana-data:
     driver: local
-  database_storage:
+  mysql_storage:
+  rabbitmq_storage:

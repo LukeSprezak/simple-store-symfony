@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Shared\Infrastructure\Framework\Event\Subscriber;
 
 use Symfony\Component\Clock\ClockInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
-use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\RateLimiter\RateLimiterFactoryInterface;
 
 final readonly class RateLimiterSubscriber implements EventSubscriberInterface
 {
@@ -18,7 +19,8 @@ final readonly class RateLimiterSubscriber implements EventSubscriberInterface
 
     public function __construct(
         private ClockInterface $clock,
-        private RateLimiterFactory $anonymousApiLimiter,
+        #[Target('anonymous_api')]
+        private RateLimiterFactoryInterface $anonymousApiLimiter,
     ) {
     }
 
@@ -35,7 +37,7 @@ final readonly class RateLimiterSubscriber implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        if (str_starts_with($request->get(self::ROUTE), self::ROUTE_NAME)) {
+        if (str_starts_with($request->attributes->get(self::ROUTE, ''), self::ROUTE_NAME)) {
             $limiter = $this->anonymousApiLimiter->create($request->getClientIp());
 
             $limit = $limiter->consume();

@@ -6,12 +6,14 @@ namespace App\Shared\Infrastructure\Bus\Messenger;
 
 use App\Shared\Application\Bus\Command\Async\Command;
 use App\Shared\Application\Bus\Command\Async\CommandBus;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Messenger\Exception\HandlerFailedException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 final readonly class AsyncCommandBus implements CommandBus
 {
     public function __construct(
+        #[Autowire(service: 'command.async.bus')]
         private MessageBusInterface $commandAsyncBus,
     ) {
     }

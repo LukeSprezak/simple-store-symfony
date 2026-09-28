@@ -7,14 +7,16 @@
 /public/bundles/
 /var/
 /vendor/
+/config/reference.php
 ###< symfony/framework-bundle ###
 .idea
 etc/docker/volumes
+/etc/docker/sql/*
 /.env.test
 /.env.test.php
 /.env.*.test
 .env.test
-.env
+/.env
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###

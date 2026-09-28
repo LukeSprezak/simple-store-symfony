@@ -46,7 +46,7 @@ class CreateUserCommandTest extends TestCase
 
         $command = new CreateUserCommand($this->entityManager, $this->passwordHasher, $this->validator);
         $this->application = new Application();
-        $this->application->add($command);
+        $this->application->addCommand($command);
     }
 
     #[Test]
@@ -289,7 +289,7 @@ class CreateUserCommandTest extends TestCase
     private function assertFailureWithMessage(CommandTester $commandTester, string $expectedMessage): void
     {
         self::assertEquals(Command::FAILURE, $commandTester->getStatusCode());
-        $output = $commandTester->getDisplay();
+        $output = preg_replace('/\s+/', ' ', $commandTester->getDisplay());
         self::assertStringContainsString($expectedMessage, $output);
     }
 }
