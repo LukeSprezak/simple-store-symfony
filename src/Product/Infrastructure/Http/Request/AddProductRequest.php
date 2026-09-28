@@ -32,9 +32,10 @@ final class AddProductRequest implements RequestInterface
     #[PositiveOrZero]
     public int $stockQuantity;
 
-    public function toCommand(string $userId): AddProductCommand
+    public function toCommand(string $id, string $userId): AddProductCommand
     {
         return new AddProductCommand(
+            $id,
             $this->name,
             $this->description,
             $this->price,

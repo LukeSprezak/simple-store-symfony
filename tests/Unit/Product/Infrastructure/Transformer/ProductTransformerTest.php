@@ -35,6 +35,7 @@ class ProductTransformerTest extends TestCase
         $transformer = new ProductTransformer($userRepository);
 
         $product = Product::create(
+            Uuid::v7()->toRfc4122(),
             'Product name',
             'Description text',
             100.00,
@@ -105,6 +106,7 @@ class ProductTransformerTest extends TestCase
         $transformer = new ProductTransformer($userRepository);
 
         $product = Product::create(
+            Uuid::v7()->toRfc4122(),
             'Product name',
             'Description text',
             100.00,

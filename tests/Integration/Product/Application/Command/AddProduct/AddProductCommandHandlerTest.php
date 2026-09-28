@@ -31,6 +31,7 @@ class AddProductCommandHandlerTest extends KernelTestCase
         // Given
         $userId = Uuid::v7()->toRfc4122();
         $message = new AddProductCommand(
+            Uuid::v7()->toRfc4122(),
             'Test Product',
             'Test Description',
             100.00,

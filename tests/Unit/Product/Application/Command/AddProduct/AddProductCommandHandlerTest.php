@@ -50,6 +50,7 @@ class AddProductCommandHandlerTest extends TestCase
             }));
 
         $command = new AddProductCommand(
+            Uuid::v7()->toRfc4122(),
             $expectedName,
             $expectedDescription,
             $expectedPrice,
@@ -71,6 +72,7 @@ class AddProductCommandHandlerTest extends TestCase
             ->willThrowException(new \Exception('Database error'));
 
         $command = new AddProductCommand(
+            Uuid::v7()->toRfc4122(),
             'Product name',
             'Description text',
             100.00,

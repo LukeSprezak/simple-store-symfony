@@ -21,6 +21,7 @@ use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Uid\Uuid;
 
 #[AsController]
 #[Route(path: Routes::PRODUCT_PATH->value, name: 'api_product_')]
@@ -50,9 +51,10 @@ final readonly class ProductController
             );
         }
 
-        $this->asyncCommandBus->dispatch($addProductRequest->toCommand($user->getId()));
+        $id = Uuid::v7()->toRfc4122();
+        $this->asyncCommandBus->dispatch($addProductRequest->toCommand($id, $user->getId()));
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(['id' => $id], Response::HTTP_ACCEPTED);
     }
 
     #[Route(
@@ -65,6 +67,6 @@ final readonly class ProductController
         $command = new RemoveProductCommand($id);
         $this->asyncCommandBus->dispatch($command);
 
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(['id' => $id], Response::HTTP_ACCEPTED);
     }
 }

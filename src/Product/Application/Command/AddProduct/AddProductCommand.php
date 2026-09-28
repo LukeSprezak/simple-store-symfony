@@ -10,6 +10,7 @@ use App\User\Domain\ValueObject\UserId;
 final readonly class AddProductCommand implements Command
 {
     public function __construct(
+        public string $id,
         public string $name,
         public string $description,
         public float $price,

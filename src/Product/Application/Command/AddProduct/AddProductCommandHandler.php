@@ -20,7 +20,7 @@ final readonly class AddProductCommandHandler implements CommandHandler
     public function __invoke(AddProductCommand $command): void
     {
         try {
-            $product = Product::create($command->name, $command->description, $command->price, $command->stockQuantity, $command->userId);
+            $product = Product::create($command->id, $command->name, $command->description, $command->price, $command->stockQuantity, $command->userId);
             $this->productRepository->save($product);
         } catch (UserNotFoundException|ProductCreateException $exception) {
             throw $exception;

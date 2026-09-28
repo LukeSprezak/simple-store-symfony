@@ -6,7 +6,6 @@ namespace App\Product\Domain\Model;
 
 use App\Product\Domain\Enum\StatusProduct;
 use App\User\Domain\ValueObject\UserId;
-use Symfony\Component\Uid\Uuid;
 
 class Product
 {
@@ -22,14 +21,13 @@ class Product
     }
 
     public static function create(
+        string $id,
         string $name,
         string $description,
         float $price,
         int $stockQuantity,
         UserId $userId,
     ): self {
-        $id = Uuid::v7()->toRfc4122();
-
         return new self($id, $name, $description, $price, $stockQuantity, $userId);
     }
 
