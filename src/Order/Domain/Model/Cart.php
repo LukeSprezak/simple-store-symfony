@@ -159,7 +159,7 @@ class Cart
         }
 
         if ($product->getStockQuantity() < $quantity) {
-            throw new ProductUnavailableException('Not enough stock for product: '.$product->getName());
+            throw new ProductUnavailableException($product->getId());
         }
 
         $existingItem = $this->findItemByProductId($product->getId());

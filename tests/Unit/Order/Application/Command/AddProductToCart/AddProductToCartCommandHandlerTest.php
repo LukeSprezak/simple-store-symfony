@@ -203,7 +203,7 @@ class AddProductToCartCommandHandlerTest extends TestCase
 
         // Then
         $this->expectException(ProductUnavailableException::class);
-        $this->expectExceptionMessage('Not enough stock for product: Test Product');
+        $this->expectExceptionMessage(sprintf('The product with the ID "%s" is not available.', $productId));
 
         // When
         $this->handler->__invoke($command);

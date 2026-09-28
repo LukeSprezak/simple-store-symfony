@@ -82,7 +82,7 @@ class CartTest extends TestCase
 
         // Then
         $this->expectException(ProductUnavailableException::class);
-        $this->expectExceptionMessage('Not enough stock for product: Product 1');
+        $this->expectExceptionMessage('The product with the ID "product-1" is not available.');
 
         // When
         $cart->addProduct($product, 2);
