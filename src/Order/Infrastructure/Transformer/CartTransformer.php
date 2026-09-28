@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Order\Infrastructure\Transformer;
 
-use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\ProductNotFoundException;
 use App\Order\Domain\Model\Cart as CartDomain;
 use App\Order\Domain\Model\CartItem as CartItemDomain;
@@ -26,6 +25,8 @@ final readonly class CartTransformer
     {
         $entity->setStatus($domain->getStatus());
         $entity->setOwnerId($domain->getOwnerId()->getId());
+        $entity->setCreatedAt($domain->getCreatedAt());
+        $entity->setExpiresAt($domain->getExpiresAt());
         $existingItems = [];
         foreach ($entity->getItems() as $itemEntity) {
             $existingItems[$itemEntity->getId()] = $itemEntity;
@@ -68,10 +69,7 @@ final readonly class CartTransformer
 
     public function toDomain(CartEntity $entity): CartDomain
     {
-        $domain = CartDomain::create($entity->getId(), $entity->getStatus(), new UserId($entity->getOwnerId()));
-        $statusEnum = StatusCart::from($domain->getStatus()->value);
-        $entity->setStatus($statusEnum);
-
+        $items = [];
         foreach ($entity->getItems() as $itemEntity) {
             $product = $itemEntity->getProduct();
             $productDomain = ProductDomainModel::fromPersistence(
@@ -91,10 +89,16 @@ final readonly class CartTransformer
 
             $itemDomain->setDeleted($itemEntity->isDeleted());
             $itemDomain->setDeletedAt($itemEntity->getDeletedAt());
-            // bypasses Cart::addItem(), which would merge a removed item into an active one of the same product
-            $domain->getItems()->add($itemDomain);
+            $items[] = $itemDomain;
         }
 
-        return $domain;
+        return CartDomain::fromPersistence(
+            $entity->getId(),
+            $entity->getStatus(),
+            new UserId($entity->getOwnerId()),
+            $entity->getCreatedAt(),
+            $entity->getExpiresAt(),
+            $items,
+        );
     }
 }

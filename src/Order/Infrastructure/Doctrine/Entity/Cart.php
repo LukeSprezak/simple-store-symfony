@@ -42,8 +42,6 @@ class Cart
     ) {
         $this->id = $id;
         $this->items = new ArrayCollection();
-        $this->createdAt = new \DateTimeImmutable();
-        $this->expiresAt = $this->createdAt->modify('+1 minute');
     }
 
     public function getId(): string

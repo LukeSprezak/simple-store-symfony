@@ -40,6 +40,10 @@ class CartTransformerTest extends TestCase
         $cartEntity->method('getId')->willReturn($cartId);
         $cartEntity->method('getStatus')->willReturn(StatusCart::ACTIVE);
         $cartEntity->method('getOwnerId')->willReturn(Uuid::v7()->toRfc4122());
+        $createdAt = new \DateTimeImmutable('2026-09-28 10:00:00');
+        $expiresAt = new \DateTimeImmutable('2026-09-29 10:00:00');
+        $cartEntity->method('getCreatedAt')->willReturn($createdAt);
+        $cartEntity->method('getExpiresAt')->willReturn($expiresAt);
 
         $productEntity1 = $this->createMock(ProductEntity::class);
         $productId1 = Uuid::v7()->toRfc4122();
@@ -89,6 +93,8 @@ class CartTransformerTest extends TestCase
         self::assertInstanceOf(CartDomain::class, $cartDomain);
         self::assertSame($cartId, $cartDomain->getId());
         self::assertSame(StatusCart::ACTIVE, $cartDomain->getStatus());
+        self::assertSame($createdAt, $cartDomain->getCreatedAt());
+        self::assertSame($expiresAt, $cartDomain->getExpiresAt());
 
         $items = $cartDomain->getItems();
         self::assertCount(2, $items, 'CartDomain should have 2 items.');
