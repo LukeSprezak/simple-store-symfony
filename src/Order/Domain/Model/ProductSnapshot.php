@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Order\Domain\Model;
 
 use App\Shared\Domain\ValueObject\Money;
+
 final readonly class ProductSnapshot
 {
     public function __construct(

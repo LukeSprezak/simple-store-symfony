@@ -9,5 +9,6 @@ use App\Product\Domain\Model\Product;
 interface ProductRepositoryInterface
 {
     public function save(Product $product): void;
+
     public function get(string $id): Product;
 }

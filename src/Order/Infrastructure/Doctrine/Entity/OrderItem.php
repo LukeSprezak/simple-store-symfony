@@ -36,7 +36,6 @@ class OrderItem
         $this->quantity = $quantity;
     }
 
-
     public function getId(): string
     {
         return $this->id;

@@ -25,7 +25,7 @@ final readonly class ExceptionListener
 
     public function __construct(
         private LoggerInterface $logger,
-        protected ParameterBagInterface $params,
+        private ParameterBagInterface $params,
     ) {
         $this->isProd = 'prod' === $params->get('kernel.environment');
     }

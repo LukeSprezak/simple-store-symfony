@@ -8,5 +8,4 @@ use App\Shared\Application\Bus\Command\Sync\Command;
 
 final readonly class RemoveExpiredCartCommand implements Command
 {
-
 }

@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4.11
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: dbname_test
+          MYSQL_USER: app
+          MYSQL_PASSWORD: app
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+      rabbit:
+        image: rabbitmq:4.3.6
+        env:
+          RABBITMQ_DEFAULT_USER: user
+          RABBITMQ_DEFAULT_PASS: password
+        ports:
+          - 5672:5672
+        options: >-
+          --health-cmd="rabbitmq-diagnostics -q ping"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+
+    env:
+      APP_ENV: test
+      DATABASE_URL: mysql://app:app@127.0.0.1:3306/dbname?serverVersion=8.4.11&charset=utf8mb4
+      MESSENGER_RABBITMQ_TRANSPORT_DSN: amqp://user:password@127.0.0.1:5672/%2f/messages
+      MESSENGER_DOCTRINE_TRANSPORT_DSN: doctrine://default?table_name=async_command_queue
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: amqp, pdo_mysql, intl, ctype, iconv
+          coverage: none
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      # .env is not versioned; bootEnv() and bin/console require it
+      - name: Create .env
+        run: |
+          cat > .env <<'EOF'
+          APP_SECRET=ci-secret
+          JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
+          JWT_PUBLIC_KEY=%kernel.project_dir%/config/jwt/public.pem
+          JWT_PASSPHRASE=ci-passphrase
+          LOCK_DSN=flock
+          EOF
+
+      - run: composer validate --strict --no-check-publish
+      - run: composer install --no-interaction --no-progress
+      - run: composer audit
+
+      - run: php bin/console lexik:jwt:generate-keypair --skip-if-exists
+      - run: php bin/console cache:warmup --env=dev
+
+      - run: vendor/bin/php-cs-fixer fix --dry-run --diff
+      - run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+      - run: vendor/bin/deptrac analyse --no-progress
+
+      - run: php bin/console lint:container
+      - run: php bin/console lint:yaml config
+      - run: php bin/console doctrine:migrations:migrate --no-interaction
+      - run: php bin/console doctrine:schema:validate
+
+      - run: php bin/phpunit

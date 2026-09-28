@@ -6,13 +6,12 @@ namespace App\Tests\Unit\Order\Infrastructure\Transformer;
 
 use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Model\Cart as CartDomain;
+use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Infrastructure\Doctrine\Entity\Cart as CartEntity;
 use App\Order\Infrastructure\Doctrine\Entity\CartItem as CartItemEntity;
 use App\Order\Infrastructure\Transformer\CartTransformer;
 use App\Product\Domain\Enum\StatusProduct;
-use App\Order\Domain\Model\ProductSnapshot;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
-use App\Shared\Domain\ValueObject\Money;
 use App\User\Infrastructure\Doctrine\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;

@@ -9,5 +9,4 @@ use App\Shared\Domain\ValueObject\UuidValueObjectInterface;
 
 class UserId extends UuidValueObject implements UuidValueObjectInterface
 {
-
 }
