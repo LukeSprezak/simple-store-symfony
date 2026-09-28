@@ -7,13 +7,16 @@ namespace App\Order\Application\Command\ConvertCartToOrder;
 use App\Order\Domain\Enum\StatusCartTransition;
 use App\Order\Domain\Enum\StatusOrder;
 use App\Order\Domain\Exception\CartNotFoundException;
+use App\Order\Domain\Exception\EmptyCartException;
 use App\Order\Domain\Exception\OrderCreateException;
 use App\Order\Domain\Model\Order;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Order\Domain\Repository\OrderRepositoryInterface;
 use App\Shared\Application\Bus\Command\Sync\CommandHandler;
+use App\Shared\Domain\Exception\ConflictException;
+use App\Shared\Domain\Exception\NotFoundException;
+use Doctrine\ORM\OptimisticLockException;
 use Symfony\Component\DependencyInjection\Attribute\Target;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Workflow\WorkflowInterface;
 
@@ -37,7 +40,7 @@ final readonly class ConvertCartToOrderCommandHandler implements CommandHandler
             }
 
             if ($cart->isEmpty()) {
-                throw new AccessDeniedHttpException('Cannot convert an empty cart.');
+                throw new EmptyCartException($cart->getId());
             }
 
             $cart->applyTransition(StatusCartTransition::CONVERT->value, $this->cartStateWorkflow);
@@ -50,7 +53,7 @@ final readonly class ConvertCartToOrderCommandHandler implements CommandHandler
 
             $this->orderRepository->save($order);
             $this->cartRepository->save($cart);
-        } catch (CartNotFoundException|AccessDeniedHttpException $exception) {
+        } catch (NotFoundException|ConflictException|OptimisticLockException $exception) {
             throw $exception;
         } catch (\Throwable $exception) {
             throw new OrderCreateException('Unable to create order from cart.', 0, $exception);

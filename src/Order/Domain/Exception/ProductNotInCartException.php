@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Order\Domain\Exception;
 
-class ProductNotInCartException extends \RuntimeException
+use App\Shared\Domain\Exception\NotFoundException;
+
+class ProductNotInCartException extends \RuntimeException implements NotFoundException
 {
     public function __construct(string $productId)
     {

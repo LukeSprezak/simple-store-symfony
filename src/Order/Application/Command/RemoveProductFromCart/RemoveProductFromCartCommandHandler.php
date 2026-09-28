@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Order\Application\Command\RemoveProductFromCart;
 
 use App\Order\Domain\Exception\CartNotFoundException;
-use App\Product\Domain\Exception\ProductNotFoundException;
 use App\Order\Domain\Exception\ProductRemoveFromCartException;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Product\Domain\Repository\ProductRepositoryInterface;
 use App\Shared\Application\Bus\Command\Sync\CommandHandler;
+use App\Shared\Domain\Exception\NotFoundException;
 
 final readonly class RemoveProductFromCartCommandHandler implements CommandHandler
 {
@@ -29,7 +29,7 @@ final readonly class RemoveProductFromCartCommandHandler implements CommandHandl
         try {
             $product = $this->productRepository->get($command->productId);
             $cart->removeProduct($product);
-        } catch (ProductNotFoundException $exception) {
+        } catch (NotFoundException $exception) {
             throw $exception;
         } catch (\Exception $exception) {
             throw new ProductRemoveFromCartException($command->productId, 'Cannot remove product: '.$exception->getMessage());

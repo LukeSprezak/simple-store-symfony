@@ -6,6 +6,7 @@ namespace App\Order\Domain\Model;
 
 use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\CartNotActiveException;
+use App\Order\Domain\Exception\CartTransitionNotAllowedException;
 use App\Order\Domain\Exception\ProductNotInCartException;
 use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Product\Domain\Enum\StatusProduct;
@@ -13,7 +14,6 @@ use App\Product\Domain\Model\Product;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Workflow\WorkflowInterface;
 
@@ -188,7 +188,7 @@ class Cart
     public function applyTransition(string $transition, WorkflowInterface $workflow): void
     {
         if (!$workflow->can($this, $transition)) {
-            throw new AccessDeniedHttpException(sprintf("Transition '%s' not allowed from status '%s'.", $transition, $this->status->value));
+            throw new CartTransitionNotAllowedException($transition, $this->status->value);
         }
 
         $workflow->apply($this, $transition);

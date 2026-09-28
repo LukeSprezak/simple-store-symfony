@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Order\Domain\Model;
 
 use App\Order\Domain\Enum\StatusCart;
+use App\Order\Domain\Exception\CartTransitionNotAllowedException;
 use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
@@ -15,7 +16,6 @@ use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Workflow\Marking;
 use Symfony\Component\Workflow\WorkflowInterface;
@@ -178,7 +178,7 @@ class CartTest extends TestCase
     #[Test]
     public function applyTransitionNotAllowed(): void
     {
-        $this->expectException(AccessDeniedHttpException::class);
+        $this->expectException(CartTransitionNotAllowedException::class);
 
         $now = new \DateTimeImmutable();
         $cart = new Cart('cart123', StatusCart::ACTIVE, UserId::generate(), $now, $now);

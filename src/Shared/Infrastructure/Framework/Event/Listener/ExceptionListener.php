@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Shared\Infrastructure\Framework\Event\Listener;
 
-use App\Order\Domain\Exception\CartNotFoundException;
-use App\Product\Domain\Exception\ProductNotFoundException;
+use App\Shared\Domain\Exception\ConflictException;
+use App\Shared\Domain\Exception\NotFoundException;
 use App\Shared\Infrastructure\Framework\Validator\ValidationError;
+use Doctrine\ORM\OptimisticLockException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -44,9 +45,14 @@ final readonly class ExceptionListener
                 $this->prepareSimpleErrorResponse($exception->getMessage()),
             ],
 
-            $exception instanceof CartNotFoundException,
-            $exception instanceof ProductNotFoundException => [
+            $exception instanceof NotFoundException => [
                 Response::HTTP_NOT_FOUND,
+                $this->prepareSimpleErrorResponse($exception->getMessage()),
+            ],
+
+            $exception instanceof ConflictException,
+            $exception instanceof OptimisticLockException => [
+                Response::HTTP_CONFLICT,
                 $this->prepareSimpleErrorResponse($exception->getMessage()),
             ],
 

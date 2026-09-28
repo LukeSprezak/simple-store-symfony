@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Order\Domain\Exception;
 
-final class ProductUnavailableException extends \RuntimeException
+use App\Shared\Domain\Exception\ConflictException;
+
+final class ProductUnavailableException extends \RuntimeException implements ConflictException
 {
     public function __construct(string $productId)
     {

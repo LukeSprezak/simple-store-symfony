@@ -6,7 +6,6 @@ namespace App\Order\Infrastructure\Framework\Workflow;
 
 use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Model\Cart;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Workflow\Attribute\AsGuardListener;
 use Symfony\Component\Workflow\Event\GuardEvent;
 
@@ -22,7 +21,6 @@ class CartWorkflowListener
 
         if ($cart->getStatus()->value === StatusCart::CONVERTED_TO_ORDER->value) {
             $event->setBlocked(true);
-            throw new AccessDeniedHttpException('Cannot modify a cart that has been converted to an order.');
         }
     }
 }
