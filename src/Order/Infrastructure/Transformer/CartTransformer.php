@@ -83,15 +83,12 @@ final readonly class CartTransformer
                 $product->getVersion(),
             );
 
-            $itemDomain = CartItemDomain::create(
+            $items[] = CartItemDomain::fromPersistence(
                 $itemEntity->getId(),
                 $productDomain,
-                $itemEntity->getQuantity()
+                $itemEntity->getQuantity(),
+                $itemEntity->getDeletedAt(),
             );
-
-            $itemDomain->setDeleted($itemEntity->isDeleted());
-            $itemDomain->setDeletedAt($itemEntity->getDeletedAt());
-            $items[] = $itemDomain;
         }
 
         return CartDomain::fromPersistence(

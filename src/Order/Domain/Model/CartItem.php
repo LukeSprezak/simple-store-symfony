@@ -6,17 +6,15 @@ namespace App\Order\Domain\Model;
 
 use App\Order\Domain\Exception\InvalidQuantityException;
 use App\Product\Domain\Model\Product;
-use App\Shared\Infrastructure\Doctrine\Entity\SoftDeleteTrait;
 use Symfony\Component\Uid\Uuid;
 
 class CartItem
 {
-    use SoftDeleteTrait;
-
     private function __construct(
         private readonly string $id,
         private readonly Product $product,
         private int $quantity,
+        private ?\DateTimeImmutable $deletedAt = null,
     ) {
         $this->validateQuantity($quantity);
     }
@@ -27,6 +25,30 @@ class CartItem
         int $quantity,
     ): self {
         return new self($id, $product, $quantity);
+    }
+
+    public static function fromPersistence(
+        string $id,
+        Product $product,
+        int $quantity,
+        ?\DateTimeImmutable $deletedAt,
+    ): self {
+        return new self($id, $product, $quantity, $deletedAt);
+    }
+
+    public function isDeleted(): bool
+    {
+        return null !== $this->deletedAt;
+    }
+
+    public function getDeletedAt(): ?\DateTimeImmutable
+    {
+        return $this->deletedAt;
+    }
+
+    public function softDelete(): void
+    {
+        $this->deletedAt = new \DateTimeImmutable();
     }
 
     public function getId(): string
