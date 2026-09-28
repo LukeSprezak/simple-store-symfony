@@ -56,16 +56,4 @@ final readonly class ProductRepository implements ProductDomainRepository
 
         return $this->transformer->toDomain($productEntity);
     }
-
-    public function remove(Product $product): void
-    {
-        $productEntity = $this->entityManager->getRepository(ProductEntity::class)->find($product->getId());
-
-        if (!$productEntity) {
-            throw new ProductNotFoundException($product->getId());
-        }
-
-        $this->entityManager->remove($productEntity);
-        $this->entityManager->flush();
-    }
 }

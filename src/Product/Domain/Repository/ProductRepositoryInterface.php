@@ -12,5 +12,4 @@ interface ProductRepositoryInterface
     public function findByIds(array $ids): array;
     public function save(Product $product): void;
     public function get(string $id): Product;
-    public function remove(Product $product): void;
 }

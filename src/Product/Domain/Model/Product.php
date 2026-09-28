@@ -17,7 +17,7 @@ class Product
         private readonly float $price,
         private int $stockQuantity,
         private readonly UserId $userId,
-        private readonly StatusProduct $status = StatusProduct::ACTIVE,
+        private StatusProduct $status = StatusProduct::ACTIVE,
     ) {
     }
 
@@ -83,6 +83,11 @@ class Product
     public function getStatus(): StatusProduct
     {
         return $this->status;
+    }
+
+    public function deactivate(): void
+    {
+        $this->status = StatusProduct::INACTIVE;
     }
 
     public function decreaseStock(int $quantity): void

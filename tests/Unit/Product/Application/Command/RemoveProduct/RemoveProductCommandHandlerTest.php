@@ -35,6 +35,8 @@ class RemoveProductCommandHandlerTest extends TestCase
         // Given
         $productId = Uuid::v7()->toRfc4122();
         $product = $this->createMock(Product::class);
+        $product->expects($this->once())
+            ->method('deactivate');
 
         $this->productRepository->expects($this->once())
             ->method('get')
@@ -42,7 +44,7 @@ class RemoveProductCommandHandlerTest extends TestCase
             ->willReturn($product);
 
         $this->productRepository->expects($this->once())
-            ->method('remove')
+            ->method('save')
             ->with($this->equalTo($product));
 
         // When
@@ -62,7 +64,7 @@ class RemoveProductCommandHandlerTest extends TestCase
             ->willReturn($this->createMock(Product::class));
 
         $this->productRepository->expects($this->once())
-            ->method('remove')
+            ->method('save')
             ->with($this->isInstanceOf(Product::class))
             ->willThrowException(new \Exception('Database error'));
 

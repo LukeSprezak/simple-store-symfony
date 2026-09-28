@@ -22,7 +22,8 @@ final readonly class RemoveProductCommandHandler implements CommandHandler
     {
         try {
             $product = $this->productRepository->get($command->id);
-            $this->productRepository->remove($product);
+            $product->deactivate();
+            $this->productRepository->save($product);
         } catch (\Exception $exception) {
             throw new ProductRemoveException('Failed to remove the product.', 0, $exception);
         }
