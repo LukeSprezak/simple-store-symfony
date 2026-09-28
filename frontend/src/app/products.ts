@@ -1,6 +1,6 @@
 import { CurrencyPipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { afterNextRender, Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { CartService } from './cart';
 
 interface Product {
@@ -51,11 +51,11 @@ interface ProductPage {
           <p>No products.</p>
         }
       </section>
-      @if (nextCursor()) {
-        <div class="more">
-          <button class="btn" type="button" (click)="load()">Load more</button>
-        </div>
-      }
+      <div #sentinel class="more">
+        @if (loading()) {
+          <span class="spinner"></span>
+        }
+      </div>
     </main>
   `,
   styles: `
@@ -119,28 +119,69 @@ interface ProductPage {
     }
 
     .more {
+      display: flex;
+      justify-content: center;
+      min-height: 48px;
       margin-top: 24px;
-      text-align: center;
+    }
+
+    .spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
     }
   `,
 })
 export class Products {
   private readonly http = inject(HttpClient);
   private readonly cart = inject(CartService);
+  private readonly sentinel = viewChild.required<ElementRef<HTMLElement>>('sentinel');
   protected readonly products = signal<Product[]>([]);
   protected readonly nextCursor = signal<string | null>(null);
+  protected readonly loading = signal(false);
   protected readonly adding = signal<string | null>(null);
   protected readonly error = signal('');
+  private observer?: IntersectionObserver;
 
   constructor() {
     this.load();
+
+    const destroyRef = inject(DestroyRef);
+    afterNextRender(() => {
+      this.observer = new IntersectionObserver(([entry]) => {
+        if (entry.isIntersecting && this.nextCursor()) {
+          this.load();
+        }
+      }, { rootMargin: '200px' });
+      this.observer.observe(this.sentinel().nativeElement);
+      destroyRef.onDestroy(() => this.observer?.disconnect());
+    });
   }
 
-  protected load(): void {
+  private load(): void {
+    if (this.loading()) {
+      return;
+    }
+
     const after = this.nextCursor();
+    this.loading.set(true);
     this.http.get<ProductPage>('/api/product', { params: after ? { limit: 12, after } : { limit: 12 } }).subscribe((page) => {
       this.products.update((products) => [...products, ...page.items]);
       this.nextCursor.set(page.nextCursor);
+      this.loading.set(false);
+      // The observer only fires on visibility changes; re-observing re-checks it after the new cards render.
+      const sentinel = this.sentinel().nativeElement;
+      this.observer?.unobserve(sentinel);
+      this.observer?.observe(sentinel);
     });
   }
 

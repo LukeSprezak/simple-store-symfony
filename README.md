@@ -1,4 +1,4 @@
-# Symfony CQRS
+# Symfony Store App
 
 Symfony 8.1, PHP 8.5, MySQL 8.4, Redis 8.10, RabbitMQ 4.3, Angular 22.
 
