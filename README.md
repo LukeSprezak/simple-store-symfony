@@ -13,21 +13,31 @@ iteration; the 8.4.12 image was not yet available.
 Requires Docker Desktop / Docker Engine with Docker Compose v2 or newer.
 
 ```sh
-cp .env.dist .env.local
-docker compose build --pull php85
-docker compose up -d --wait mysql redis rabbit php85
-docker compose exec php85 composer install
-docker compose exec php85 php bin/console lexik:jwt:generate-keypair --skip-if-exists
-docker compose exec php85 php bin/console doctrine:migrations:migrate --no-interaction
-docker compose exec php85 php bin/console app:create-user
-docker compose up -d nginx phpmyadmin
+scripts/setup.sh
 ```
 
-Set a local `APP_SECRET` in `.env.local`. Existing `.env.local` files must use
-the new MySQL URL and Messenger variables from `.env.dist`.
+The script builds the PHP image, starts the containers, installs Composer
+dependencies, generates JWT keys, runs migrations for the `dev` and `test`
+databases and loads fixtures. Loading fixtures purges the `dev` database.
 
-The API is available at http://localhost:8080, phpMyAdmin at
-http://localhost:8883 and RabbitMQ management at http://localhost:15672.
+Fixtures (`src/Shared/Infrastructure/DataFixtures/AppFixtures.php`) create five sample products and
+two users, both with the password `password`:
+
+| Username | Email               | Role         |
+|----------|---------------------|--------------|
+| `admin`  | `admin@example.com` | `ROLE_ADMIN` |
+| `user`   | `user@example.com`  | `ROLE_USER`  |
+
+Reload fixtures at any time with:
+
+```sh
+docker compose exec php85 php bin/console doctrine:fixtures:load --no-interaction
+```
+
+Use `app:create-user` to add further users interactively.
+
+The API is available at http://localhost:8080 and RabbitMQ management at
+http://localhost:15672.
 MySQL is exposed on port 13306; inside Docker its hostname is `mysql`.
 The supplied credentials are for local development.
 

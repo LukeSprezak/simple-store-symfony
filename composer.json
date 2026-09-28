@@ -86,6 +86,7 @@
     },
     "require-dev": {
         "deptrac/deptrac": "^4.7",
+        "doctrine/doctrine-fixtures-bundle": "^4.3",
         "friendsofphp/php-cs-fixer": "^3.65",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.2",
