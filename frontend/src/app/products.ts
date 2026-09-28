@@ -1,6 +1,7 @@
 import { CurrencyPipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
+import { CartService } from './cart';
 
 interface Product {
   id: string;
@@ -21,6 +22,9 @@ interface ProductPage {
   template: `
     <main class="container">
       <h1>Products</h1>
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
       <section class="grid">
         @for (product of products(); track product.id) {
           <article class="panel card">
@@ -34,6 +38,14 @@ interface ProductPage {
                 <span class="stock out">Out of stock</span>
               }
             </div>
+            <button
+              class="btn btn-primary add"
+              type="button"
+              [disabled]="product.stockQuantity === 0 || adding() === product.id"
+              (click)="add(product)"
+            >
+              Add to cart
+            </button>
           </article>
         } @empty {
           <p>No products.</p>
@@ -97,6 +109,15 @@ interface ProductPage {
       color: var(--danger);
     }
 
+    .add {
+      margin-top: 16px;
+    }
+
+    .add:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .more {
       margin-top: 24px;
       text-align: center;
@@ -105,8 +126,11 @@ interface ProductPage {
 })
 export class Products {
   private readonly http = inject(HttpClient);
+  private readonly cart = inject(CartService);
   protected readonly products = signal<Product[]>([]);
   protected readonly nextCursor = signal<string | null>(null);
+  protected readonly adding = signal<string | null>(null);
+  protected readonly error = signal('');
 
   constructor() {
     this.load();
@@ -117,6 +141,18 @@ export class Products {
     this.http.get<ProductPage>('/api/product', { params: after ? { limit: 12, after } : { limit: 12 } }).subscribe((page) => {
       this.products.update((products) => [...products, ...page.items]);
       this.nextCursor.set(page.nextCursor);
+    });
+  }
+
+  protected add(product: Product): void {
+    this.adding.set(product.id);
+    this.error.set('');
+    this.cart.add(product.id).subscribe({
+      next: () => this.adding.set(null),
+      error: (error: HttpErrorResponse) => {
+        this.adding.set(null);
+        this.error.set(error.error?.error ?? `Could not add ${product.name} to the cart.`);
+      },
     });
   }
 }

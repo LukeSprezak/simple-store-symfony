@@ -40,6 +40,15 @@
   color: var(--primary);
 }
 
+.badge {
+  margin-left: 4px;
+  padding: 0 7px;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 12px;
+}
+
 .logo-mark {
   width: 28px;
   height: 28px;
