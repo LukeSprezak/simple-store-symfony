@@ -51,7 +51,6 @@ final class ReadEndpointsTest extends WebTestCase
         $this->entityManager->persist($cart);
         $this->entityManager->flush();
         $this->token = self::getContainer()->get(JWTTokenManagerInterface::class)->create($this->owner);
-        self::getContainer()->get('limiter.anonymous_api')->create('127.0.0.1')->reset();
     }
 
     protected function tearDown(): void

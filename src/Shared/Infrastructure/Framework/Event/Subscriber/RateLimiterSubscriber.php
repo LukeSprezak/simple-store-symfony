@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Shared\Infrastructure\Framework\Event\Subscriber;
 
+use App\User\Infrastructure\Doctrine\Entity\User;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Clock\ClockInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -21,6 +23,9 @@ final readonly class RateLimiterSubscriber implements EventSubscriberInterface
         private ClockInterface $clock,
         #[Target('anonymous_api')]
         private RateLimiterFactoryInterface $anonymousApiLimiter,
+        #[Target('authenticated_api')]
+        private RateLimiterFactoryInterface $authenticatedApiLimiter,
+        private Security $security,
     ) {
     }
 
@@ -39,7 +44,10 @@ final readonly class RateLimiterSubscriber implements EventSubscriberInterface
         $route = $request->attributes->get(self::ROUTE);
 
         if (is_string($route) && str_starts_with($route, self::ROUTE_NAME)) {
-            $limiter = $this->anonymousApiLimiter->create($request->getClientIp());
+            $user = $this->security->getUser();
+            $limiter = $user instanceof User
+                ? $this->authenticatedApiLimiter->create($user->getId())
+                : $this->anonymousApiLimiter->create($request->getClientIp());
 
             $limit = $limiter->consume();
 

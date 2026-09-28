@@ -14,7 +14,7 @@ use EventSauce\EventSourcing\MessageConsumer;
 final readonly class OrderTableProjector implements MessageConsumer
 {
     public function __construct(
-        private Connection $connection
+        private Connection $connection,
     ) {
     }
 

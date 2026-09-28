@@ -12,7 +12,7 @@ use EventSauce\EventSourcing\MessageConsumer;
 final readonly class OutboxRelay implements MessageConsumer
 {
     public function __construct(
-        private EventBus $eventBus
+        private EventBus $eventBus,
     ) {
     }
 

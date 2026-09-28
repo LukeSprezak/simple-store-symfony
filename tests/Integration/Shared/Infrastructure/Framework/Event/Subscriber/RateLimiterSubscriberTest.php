@@ -18,6 +18,7 @@ class RateLimiterSubscriberTest extends WebTestCase
     private const string LOGIN_CHECK_URI = '/api/login_check';
 
     private KernelBrowser $client;
+    private string $userId;
 
     protected function setUp(): void
     {
@@ -32,10 +33,11 @@ class RateLimiterSubscriberTest extends WebTestCase
             $entityManager->flush();
         }
 
+        $this->userId = Uuid::v7()->toRfc4122();
         $user = new User();
         $hashedPassword = $passwordHasher->hashPassword($user, 'testpassword');
         $user
-            ->setId(Uuid::v7()->toRfc4122())
+            ->setId($this->userId)
             ->setUsername('test')
             ->setEmail('test@example.com')
             ->setRoles(['ROLE_USER'])
@@ -70,9 +72,8 @@ class RateLimiterSubscriberTest extends WebTestCase
     #[Test]
     public function rateLimiterBlocksExcessiveRequests(): void
     {
-        static::getContainer()->get('limiter.anonymous_api')->create('127.0.0.1')->reset();
         $token = $this->getJwtToken();
-        static::getContainer()->get('limiter.anonymous_api')->create('127.0.0.1')->reset();
+        static::getContainer()->get('limiter.authenticated_api')->create($this->userId)->reset();
 
         $limit = 5;
         $route = '/api';
@@ -89,7 +90,7 @@ class RateLimiterSubscriberTest extends WebTestCase
         }
 
         $this->client->request('GET', $route, [], [], [
-            'REMOTE_ADDR' => '127.0.0.1',
+            'REMOTE_ADDR' => '192.0.2.1', // The limit follows the user, not the address.
             'HTTP_Authorization' => 'Bearer '.$token,
         ]);
         $response = $this->client->getResponse();

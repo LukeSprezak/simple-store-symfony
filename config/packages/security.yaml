@@ -11,6 +11,10 @@ security:
             entity:
                 class: App\User\Infrastructure\Doctrine\Entity\User
                 property: email
+        app_user_by_id_provider:
+            entity:
+                class: App\User\Infrastructure\Doctrine\Entity\User
+                property: id
 
     firewalls:
         dev:
@@ -19,6 +23,7 @@ security:
         login:
             pattern: ^/api/login
             stateless: true
+            provider: app_user_provider
             json_login:
                 check_path: /api/login_check
                 username_path: email
@@ -35,6 +40,7 @@ security:
             pattern: ^/api
             stateless: true
             jwt: ~
+            provider: app_user_by_id_provider
             user_checker: App\User\Infrastructure\Security\UserChecker
 
     access_control:
