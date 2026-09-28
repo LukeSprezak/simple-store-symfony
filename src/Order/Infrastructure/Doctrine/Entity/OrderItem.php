@@ -27,6 +27,9 @@ class OrderItem
     #[ORM\Column(type: Types::INTEGER)]
     private int $quantity;
 
+    #[ORM\Column(type: Types::INTEGER)]
+    private int $unitPrice;
+
     public function __construct(?string $id, int $quantity = 1)
     {
         $this->id = $id ?? Uuid::v4()->toRfc4122();
@@ -62,6 +65,16 @@ class OrderItem
     public function setProduct(Product $product): void
     {
         $this->product = $product;
+    }
+
+    public function getUnitPrice(): int
+    {
+        return $this->unitPrice;
+    }
+
+    public function setUnitPrice(int $unitPrice): void
+    {
+        $this->unitPrice = $unitPrice;
     }
 
     public function getQuantity(): int

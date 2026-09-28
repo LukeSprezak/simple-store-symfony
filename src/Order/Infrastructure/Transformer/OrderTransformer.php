@@ -53,6 +53,7 @@ final readonly class OrderTransformer
                 $itemEntity = new EntityOrderItem($itemDomain->getId(), $itemDomain->getQuantity());
                 $itemEntity->setProduct($productEntity);
                 $itemEntity->setQuantity($itemDomain->getQuantity());
+                $itemEntity->setUnitPrice($itemDomain->getProduct()->getPrice()->getAmount());
                 $itemEntity->setOrder($entityOrder);
 
                 $entityOrder->addItem($itemEntity);
@@ -79,7 +80,7 @@ final readonly class OrderTransformer
             $product = $itemEntity->getProduct();
             $domainOrderItem = DomainOrderItem::fromPersistence(
                 $itemEntity->getId(),
-                new ProductSnapshot($product->getId(), $product->getName(), new Money($product->getPrice())),
+                new ProductSnapshot($product->getId(), $product->getName(), new Money($itemEntity->getUnitPrice())),
                 $itemEntity->getQuantity()
             );
             $domainOrder->addItem($domainOrderItem);
