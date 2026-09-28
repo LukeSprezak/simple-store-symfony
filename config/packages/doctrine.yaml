@@ -15,13 +15,6 @@ doctrine:
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
         auto_mapping: true
         mappings:
-            App\Order:
-                type: attribute
-                is_bundle: false
-                dir: '%kernel.project_dir%/src/Order/Infrastructure/Doctrine/Entity'
-                prefix: 'App\Order\Infrastructure\Doctrine\Entity'
-                alias: App\Order
-
             App\Order\Domain:
                 type: xml
                 is_bundle: false
