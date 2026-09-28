@@ -203,7 +203,7 @@ class Cart
 
     public function isEmpty(): bool
     {
-        return empty($this->items);
+        return !$this->items->exists(static fn (int $key, CartItem $item) => !$item->isDeleted());
     }
 
     public function isExpired(): bool
