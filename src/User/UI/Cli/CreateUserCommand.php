@@ -92,15 +92,13 @@ class CreateUserCommand extends Command
     private function askRoles(SymfonyStyle $io): array
     {
         $allowedRoles = array_map(static fn (Role $role) => $role->value, Role::cases());
-        $defaultRoles = implode(',', $allowedRoles);
-
         $input = $io->ask(
             'Specify the user roles (separated by commas, e.g. ROLE_USER,ROLE_ADMIN):',
-            $defaultRoles
+            implode(',', self::DEFAULT_ROLES)
         );
 
         if (empty(trim($input))) {
-            return $allowedRoles;
+            return self::DEFAULT_ROLES;
         }
 
         $rolesArray = array_unique(array_map('trim', explode(',', $input)));

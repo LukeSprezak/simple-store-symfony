@@ -10,11 +10,11 @@ class ValidationError extends \RuntimeException
 
     private array $errors;
 
-    public function __construct(array $errors)
+    public function __construct(array $errors, ?\Throwable $previous = null)
     {
         $this->errors = $errors;
 
-        parent::__construct('Request is invalid.', 400);
+        parent::__construct('Request is invalid.', 400, $previous);
     }
 
     public function getErrors(): array

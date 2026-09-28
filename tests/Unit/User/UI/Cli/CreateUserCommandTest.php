@@ -10,6 +10,7 @@ use App\User\UI\Cli\CreateUserCommand;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -29,13 +30,13 @@ class CreateUserCommandTest extends TestCase
     private const string VALID_PASSWORD = 'Admin123';
     private const string SHORT_PASSWORD = 'short';
     private const string CUSTOM_ROLES = 'ROLE_ADMIN,ROLE_SUPER_ADMIN';
-    private const string DEFAULT_ROLES = 'ROLE_SUPER_ADMIN, ROLE_ADMIN, ROLE_USER';
+    private const string DEFAULT_ROLES = 'ROLE_USER';
     private const string INVALID_ROLES = 'ROLE_ADMIN,ROLE_INVALID';
     private const string DUPLICATE_ROLES = 'ROLE_ADMIN,ROLE_ADMIN,ROLE_USER';
 
-    private EntityManagerInterface $entityManager;
-    private UserPasswordHasherInterface $passwordHasher;
-    private ValidatorInterface $validator;
+    private EntityManagerInterface&MockObject $entityManager;
+    private UserPasswordHasherInterface&MockObject $passwordHasher;
+    private ValidatorInterface&MockObject $validator;
     private Application $application;
 
     protected function setUp(): void

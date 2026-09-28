@@ -44,7 +44,6 @@ class AddProductCommandHandlerTest extends KernelTestCase
         $this->messageBus->dispatch($message);
 
         // Then
-        self::assertNotNull($message);
         self::assertEquals('Test Product', $message->name);
         self::assertEquals('Test Description', $message->description);
         self::assertSame(10000, $message->price->getAmount());

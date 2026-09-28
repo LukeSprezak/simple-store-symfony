@@ -23,6 +23,7 @@ class Order
     #[Column(type: Types::GUID)]
     private string $id;
 
+    /** @var Collection<int, OrderItem> */
     #[OneToMany(
         targetEntity: OrderItem::class,
         mappedBy: 'order',
@@ -61,6 +62,9 @@ class Order
         $this->id = $id;
     }
 
+    /**
+     * @return Collection<int, OrderItem>
+     */
     public function getItems(): Collection
     {
         return $this->items;

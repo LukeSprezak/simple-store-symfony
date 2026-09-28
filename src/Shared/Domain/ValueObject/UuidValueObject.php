@@ -10,7 +10,7 @@ abstract class UuidValueObject
 {
     protected string $id;
 
-    public function __construct(string $id)
+    final public function __construct(string $id)
     {
         if (!Uuid::isValid($id)) {
             throw new \InvalidArgumentException('Incorrect UUID format.');
