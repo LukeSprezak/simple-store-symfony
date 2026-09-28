@@ -6,7 +6,9 @@ namespace App\Order\UI\Controller;
 
 use App\Order\Application\Command\ConvertCartToOrder\ConvertCartToOrderCommand;
 use App\Order\Application\Query\GetCart\GetCartQuery;
+use App\Order\Application\Query\GetCartActivity\GetCartActivityQuery;
 use App\Order\Infrastructure\Request\AddProductToCartRequest;
+use App\Order\Infrastructure\Request\CartActivityRequest;
 use App\Order\Infrastructure\Request\RemoveProductFromCartRequest;
 use App\Shared\Application\Bus\Query\QueryBus;
 use App\Shared\Domain\Enum\Routes;
@@ -18,6 +20,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
@@ -40,6 +43,12 @@ final readonly class CartController
     public function get(string $cartId, #[CurrentUser] User $user): JsonResponse
     {
         return new JsonResponse($this->queryBus->ask(new GetCartQuery($cartId, new UserId($user->getId()))));
+    }
+
+    #[Route(path: '/{cartId}/activity', name: 'activity', requirements: ['cartId' => Requirement::UUID], methods: [Request::METHOD_GET])]
+    public function activity(string $cartId, #[CurrentUser] User $user, #[MapQueryString(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)] CartActivityRequest $page = new CartActivityRequest()): JsonResponse
+    {
+        return new JsonResponse($this->queryBus->ask(new GetCartActivityQuery($cartId, new UserId($user->getId()), $page->limit, $page->after)));
     }
 
     #[Route(

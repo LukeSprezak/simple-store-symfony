@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Shared\UI\Controller;
 
 use App\Order\Domain\Enum\StatusCart;
+use App\Order\Domain\Event\CartConverted;
+use App\Order\Domain\Event\CartCreated;
+use App\Order\Domain\Event\ProductAddedToCart;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\ProductSnapshot;
 use App\Product\Domain\Model\Product;
+use App\Shared\Application\Bus\Event\PublishedEvent;
 use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use App\User\Infrastructure\Doctrine\Entity\User;
@@ -200,6 +204,74 @@ final class ReadEndpointsTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertNotContains('session.factory', self::getContainer()->getServiceIds());
         self::assertSame([], $this->client->getResponse()->headers->getCookies());
+    }
+
+    #[Test]
+    public function cartActivityIsProjectedIdempotentlyAndPaginatedInRecordedOrder(): void
+    {
+        $path = '/api/cart/'.$this->cartId.'/activity';
+        $this->request('GET', $path);
+        self::assertResponseIsSuccessful();
+        self::assertSame(['items' => [], 'nextCursor' => null], $this->body());
+        $events = [
+            new PublishedEvent(Uuid::v7()->toRfc4122(), CartCreated::NAME, '2026-01-01T00:00:00+00:00', json_encode(['cartId' => $this->cartId, 'ownerId' => $this->owner->getId()], JSON_THROW_ON_ERROR)),
+            new PublishedEvent(Uuid::v7()->toRfc4122(), ProductAddedToCart::NAME, '2026-01-01T00:00:01+00:00', json_encode(['cartId' => $this->cartId, 'productId' => $this->productId, 'quantity' => 2], JSON_THROW_ON_ERROR)),
+            new PublishedEvent(Uuid::v7()->toRfc4122(), CartConverted::NAME, '2026-01-01T00:00:02+00:00', json_encode(['cartId' => $this->cartId], JSON_THROW_ON_ERROR)),
+        ];
+        $bus = self::getContainer()->get('event.bus');
+        foreach ([2, 1, 0, 1, 2] as $index) {
+            $bus->dispatch($events[$index]);
+        }
+        $this->request('GET', $path.'?limit=2');
+        self::assertResponseIsSuccessful();
+        $first = $this->body();
+        self::assertIsArray($first['items']);
+        self::assertSame([$events[0]->id, $events[1]->id], array_column($first['items'], 'eventId'));
+        self::assertSame($events[1]->id, $first['nextCursor']);
+        self::assertIsArray($first['items'][1]);
+        self::assertSame(2, $first['items'][1]['quantity']);
+        self::assertSame($this->productId, $first['items'][1]['productId']);
+
+        $this->request('GET', $path.'?limit=2&after='.$events[1]->id);
+        self::assertResponseIsSuccessful();
+        $second = $this->body();
+        self::assertIsArray($second['items']);
+        self::assertSame([$events[2]->id], array_column($second['items'], 'eventId'));
+        self::assertNull($second['nextCursor']);
+        self::assertSame(3, $this->entityManager->getConnection()->fetchOne('SELECT COUNT(*) FROM cart_activity WHERE cart_id = ?', [$this->cartId]));
+    }
+
+    #[Test]
+    public function cartActivityRequiresAuthenticationAndOwnership(): void
+    {
+        $path = '/api/cart/'.$this->cartId.'/activity';
+        $this->client->jsonRequest('GET', $path);
+        self::assertResponseStatusCodeSame(401);
+        $this->entityManager->getConnection()->update('cart', ['owner_id' => UserId::generate()->getId()], ['id' => $this->cartId]);
+        $this->request('GET', $path);
+        self::assertResponseStatusCodeSame(404);
+        $this->request('GET', '/api/cart/'.Uuid::v7()->toRfc4122().'/activity');
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function invalidActivityPages(): iterable
+    {
+        yield 'zero' => ['limit=0'];
+        yield 'too large' => ['limit=101'];
+        yield 'wrong type' => ['limit=abc'];
+        yield 'invalid cursor' => ['after=invalid'];
+    }
+
+    #[Test]
+    #[DataProvider('invalidActivityPages')]
+    public function rejectsInvalidActivityPagination(string $query): void
+    {
+        $this->request('GET', '/api/cart/'.$this->cartId.'/activity?'.$query);
+
+        self::assertResponseStatusCodeSame(422);
     }
 
     private function request(string $method, string $path): void

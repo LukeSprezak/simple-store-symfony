@@ -8,6 +8,13 @@ use App\Shared\Domain\Event\DomainEvent;
 
 final readonly class CartExpired implements DomainEvent
 {
+    public const string NAME = 'cart.expired';
+
+    public function eventName(): string
+    {
+        return self::NAME;
+    }
+
     public function __construct(
         public string $cartId,
     ) {

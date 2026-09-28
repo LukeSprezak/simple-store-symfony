@@ -6,4 +6,5 @@ namespace App\Shared\Domain\Event;
 
 interface DomainEvent
 {
+    public function eventName(): string;
 }

@@ -12,6 +12,8 @@ framework:
                     - doctrine_close_connection
                     - doctrine_transaction
             event.bus:
+                middleware:
+                    - doctrine_transaction
                 default_middleware:
                     enabled: true
                     allow_no_handlers: true
@@ -21,6 +23,24 @@ framework:
                 format: json
                 context: { }
         transports:
+            events:
+                dsn: '%env(MESSENGER_RABBITMQ_TRANSPORT_DSN)%'
+                options:
+                    confirm_timeout: 5
+                    connect_timeout: 5
+                    read_timeout: 5
+                    write_timeout: 5
+                    exchange:
+                        name: domain_events
+                        type: direct
+                        default_publish_routing_key: events
+                    queues:
+                        domain_events:
+                            binding_keys: [events]
+                retry_strategy:
+                    max_retries: 5
+                    delay: 1000
+                    multiplier: 2
             sync:
                 dsn: 'sync://'
             async:

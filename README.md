@@ -48,6 +48,44 @@ docker compose exec php85 php bin/console lint:yaml config
 The integration suite requires MySQL, RabbitMQ and generated JWT keys.
 Unit tests can also be run separately with `php bin/phpunit tests/Unit` on PHP 8.5.
 
+## Read API and Query Bus
+
+Send a JWT in `Authorization: Bearer <token>` to use these JSON endpoints:
+
+| Endpoint | Access | Response |
+| --- | --- | --- |
+| `GET /api/cart/{cartId}` | Cart owner with `ROLE_USER` | `id`, `status`, `createdAt`, `expiresAt`, `items`, `totalAmountInCents` |
+| `GET /api/product/{id}` | `ROLE_USER`, active products | `id`, `name`, `description`, `priceInCents`, `stockQuantity` |
+
+Cart items contain `id`, `productId`, `productName`, `unitPriceInCents`,
+`quantity` and `totalAmountInCents`. Names and prices come from the cart snapshot;
+removed items are excluded. Empty carts return `items: []` and a zero total.
+Dates use ISO 8601 with an offset. All `*InCents` fields are integers.
+
+Foreign and missing carts return 404. Inactive and missing products also return
+404. Expired and converted carts remain readable by their owner. Reads do not
+expire carts or release stock. Product creation/removal requires
+`ROLE_SUPER_ADMIN`. Route IDs must be UUIDs, including the v4 and v7 IDs used by
+the application; malformed IDs return 404.
+
+Controllers ask the application `QueryBus` for immutable read models.
+`GetCartQuery` and `GetProductQuery` run on Messenger's synchronous `query.bus`,
+which requires exactly one handler and checks the result type. Reader ports
+live in `Application/ReadModel`; their DBAL adapters query existing tables
+directly. The cart reader retrieves the owner-filtered cart and its items in
+one SQL statement. These reads neither hydrate ORM aggregates nor flush pending
+ORM changes. Queries have no transport routing or Doctrine transaction
+middleware.
+
+No additional database migration is required for these read models. Changes
+become visible after they are stored; asynchronous product commands become
+visible after the worker processes them. Event-driven projections and a
+transactional outbox remain separate work.
+
+The API uses stateless JWT authentication with sessions disabled. Exception
+details and traces are included only when `kernel.debug` is true; use
+`APP_DEBUG=0` in deployed environments, including staging.
+
 ## Cart limits
 
 `src/Order/Domain/Policy/CartLimits.php` defines the limits: 10 units of each
