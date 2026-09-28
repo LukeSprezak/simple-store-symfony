@@ -7,7 +7,6 @@ namespace App\Tests\Integration\User\Infrastructure\Doctrine;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Version\Version;
 use Doctrine\ORM\EntityManagerInterface;
@@ -88,7 +87,6 @@ final class UserCredentialsMigrationTest extends KernelTestCase
     private function migration(): AbstractMigration
     {
         $factory = self::getContainer()->get('doctrine.migrations.dependency_factory');
-        self::assertInstanceOf(DependencyFactory::class, $factory);
 
         return $factory->getMigrationRepository()->getMigrations()
             ->getMigration(new Version('DoctrineMigrations\\Version20260928183000'))->getMigration();

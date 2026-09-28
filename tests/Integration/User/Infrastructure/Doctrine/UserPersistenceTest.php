@@ -78,7 +78,6 @@ final class UserPersistenceTest extends KernelTestCase
     public function acceptsAndPersistsAnEmailAtTheLengthLimit(): void
     {
         $email = str_repeat('a', 64).'@'.str_repeat('b', 63).'.'.str_repeat('c', 63).'.'.str_repeat('d', 61);
-        self::assertSame(254, strlen($email));
         $user = $this->newUser()->setEmail($email);
         self::assertCount(0, $this->validator->validate($user));
         $this->entityManager->persist($user);

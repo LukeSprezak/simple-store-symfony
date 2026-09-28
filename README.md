@@ -74,6 +74,27 @@ share the same transaction. Migration `Version20260928180000` adds the
 `cart(owner_id, status)` index; apply pending migrations when updating an existing
 environment using the setup command above.
 
+## User credentials
+
+User activation and password-reset tokens are stored only as SHA-256 hashes.
+Pass the original token to `setToken()` / `setResetPasswordToken()` and check it
+with `matchesToken()` / `matchesResetPasswordToken()`. Passing `null` or an empty
+string clears that token; an unset token never matches. These fields are
+separate from JWT authentication.
+
+`plainPassword` is transient and cleared by `eraseCredentials()`; the redundant
+`repeatPassword` field has been removed. Symfony's serializer excludes passwords
+and token hashes. Email addresses allow up to 254 characters, with format
+validation and separate uniqueness validation for email and username.
+
+Migration `Version20260928183000` converts existing tokens to hashes and drops
+the old token, plaintext-password and repeated-password columns. Existing
+nonempty tokens and login password hashes remain valid. The migration is
+irreversible and uses MySQL DDL outside a transaction. Pause application traffic
+and workers while applying it together with this code update; the old and new
+user mappings require different columns. Apply it to each environment using
+the migration command in the setup section (`--env=test` for the test database).
+
 ## Workers
 
 ```sh
