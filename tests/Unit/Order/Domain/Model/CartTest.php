@@ -79,13 +79,12 @@ class CartTest extends TestCase
         $createdAt = (new \DateTimeImmutable())->modify('-25 hours');
         $expiresAt = (new \DateTimeImmutable())->modify('-1 hour');
 
-        $cart = Cart::fromPersistence(
+        $cart = new Cart(
             id: Uuid::v7()->toRfc4122(),
             status: StatusCart::ACTIVE,
             ownerId: UserId::generate(),
             createdAt: $createdAt,
             expiresAt: $expiresAt,
-            items: []
         );
 
         // When

@@ -22,6 +22,13 @@ doctrine:
                 prefix: 'App\Order\Infrastructure\Doctrine\Entity'
                 alias: App\Order
 
+            App\Order\Domain:
+                type: xml
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Order/Infrastructure/Doctrine/Mapping'
+                prefix: 'App\Order\Domain\Model'
+                alias: App\Order\Domain
+
             App\Product:
                 type: attribute
                 is_bundle: false
@@ -35,13 +42,6 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Product/Infrastructure/Doctrine/Mapping'
                 prefix: 'App\Product\Domain\Model'
                 alias: App\Product\Domain
-
-            App\Shared:
-                type: attribute
-                is_bundle: false
-                dir: '%kernel.project_dir%/src/Shared/Infrastructure/Doctrine/Entity'
-                prefix: 'App\Shared\Infrastructure\Doctrine\Entity'
-                alias: App\Shared
 
             App\User:
                 type: attribute

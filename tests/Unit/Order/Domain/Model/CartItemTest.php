@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Order\Domain\Model;
 
+use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\InvalidQuantityException;
+use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
 use App\Order\Domain\Model\ProductSnapshot;
 use App\Shared\Domain\ValueObject\Money;
+use App\User\Domain\ValueObject\UserId;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +30,7 @@ class CartItemTest extends TestCase
         $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
         // When
-        $cartItem = CartItem::create($itemId, $product, $quantity);
+        $cartItem = CartItem::create($itemId, $this->createCart(), $product, $quantity);
 
         // Then
         self::assertSame($itemId, $cartItem->getId());
@@ -50,7 +53,7 @@ class CartItemTest extends TestCase
         $this->expectExceptionMessage('The quantity cannot be negative.');
 
         // When
-        CartItem::create($itemId, $product, $quantity);
+        CartItem::create($itemId, $this->createCart(), $product, $quantity);
     }
 
     #[Test]
@@ -64,7 +67,7 @@ class CartItemTest extends TestCase
 
         $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
-        $cartItem = CartItem::create($itemId, $product, $initialQuantity);
+        $cartItem = CartItem::create($itemId, $this->createCart(), $product, $initialQuantity);
 
         // When
         $cartItem->increaseQuantity($increaseAmount);
@@ -84,7 +87,7 @@ class CartItemTest extends TestCase
 
         $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
-        $cartItem = CartItem::create($itemId, $product, $initialQuantity);
+        $cartItem = CartItem::create($itemId, $this->createCart(), $product, $initialQuantity);
 
         // Then
         $this->expectException(InvalidQuantityException::class);
@@ -105,7 +108,7 @@ class CartItemTest extends TestCase
 
         $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
-        $cartItem = CartItem::create($itemId, $product, $initialQuantity);
+        $cartItem = CartItem::create($itemId, $this->createCart(), $product, $initialQuantity);
 
         // When
         $cartItem->decreaseQuantity($decreaseAmount);
@@ -125,7 +128,7 @@ class CartItemTest extends TestCase
 
         $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
-        $cartItem = CartItem::create($itemId, $product, $initialQuantity);
+        $cartItem = CartItem::create($itemId, $this->createCart(), $product, $initialQuantity);
 
         // Then
         $this->expectException(InvalidQuantityException::class);
@@ -146,7 +149,7 @@ class CartItemTest extends TestCase
 
         $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
-        $cartItem = CartItem::create($itemId, $product, $initialQuantity);
+        $cartItem = CartItem::create($itemId, $this->createCart(), $product, $initialQuantity);
 
         // When
         $cartItem->setQuantity($newQuantity);
@@ -166,7 +169,7 @@ class CartItemTest extends TestCase
 
         $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
-        $cartItem = CartItem::create($itemId, $product, $initialQuantity);
+        $cartItem = CartItem::create($itemId, $this->createCart(), $product, $initialQuantity);
 
         // Then
         $this->expectException(InvalidQuantityException::class);
@@ -174,5 +177,10 @@ class CartItemTest extends TestCase
 
         // When
         $cartItem->setQuantity($newQuantity);
+    }
+
+    private function createCart(): Cart
+    {
+        return Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
     }
 }

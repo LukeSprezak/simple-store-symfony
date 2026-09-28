@@ -27,8 +27,13 @@ class Cart extends AggregateRoot
     private readonly UserId $ownerId;
     private readonly \DateTimeImmutable $createdAt;
     private readonly \DateTimeImmutable $expiresAt;
-    private readonly Collection $items;
+    /** @var Collection<int, CartItem> */
+    // not readonly: Doctrine swaps it for a PersistentCollection when a new cart is persisted
+    private Collection $items;
 
+    /**
+     * @param Collection<int, CartItem>|null $items
+     */
     public function __construct(
         string $id,
         StatusCart $status,
@@ -57,24 +62,6 @@ class Cart extends AggregateRoot
         $cart->recordThat(new CartCreated($id, $ownerId->getId()));
 
         return $cart;
-    }
-
-    public static function fromPersistence(
-        string $id,
-        StatusCart $status,
-        UserId $ownerId,
-        \DateTimeImmutable $createdAt,
-        \DateTimeImmutable $expiresAt,
-        array $items,
-    ): self {
-        return new self(
-            id: $id,
-            status: $status,
-            ownerId: $ownerId,
-            createdAt: $createdAt,
-            expiresAt: $expiresAt,
-            items: new ArrayCollection($items)
-        );
     }
 
     public function getId(): string
@@ -107,25 +94,20 @@ class Cart extends AggregateRoot
         return $this->expiresAt;
     }
 
+    /**
+     * @return Collection<int, CartItem>
+     */
     public function getItems(): Collection
     {
         return $this->items;
     }
 
+    /**
+     * @return Collection<int, CartItem>
+     */
     public function getActiveItems(): Collection
     {
         return $this->items->filter(static fn (CartItem $item) => !$item->isDeleted());
-    }
-
-    public function addItem(CartItem $item): void
-    {
-        $existingItem = $this->findItemByProductId($item->getProduct()->getId());
-
-        if ($existingItem) {
-            $existingItem->increaseQuantity($item->getQuantity());
-        } else {
-            $this->items->add($item);
-        }
     }
 
     public function removeProduct(string $productId): int
@@ -158,7 +140,7 @@ class Cart extends AggregateRoot
             $existingItem->increaseQuantity($quantity);
         } else {
             $itemId = Uuid::v4()->toRfc4122();
-            $cartItem = CartItem::create($itemId, $product, $quantity);
+            $cartItem = CartItem::create($itemId, $this, $product, $quantity);
             $this->items->add($cartItem);
         }
 

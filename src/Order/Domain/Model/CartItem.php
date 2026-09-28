@@ -11,6 +11,7 @@ class CartItem
 {
     private function __construct(
         private readonly string $id,
+        private readonly Cart $cart,
         private readonly ProductSnapshot $product,
         private int $quantity,
         private ?\DateTimeImmutable $deletedAt = null,
@@ -20,19 +21,11 @@ class CartItem
 
     public static function create(
         string $id,
+        Cart $cart,
         ProductSnapshot $product,
         int $quantity,
     ): self {
-        return new self($id, $product, $quantity);
-    }
-
-    public static function fromPersistence(
-        string $id,
-        ProductSnapshot $product,
-        int $quantity,
-        ?\DateTimeImmutable $deletedAt,
-    ): self {
-        return new self($id, $product, $quantity, $deletedAt);
+        return new self($id, $cart, $product, $quantity);
     }
 
     public function isDeleted(): bool

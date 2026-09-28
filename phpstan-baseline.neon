@@ -1,18 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: '#^Cannot call method toOrderItem\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Order/Application/Command/ConvertCartToOrder/ConvertCartToOrderCommandHandler.php
-
-		-
-			message: '#^Parameter \#1 \$orderItem of method App\\Order\\Domain\\Model\\Order\:\:addItem\(\) expects App\\Order\\Domain\\Model\\OrderItem, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Application/Command/ConvertCartToOrder/ConvertCartToOrderCommandHandler.php
-
-		-
 			message: '#^Argument of an invalid type mixed supplied for foreach, only iterables are supported\.$#'
 			identifier: foreach.nonIterable
 			count: 1
@@ -73,84 +61,6 @@ parameters:
 			path: src/Order/Application/Service/RemoveExpiredCart/RemoveExpiredCartService.php
 
 		-
-			message: '#^Cannot call method getId\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Cannot call method getProduct\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Cannot call method isDeleted\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Cannot call method setQuantity\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:__construct\(\) has parameter \$items with generic interface Doctrine\\Common\\Collections\\Collection but does not specify its types\: TKey, T$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:findItemByProductId\(\) should return App\\Order\\Domain\\Model\\CartItem\|null but returns mixed\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:fromPersistence\(\) has parameter \$items with no value type specified in iterable type array\.$#'
-			identifier: missingType.iterableValue
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:getActiveItems\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:getItemById\(\) should return App\\Order\\Domain\\Model\\CartItem\|null but returns mixed\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Method App\\Order\\Domain\\Model\\Cart\:\:getItems\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Parameter \#1 \$p of method Doctrine\\Common\\Collections\\Collection\<\(int\|string\),mixed\>\:\:filter\(\) expects Closure\(mixed, int\|string\)\: bool, Closure\(App\\Order\\Domain\\Model\\CartItem\)\: bool given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Parameter \$callback of function array_reduce expects callable\(App\\Shared\\Domain\\ValueObject\\Money, mixed\)\: App\\Shared\\Domain\\ValueObject\\Money, Closure\(App\\Shared\\Domain\\ValueObject\\Money, App\\Order\\Domain\\Model\\CartItem\)\: App\\Shared\\Domain\\ValueObject\\Money given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
-			message: '#^Property App\\Order\\Domain\\Model\\Cart\:\:\$items with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Order/Domain/Model/Cart.php
-
-		-
 			message: '#^Method App\\Order\\Domain\\Model\\Order\:\:fromPersistence\(\) has parameter \$items with no value type specified in iterable type array\.$#'
 			identifier: missingType.iterableValue
 			count: 1
@@ -181,36 +91,6 @@ parameters:
 			path: src/Order/Domain/Repository/CartRepositoryInterface.php
 
 		-
-			message: '#^Method App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\:\:getItems\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Order/Infrastructure/Doctrine/Entity/Cart.php
-
-		-
-			message: '#^Property App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\:\:\$items type mapping mismatch\: property can contain Doctrine\\Common\\Collections\\Collection but database expects Doctrine\\Common\\Collections\\Collection&iterable\<App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\>\.$#'
-			identifier: doctrine.associationType
-			count: 1
-			path: src/Order/Infrastructure/Doctrine/Entity/Cart.php
-
-		-
-			message: '#^Property App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\:\:\$items with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Order/Infrastructure/Doctrine/Entity/Cart.php
-
-		-
-			message: '#^Method App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:getCart\(\) should return App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart but returns App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\|null\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Order/Infrastructure/Doctrine/Entity/CartItem.php
-
-		-
-			message: '#^Property App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:\$product type mapping mismatch\: database can contain App\\Product\\Domain\\Model\\Product\|null but property expects App\\Product\\Domain\\Model\\Product\.$#'
-			identifier: doctrine.associationType
-			count: 1
-			path: src/Order/Infrastructure/Doctrine/Entity/CartItem.php
-
-		-
 			message: '#^Method App\\Order\\Infrastructure\\Doctrine\\Entity\\Order\:\:getItems\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
 			identifier: missingType.generics
 			count: 1
@@ -239,162 +119,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: src/Order/Infrastructure/Repository/CartRepository.php
-
-		-
-			message: '#^Parameter \#1 \$callback of function array_map expects \(callable\(mixed\)\: mixed\)\|null, Closure\(App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\)\: App\\Order\\Domain\\Model\\Cart given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Repository/CartRepository.php
-
-		-
-			message: '#^Parameter \#2 \$array of function array_map expects array, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Repository/CartRepository.php
-
-		-
-			message: '#^Cannot call method getDeletedAt\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Cannot call method getId\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 10
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Cannot call method getName\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Cannot call method getPrice\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Cannot call method getProduct\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Cannot call method getQuantity\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 3
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Cannot call method isDeleted\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Cannot call method setDeleted\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Cannot call method setDeletedAt\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Cannot call method setQuantity\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#1 \$deleted of method App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:setDeleted\(\) expects bool, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#1 \$deletedAt of method App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:setDeletedAt\(\) expects DateTimeImmutable\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#1 \$id of class App\\Order\\Domain\\Model\\ProductSnapshot constructor expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#1 \$id of method App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:setId\(\) expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#1 \$id of static method App\\Order\\Domain\\Model\\CartItem\:\:fromPersistence\(\) expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#1 \$item of method App\\Order\\Infrastructure\\Doctrine\\Entity\\Cart\:\:removeItem\(\) expects App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#1 \$itemId of method App\\Order\\Domain\\Model\\Cart\:\:getItemById\(\) expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#1 \$productId of class App\\Product\\Domain\\Exception\\ProductNotFoundException constructor expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#1 \$quantity of method App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:setQuantity\(\) expects int, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#2 \$name of class App\\Order\\Domain\\Model\\ProductSnapshot constructor expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#3 \$price of class App\\Order\\Domain\\Model\\ProductSnapshot constructor expects App\\Shared\\Domain\\ValueObject\\Money, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#3 \$quantity of static method App\\Order\\Domain\\Model\\CartItem\:\:fromPersistence\(\) expects int, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Parameter \#4 \$deletedAt of static method App\\Order\\Domain\\Model\\CartItem\:\:fromPersistence\(\) expects DateTimeImmutable\|null, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
-			message: '#^Possibly invalid array key type mixed\.$#'
-			identifier: offsetAccess.invalidOffset
-			count: 4
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
 
 		-
 			message: '#^Cannot call method getAmount\(\) on mixed\.$#'
@@ -793,13 +517,19 @@ parameters:
 			path: tests/Integration/Shared/Infrastructure/Framework/Event/Subscriber/RateLimiterSubscriberTest.php
 
 		-
-			message: '#^Cannot call method getId\(\) on mixed\.$#'
+			message: '#^Cannot call method getId\(\) on App\\Order\\Domain\\Model\\CartItem\|false\.$#'
 			identifier: method.nonObject
-			count: 2
+			count: 1
 			path: tests/Unit/Order/Application/Command/AddProductToCart/AddProductToCartCommandHandlerTest.php
 
 		-
-			message: '#^Cannot call method getProduct\(\) on mixed\.$#'
+			message: '#^Cannot call method getProduct\(\) on App\\Order\\Domain\\Model\\CartItem\|false\.$#'
+			identifier: method.nonObject
+			count: 1
+			path: tests/Unit/Order/Application/Command/AddProductToCart/AddProductToCartCommandHandlerTest.php
+
+		-
+			message: '#^Cannot call method getQuantity\(\) on App\\Order\\Domain\\Model\\CartItem\|false\.$#'
 			identifier: method.nonObject
 			count: 1
 			path: tests/Unit/Order/Application/Command/AddProductToCart/AddProductToCartCommandHandlerTest.php
@@ -811,19 +541,7 @@ parameters:
 			path: tests/Unit/Order/Application/Command/AddProductToCart/AddProductToCartCommandHandlerTest.php
 
 		-
-			message: '#^Cannot call method getQuantity\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 1
-			path: tests/Unit/Order/Application/Command/AddProductToCart/AddProductToCartCommandHandlerTest.php
-
-		-
-			message: '#^Parameter \#1 \$itemId of method App\\Order\\Domain\\Model\\Cart\:\:getItemById\(\) expects string, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: tests/Unit/Order/Application/Command/AddProductToCart/AddProductToCartCommandHandlerTest.php
-
-		-
-			message: '#^Cannot call method getQuantity\(\) on mixed\.$#'
+			message: '#^Cannot call method getQuantity\(\) on App\\Order\\Domain\\Model\\CartItem\|false\.$#'
 			identifier: method.nonObject
 			count: 1
 			path: tests/Unit/Order/Domain/Model/CartTest.php
@@ -833,30 +551,6 @@ parameters:
 			identifier: missingType.iterableValue
 			count: 1
 			path: tests/Unit/Order/Domain/Model/OrderTest.php
-
-		-
-			message: '#^Call to static method PHPUnit\\Framework\\Assert\:\:assertInstanceOf\(\) with ''App\\\\Order\\\\Domain\\\\Model\\\\Cart'' and App\\Order\\Domain\\Model\\Cart will always evaluate to true\.$#'
-			identifier: staticMethod.alreadyNarrowedType
-			count: 1
-			path: tests/Unit/Order/Infrastructure/Transformer/CartTransformerTest.php
-
-		-
-			message: '#^Cannot call method getId\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: tests/Unit/Order/Infrastructure/Transformer/CartTransformerTest.php
-
-		-
-			message: '#^Cannot call method getProduct\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: tests/Unit/Order/Infrastructure/Transformer/CartTransformerTest.php
-
-		-
-			message: '#^Cannot call method getQuantity\(\) on mixed\.$#'
-			identifier: method.nonObject
-			count: 2
-			path: tests/Unit/Order/Infrastructure/Transformer/CartTransformerTest.php
 
 		-
 			message: '#^Call to an undefined method App\\Product\\Domain\\Repository\\ProductRepositoryInterface\|PHPUnit\\Framework\\MockObject\\MockObject\:\:expects\(\)\.$#'

@@ -10,6 +10,8 @@ use App\User\Domain\ValueObject\UserId;
 
 class Product
 {
+    private int $version = 1;
+
     private function __construct(
         private readonly string $id,
         private readonly string $name,
@@ -18,7 +20,6 @@ class Product
         private int $stockQuantity,
         private readonly UserId $userId,
         private StatusProduct $status = StatusProduct::ACTIVE,
-        private ?int $version = null,
     ) {
     }
 
@@ -31,19 +32,6 @@ class Product
         UserId $userId,
     ): self {
         return new self($id, $name, $description, $price, $stockQuantity, $userId);
-    }
-
-    public static function fromPersistence(
-        string $id,
-        string $name,
-        string $description,
-        Money $price,
-        int $stockQuantity,
-        UserId $userId,
-        StatusProduct $status,
-        int $version,
-    ): self {
-        return new self($id, $name, $description, $price, $stockQuantity, $userId, $status, $version);
     }
 
     public function getId(): string
@@ -79,11 +67,6 @@ class Product
     public function getUserId(): UserId
     {
         return $this->userId;
-    }
-
-    public function getVersion(): ?int
-    {
-        return $this->version;
     }
 
     public function getStatus(): StatusProduct
