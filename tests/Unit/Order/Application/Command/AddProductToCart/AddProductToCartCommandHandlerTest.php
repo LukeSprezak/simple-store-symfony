@@ -13,6 +13,7 @@ use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Product\Domain\Model\Product;
 use App\Product\Domain\Repository\ProductRepositoryInterface;
+use App\User\Domain\ValueObject\UserId;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -25,10 +26,13 @@ class AddProductToCartCommandHandlerTest extends TestCase
     private CartRepositoryInterface&MockObject $cartRepository;
     private ProductRepositoryInterface&MockObject $productRepository;
     private AddProductToCartCommandHandler $handler;
+    private UserId $userId;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->userId = UserId::generate();
 
         $this->cartRepository = $this->createMock(CartRepositoryInterface::class);
         $this->productRepository = $this->createMock(ProductRepositoryInterface::class);
@@ -46,9 +50,9 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 2;
 
-        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE);
+        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE, $this->userId, false);
 
-        $existingCart = Cart::create($cartId, StatusCart::ACTIVE);
+        $existingCart = Cart::create($cartId, StatusCart::ACTIVE, $this->userId);
         $product = $this->createProductMock($productId, 10);
         $this->cartRepository->expects($this->once())
             ->method('find')
@@ -87,14 +91,12 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 1;
 
-        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE);
+        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE, $this->userId, true);
 
         $product = $this->createProductMock($productId, 10);
 
-        $this->cartRepository->expects($this->once())
-            ->method('find')
-            ->with($cartId)
-            ->willReturn(null);
+        $this->cartRepository->expects($this->never())
+            ->method('find');
 
         $this->productRepository->expects($this->once())
             ->method('get')
@@ -144,9 +146,9 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 1;
 
-        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE);
+        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE, $this->userId, false);
 
-        $existingCart = Cart::create($cartId, StatusCart::ACTIVE);
+        $existingCart = Cart::create($cartId, StatusCart::ACTIVE, $this->userId);
         $this->cartRepository->expects($this->once())
             ->method('find')
             ->with($cartId)
@@ -179,9 +181,9 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 10;
 
-        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE);
+        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE, $this->userId, false);
 
-        $existingCart = Cart::create($cartId, StatusCart::ACTIVE);
+        $existingCart = Cart::create($cartId, StatusCart::ACTIVE, $this->userId);
         $product = $this->createProductMock($productId, 5, 'Test Product');
         $this->cartRepository->expects($this->once())
             ->method('find')
@@ -215,14 +217,12 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 2;
 
-        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE);
+        $command = new AddProductToCartCommand($cartId, $productId, $quantity, StatusCart::ACTIVE, $this->userId, true);
 
         $product = $this->createProductMock($productId, 5);
 
-        $this->cartRepository->expects($this->once())
-            ->method('find')
-            ->with($cartId)
-            ->willReturn(null);
+        $this->cartRepository->expects($this->never())
+            ->method('find');
 
         $this->productRepository->expects($this->once())
             ->method('get')

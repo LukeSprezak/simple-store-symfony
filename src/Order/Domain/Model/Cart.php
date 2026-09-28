@@ -9,6 +9,7 @@ use App\Order\Domain\Exception\ProductNotInCartException;
 use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Product\Domain\Model\Product;
 use App\Shared\Infrastructure\Doctrine\Entity\SoftDeleteTrait;
+use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -21,6 +22,7 @@ class Cart
 
     private readonly string $id;
     private StatusCart $status;
+    private readonly UserId $ownerId;
     private readonly \DateTimeImmutable $createdAt;
     private readonly \DateTimeImmutable $expiresAt;
     private readonly Collection $items;
@@ -28,22 +30,25 @@ class Cart
     public function __construct(
         string $id,
         StatusCart $status,
+        UserId $ownerId,
         \DateTimeImmutable $createdAt,
         \DateTimeImmutable $expiresAt,
         ?Collection $items = null,
     ) {
         $this->id = $id;
         $this->status = $status;
+        $this->ownerId = $ownerId;
         $this->createdAt = $createdAt;
         $this->expiresAt = $expiresAt;
         $this->items = $items ?? new ArrayCollection();
     }
 
-    public static function create(string $id, StatusCart $status): self
+    public static function create(string $id, StatusCart $status, UserId $ownerId): self
     {
         return new self(
             id: $id,
             status: $status,
+            ownerId: $ownerId,
             createdAt: new \DateTimeImmutable(),
             expiresAt: (new \DateTimeImmutable())->modify('+24 hours')
         );
@@ -52,6 +57,7 @@ class Cart
     public static function fromPersistence(
         string $id,
         StatusCart $status,
+        UserId $ownerId,
         \DateTimeImmutable $createdAt,
         \DateTimeImmutable $expiresAt,
         array $items,
@@ -59,6 +65,7 @@ class Cart
         return new self(
             id: $id,
             status: $status,
+            ownerId: $ownerId,
             createdAt: $createdAt,
             expiresAt: $expiresAt,
             items: new ArrayCollection($items)
@@ -68,6 +75,16 @@ class Cart
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getOwnerId(): UserId
+    {
+        return $this->ownerId;
+    }
+
+    public function isOwnedBy(UserId $userId): bool
+    {
+        return $this->ownerId->equals($userId);
     }
 
     public function getStatus(): StatusCart

@@ -6,12 +6,11 @@ namespace App\Order\Infrastructure\Request;
 
 use App\Order\Application\Command\AddProductToCart\AddProductToCartCommand;
 use App\Order\Domain\Enum\StatusCart;
+use App\User\Domain\ValueObject\UserId;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final class AddProductToCartRequest
 {
-    public ?string $cartId = null;
-
     #[Assert\NotBlank]
     public string $productId;
 
@@ -22,13 +21,15 @@ final class AddProductToCartRequest
 
     public StatusCart $status;
 
-    public function toCommand(): AddProductToCartCommand
+    public function toCommand(string $cartId, bool $createCart, string $userId): AddProductToCartCommand
     {
         return new AddProductToCartCommand(
-            $this->cartId,
+            $cartId,
             $this->productId,
             $this->quantity,
             StatusCart::ACTIVE,
+            new UserId($userId),
+            $createCart,
         );
     }
 }

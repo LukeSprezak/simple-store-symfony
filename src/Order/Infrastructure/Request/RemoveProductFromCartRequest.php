@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Order\Infrastructure\Request;
 
 use App\Order\Application\Command\RemoveProductFromCart\RemoveProductFromCartCommand;
+use App\User\Domain\ValueObject\UserId;
 use Symfony\Component\Validator\Constraints as Assert;
 
 final class RemoveProductFromCartRequest
@@ -15,11 +16,12 @@ final class RemoveProductFromCartRequest
     #[Assert\NotBlank]
     public string $productId;
 
-    public function toCommand(): RemoveProductFromCartCommand
+    public function toCommand(string $userId): RemoveProductFromCartCommand
     {
         return new RemoveProductFromCartCommand(
             $this->cartId,
-            $this->productId
+            $this->productId,
+            new UserId($userId),
         );
     }
 }

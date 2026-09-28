@@ -39,6 +39,7 @@ class CartTransformerTest extends TestCase
         $cartId = Uuid::v7()->toRfc4122();
         $cartEntity->method('getId')->willReturn($cartId);
         $cartEntity->method('getStatus')->willReturn(StatusCart::ACTIVE);
+        $cartEntity->method('getOwnerId')->willReturn(Uuid::v7()->toRfc4122());
 
         $productEntity1 = $this->createMock(ProductEntity::class);
         $productId1 = Uuid::v7()->toRfc4122();

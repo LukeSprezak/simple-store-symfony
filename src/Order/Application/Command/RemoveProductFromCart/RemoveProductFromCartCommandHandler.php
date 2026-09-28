@@ -23,7 +23,7 @@ final readonly class RemoveProductFromCartCommandHandler implements CommandHandl
     public function __invoke(RemoveProductFromCartCommand $command): void
     {
         $cart = $this->cartRepository->find($command->cartId);
-        if (!$cart) {
+        if (!$cart || !$cart->isOwnedBy($command->userId)) {
             throw new CartNotFoundException($command->cartId);
         }
 

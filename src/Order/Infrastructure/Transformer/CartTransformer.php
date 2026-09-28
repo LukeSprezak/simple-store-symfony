@@ -25,6 +25,7 @@ final readonly class CartTransformer
     public function fromDomain(CartDomain $domain, CartEntity $entity): void
     {
         $entity->setStatus($domain->getStatus());
+        $entity->setOwnerId($domain->getOwnerId()->getId());
         $existingItems = [];
         foreach ($entity->getItems() as $itemEntity) {
             $existingItems[$itemEntity->getId()] = $itemEntity;
@@ -67,7 +68,7 @@ final readonly class CartTransformer
 
     public function toDomain(CartEntity $entity): CartDomain
     {
-        $domain = CartDomain::create($entity->getId(), $entity->getStatus());
+        $domain = CartDomain::create($entity->getId(), $entity->getStatus(), new UserId($entity->getOwnerId()));
         $statusEnum = StatusCart::from($domain->getStatus()->value);
         $entity->setStatus($statusEnum);
 

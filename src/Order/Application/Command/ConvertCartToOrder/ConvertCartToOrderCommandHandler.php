@@ -31,7 +31,7 @@ final readonly class ConvertCartToOrderCommandHandler implements CommandHandler
         try {
             $cart = $this->cartRepository->find($command->cartId);
 
-            if (!$cart) {
+            if (!$cart || !$cart->isOwnedBy($command->userId)) {
                 throw new CartNotFoundException($command->cartId);
             }
 

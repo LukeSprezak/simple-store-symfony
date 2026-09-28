@@ -9,6 +9,7 @@ use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
 use App\Product\Domain\Model\Product;
+use App\User\Domain\ValueObject\UserId;
 use LogicException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -25,7 +26,7 @@ class CartTest extends TestCase
     public function shouldAddProductToEmptyCart(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE);
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
         $product = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
 
         $product->expects($this->once())
@@ -46,7 +47,7 @@ class CartTest extends TestCase
     public function shouldAddProductToExistingCartItem(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE);
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
 
         $product = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
 
@@ -73,7 +74,7 @@ class CartTest extends TestCase
     public function shouldAddProductWithInsufficientStockThrowsException(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE);
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
         $product = $this->createProductMock('product-1', 30.0, 1, 'Product 1');
 
         $product->expects($this->never())
@@ -91,7 +92,7 @@ class CartTest extends TestCase
     public function shouldGetTotalAmount(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE);
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
         $product1 = $this->createProductMock('product-1', 50.0, 10, 'Product 1');
         $product2 = $this->createProductMock('product-2', 25.0, 10, 'Product 2');
 
@@ -122,6 +123,7 @@ class CartTest extends TestCase
         $cart = Cart::fromPersistence(
             id: Uuid::v7()->toRfc4122(),
             status: StatusCart::ACTIVE,
+            ownerId: UserId::generate(),
             createdAt: $createdAt,
             expiresAt: $expiresAt,
             items: []
@@ -138,7 +140,7 @@ class CartTest extends TestCase
     public function shouldExpireCart(): void
     {
         // Given
-        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE);
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
 
         // When
         $cart->expire();
@@ -151,7 +153,7 @@ class CartTest extends TestCase
     public function applyTransitionSuccess(): void
     {
         $now = new \DateTimeImmutable();
-        $cart = new Cart('cart123', StatusCart::ACTIVE, $now, $now);
+        $cart = new Cart('cart123', StatusCart::ACTIVE, UserId::generate(), $now, $now);
         $cart->setStatus(StatusCart::ACTIVE);
 
         $workflow = $this->createMock(WorkflowInterface::class);
@@ -178,7 +180,7 @@ class CartTest extends TestCase
         $this->expectException(AccessDeniedHttpException::class);
 
         $now = new \DateTimeImmutable();
-        $cart = new Cart('cart123', StatusCart::ACTIVE, $now, $now);
+        $cart = new Cart('cart123', StatusCart::ACTIVE, UserId::generate(), $now, $now);
         $cart->setStatus(StatusCart::ACTIVE);
 
         $workflow = $this->createMock(WorkflowInterface::class);
@@ -197,7 +199,7 @@ class CartTest extends TestCase
         $this->expectExceptionMessage('Cart should have exactly one active place.');
 
         $now = new \DateTimeImmutable();
-        $cart = new Cart('cart123', StatusCart::ACTIVE, $now, $now);
+        $cart = new Cart('cart123', StatusCart::ACTIVE, UserId::generate(), $now, $now);
         $cart->setStatus(StatusCart::ACTIVE);
 
         $workflow = $this->createMock(WorkflowInterface::class);
@@ -223,7 +225,7 @@ class CartTest extends TestCase
         $this->expectExceptionMessage("Invalid status value 'invalid_status'.");
 
         $now = new \DateTimeImmutable();
-        $cart = new Cart('cart123', StatusCart::ACTIVE, $now, $now);
+        $cart = new Cart('cart123', StatusCart::ACTIVE, UserId::generate(), $now, $now);
         $cart->setStatus(StatusCart::ACTIVE);
 
         $workflow = $this->createMock(WorkflowInterface::class);

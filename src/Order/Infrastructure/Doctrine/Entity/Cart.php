@@ -34,6 +34,9 @@ class Cart
     #[ORM\Column(type: Types::STRING, length: 50, enumType: StatusCart::class)]
     private StatusCart $status;
 
+    #[ORM\Column(type: Types::GUID)]
+    private string $ownerId;
+
     public function __construct(
         string $id,
     ) {
@@ -91,6 +94,16 @@ class Cart
     public function setExpiresAt(\DateTimeImmutable $expiresAt): void
     {
         $this->expiresAt = $expiresAt;
+    }
+
+    public function getOwnerId(): string
+    {
+        return $this->ownerId;
+    }
+
+    public function setOwnerId(string $ownerId): void
+    {
+        $this->ownerId = $ownerId;
     }
 
     public function getStatus(): StatusCart

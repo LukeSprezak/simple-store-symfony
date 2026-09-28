@@ -5,19 +5,20 @@ declare(strict_types=1);
 namespace App\Order\UI\Controller;
 
 use App\Order\Application\Command\ConvertCartToOrder\ConvertCartToOrderCommand;
-use App\Order\Domain\Exception\CartNotFoundException;
-use App\Order\Infrastructure\Repository\CartRepository;
 use App\Order\Infrastructure\Request\AddProductToCartRequest;
 use App\Order\Infrastructure\Request\RemoveProductFromCartRequest;
 use App\Shared\Domain\Enum\Routes;
 use App\Shared\Infrastructure\Bus\Messenger\SyncCommandBus;
 use App\User\Domain\Enum\Role;
+use App\User\Domain\ValueObject\UserId;
+use App\User\Infrastructure\Doctrine\Entity\User;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Uid\Uuid;
 
@@ -28,7 +29,6 @@ final readonly class CartController
 {
     public function __construct(
         private SyncCommandBus $syncCommandBus,
-        private CartRepository $cartRepository,
     ) {
     }
 
@@ -40,15 +40,13 @@ final readonly class CartController
     )]
     public function addProductToCart(
         #[MapRequestPayload] AddProductToCartRequest $addProductToCartRequest,
+        #[CurrentUser] User $user,
         ?string $cartId,
     ): JsonResponse {
-        if (null === $cartId) {
-            $cartId = Uuid::v4()->toRfc4122();
-        }
+        $createCart = null === $cartId;
+        $cartId ??= Uuid::v4()->toRfc4122();
 
-        $addProductToCartRequest->cartId = $cartId;
-
-        $this->syncCommandBus->dispatch($addProductToCartRequest->toCommand());
+        $this->syncCommandBus->dispatch($addProductToCartRequest->toCommand($cartId, $createCart, $user->getId()));
 
         return new JsonResponse(['cartId' => $cartId], Response::HTTP_OK);
     }
@@ -58,15 +56,9 @@ final readonly class CartController
         name: Routes::CONVERT_PRODUCT_TO_ORDER_NAME->value,
         methods: [Request::METHOD_POST]
     )]
-    public function convertToOrder(string $cartId): JsonResponse
+    public function convertToOrder(string $cartId, #[CurrentUser] User $user): JsonResponse
     {
-        $cartDomain = $this->cartRepository->find($cartId);
-        if (!$cartDomain) {
-            throw new CartNotFoundException($cartId);
-        }
-
-        $command = new ConvertCartToOrderCommand($cartId);
-        $this->syncCommandBus->dispatch($command);
+        $this->syncCommandBus->dispatch(new ConvertCartToOrderCommand($cartId, new UserId($user->getId())));
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -78,8 +70,9 @@ final readonly class CartController
     )]
     public function removeProductFromCart(
         #[MapRequestPayload] RemoveProductFromCartRequest $removeProductFromCartRequest,
+        #[CurrentUser] User $user,
     ): JsonResponse {
-        $this->syncCommandBus->dispatch($removeProductFromCartRequest->toCommand());
+        $this->syncCommandBus->dispatch($removeProductFromCartRequest->toCommand($user->getId()));
 
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
