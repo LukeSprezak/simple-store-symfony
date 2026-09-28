@@ -12,4 +12,6 @@ interface OrderReader
      * @param UserId|null $ownerId null returns orders of all owners
      */
     public function findPage(?UserId $ownerId, int $limit, ?string $after): OrderPage;
+
+    public function find(string $orderId): ?OrderView;
 }

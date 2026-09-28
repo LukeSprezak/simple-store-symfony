@@ -3,50 +3,64 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, Observable, throwError } from 'rxjs';
 
-const TOKEN_KEY = 'token';
-
-@Injectable({ providedIn: 'root' })
-export class AuthService {
+abstract class Session {
   private readonly http = inject(HttpClient);
-  readonly token = signal(localStorage.getItem(TOKEN_KEY));
-  private readonly claims = computed<{ roles: string[]; email: string } | null>(() => {
-    const token = this.token();
+  readonly token;
+  readonly email;
 
-    return token ? JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) : null;
-  });
-  // UI hint only; the API enforces the role on every request.
-  readonly isAdmin = computed(() => {
-    const roles = this.claims()?.roles ?? [];
+  constructor(
+    private readonly storageKey: string,
+    private readonly loginUrl: string,
+  ) {
+    this.token = signal(localStorage.getItem(storageKey));
+    this.email = computed<string | undefined>(() => {
+      const token = this.token();
 
-    return roles.includes('ROLE_ADMIN') || roles.includes('ROLE_SUPER_ADMIN');
-  });
-  readonly email = computed(() => this.claims()?.email);
+      return token ? JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).email : undefined;
+    });
+  }
 
   login(email: string, password: string): Observable<void> {
-    return this.http.post<{ token: string }>('/api/login_check', { email, password }).pipe(
+    return this.http.post<{ token: string }>(this.loginUrl, { email, password }).pipe(
       map(({ token }) => {
-        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(this.storageKey, token);
         this.token.set(token);
       }),
     );
   }
 
   logout(): void {
-    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(this.storageKey);
     this.token.set(null);
   }
 }
 
+@Injectable({ providedIn: 'root' })
+export class AuthService extends Session {
+  constructor() {
+    super('token', '/api/login_check');
+  }
+}
+
+@Injectable({ providedIn: 'root' })
+export class AdminAuthService extends Session {
+  constructor() {
+    super('adminToken', '/api/admin/login_check');
+  }
+}
+
+// Staff panel and shop keep separate sessions; the request path decides which token is sent.
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const auth = inject(AuthService);
+  const admin = req.url.startsWith('/api/admin');
+  const session = admin ? inject(AdminAuthService) : inject(AuthService);
   const router = inject(Router);
-  const token = auth.token();
+  const token = session.token();
 
   return next(token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req).pipe(
     catchError((error: HttpErrorResponse) => {
       if (error.status === 401) {
-        auth.logout();
-        router.navigateByUrl('/login');
+        session.logout();
+        router.navigateByUrl(admin ? '/admin/login' : '/login');
       }
 
       return throwError(() => error);
@@ -56,3 +70,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 export const authGuard: CanActivateFn = () =>
   inject(AuthService).token() ? true : inject(Router).parseUrl('/login');
+
+export const adminGuard: CanActivateFn = () =>
+  inject(AdminAuthService).token() ? true : inject(Router).parseUrl('/admin/login');

@@ -1,28 +1,9 @@
-import { Component, inject } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from './auth';
-import { CartService } from './cart';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [RouterOutlet],
   selector: 'app-root',
-  styleUrl: './app.css',
-  templateUrl: './app.html',
+  template: '<router-outlet />',
 })
-export class App {
-  protected readonly auth = inject(AuthService);
-  protected readonly cart = inject(CartService);
-  private readonly router = inject(Router);
-
-  constructor() {
-    if (this.auth.token()) {
-      this.cart.load();
-    }
-  }
-
-  protected logout(): void {
-    this.auth.logout();
-    this.cart.clear();
-    this.router.navigateByUrl('/login');
-  }
-}
+export class App {}

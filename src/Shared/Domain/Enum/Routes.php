@@ -28,4 +28,6 @@ enum Routes: string
     // Order
     case ORDER_PATH = '/api/order';
     case ORDER_NAME = 'api_order_';
+    case ADMIN_ORDER_PATH = '/api/admin/order';
+    case ADMIN_ORDER_NAME = 'api_admin_order_';
 }

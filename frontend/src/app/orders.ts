@@ -1,17 +1,13 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { HttpClient } from '@angular/common/http';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { finalize, map, Observable, switchMap, take, takeWhile, timer } from 'rxjs';
-import { AuthService } from './auth';
 
 interface Order {
   id: string;
   status: string;
   createdAt: string;
   totalAmountInCents: number;
-  transitions: string[];
 }
 
 interface StatusChange {
@@ -55,31 +51,7 @@ interface Page<T> {
                     <span>{{ change.recordedAt | date: 'medium' }}</span>
                   </li>
                 }
-                @if (refreshing() === order.id) {
-                  <li class="pending">
-                    <strong><span class="spinner"></span>Updating history…</strong>
-                  </li>
-                }
               </ol>
-              @if (auth.isAdmin() && order.transitions.length) {
-                <div class="actions">
-                  <span>Change status:</span>
-                  @for (transition of order.transitions; track transition) {
-                    <button
-                      class="btn"
-                      [class.btn-primary]="transition !== 'cancel' && transition !== 'fail_payment'"
-                      type="button"
-                      [disabled]="changing()"
-                      (click)="changeStatus(order.id, transition)"
-                    >
-                      {{ label(transition) }}
-                    </button>
-                  }
-                </div>
-              }
-              @if (error()) {
-                <p class="error">{{ error() }}</p>
-              }
             }
           </div>
         } @empty {
@@ -170,48 +142,8 @@ interface Page<T> {
       background: var(--primary);
     }
 
-    .timeline .pending {
-      color: var(--muted);
-    }
-
-    .timeline .pending::before {
-      background: var(--border);
-    }
-
-    .spinner {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      margin-right: 8px;
-      border: 2px solid var(--border);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
-    }
-
     .timeline span {
       color: var(--muted);
-    }
-
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 12px;
-      padding: 16px 0;
-      border-bottom: 1px solid var(--border);
-      font-weight: 600;
-    }
-
-    .actions button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
 
     .empty {
@@ -230,88 +162,33 @@ interface Page<T> {
 })
 export class Orders {
   private readonly http = inject(HttpClient);
-  private readonly destroyRef = inject(DestroyRef);
-  protected readonly auth = inject(AuthService);
   protected readonly orders = signal<Order[]>([]);
   protected readonly nextCursor = signal<string | null>(null);
   protected readonly expanded = signal<string | null>(null);
   protected readonly history = signal<Record<string, StatusChange[]>>({});
-  protected readonly changing = signal(false);
-  protected readonly refreshing = signal<string | null>(null);
-  protected readonly error = signal('');
 
   constructor() {
     this.load();
   }
 
   protected load(): void {
-    this.fetchPage(this.nextCursor()).subscribe((page) => {
+    const after = this.nextCursor();
+    this.http.get<Page<Order>>('/api/order', { params: after ? { limit: 20, after } : { limit: 20 } }).subscribe((page) => {
       this.orders.update((orders) => [...orders, ...page.items]);
       this.nextCursor.set(page.nextCursor);
     });
   }
 
   protected toggle(orderId: string): void {
-    this.error.set('');
     if (this.expanded() === orderId) {
       this.expanded.set(null);
       return;
     }
 
     this.expanded.set(orderId);
-    this.loadHistory(orderId);
-  }
-
-  protected changeStatus(orderId: string, transition: string): void {
-    this.changing.set(true);
-    this.error.set('');
-    this.http.post<void>(`/api/order/${orderId}/status`, { transition }).subscribe({
-      next: () => {
-        this.changing.set(false);
-        this.fetchPage(null).subscribe((page) => {
-          this.orders.set(page.items);
-          this.nextCursor.set(page.nextCursor);
-        });
-        this.pollHistory(orderId);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.changing.set(false);
-        this.error.set(error.error?.error ?? 'Could not change the order status.');
-      },
-    });
-  }
-
-  private fetchPage(after: string | null): Observable<Page<Order>> {
-    return this.http.get<Page<Order>>('/api/order', { params: after ? { limit: 20, after } : { limit: 20 } });
-  }
-
-  private loadHistory(orderId: string): void {
-    this.fetchHistory(orderId).subscribe((items) => this.setHistory(orderId, items));
-  }
-
-  // History is projected asynchronously from the outbox, so poll until the new entry shows up (max 30 s).
-  private pollHistory(orderId: string): void {
-    const known = this.history()[orderId]?.length ?? 0;
-    this.refreshing.set(orderId);
-    timer(0, 2000)
-      .pipe(
-        take(15),
-        switchMap(() => this.fetchHistory(orderId)),
-        takeWhile((items) => items.length <= known, true),
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.refreshing.set(null)),
-      )
-      .subscribe((items) => this.setHistory(orderId, items));
-  }
-
-  private fetchHistory(orderId: string): Observable<StatusChange[]> {
-    return this.http
+    this.http
       .get<Page<StatusChange>>(`/api/order/${orderId}/status-history`, { params: { limit: 100 } })
-      .pipe(map((page) => page.items));
-  }
-
-  private setHistory(orderId: string, items: StatusChange[]): void {
-    this.history.update((history) => ({ ...history, [orderId]: items }));
+      .subscribe((page) => this.history.update((history) => ({ ...history, [orderId]: page.items })));
   }
 
   protected label(status: string): string {

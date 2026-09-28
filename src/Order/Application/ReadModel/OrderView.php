@@ -12,6 +12,7 @@ final readonly class OrderView
     public function __construct(
         public string $id,
         public string $status,
+        public string $customerEmail,
         public string $createdAt,
         public int $totalAmountInCents,
         public array $transitions,

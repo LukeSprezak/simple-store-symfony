@@ -9,7 +9,6 @@
   --border: #c7d2fe;
   --field: #eef0f6;
   --danger: #dc2626;
-  --staff: #fbbf24;
   --radius: 8px;
   --shadow: 2px 2px 0 0 var(--text);
 }
@@ -114,5 +113,124 @@ h2 {
 
 .error {
   color: var(--danger);
+  font-weight: 600;
+}
+
+/* Staff panel (/admin), modelled on Laravel Nova. */
+.nova {
+  --nv-primary: #0ea5e9;
+  --nv-primary-hover: #0284c7;
+  --nv-bg: #f1f5f9;
+  --nv-surface: #ffffff;
+  --nv-text: #1e293b;
+  --nv-muted: #64748b;
+  --nv-border: #e2e8f0;
+  --nv-header: #f8fafc;
+  --nv-success: #16a34a;
+  --nv-success-soft: #dcfce7;
+  --nv-warning: #ca8a04;
+  --nv-warning-soft: #fef9c3;
+  --nv-danger: #dc2626;
+  --nv-danger-soft: #fee2e2;
+  --nv-info-soft: #e0f2fe;
+
+  display: block;
+  min-height: 100vh;
+  background: var(--nv-bg);
+  color: var(--nv-text);
+  font: 400 14px/1.5 'Nunito Sans', sans-serif;
+}
+
+.nova h1 {
+  margin: 0 0 16px;
+  font: 400 24px 'Nunito Sans', sans-serif;
+}
+
+.nova .nv-card {
+  overflow: hidden;
+  background: var(--nv-surface);
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+
+.nova .nv-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--nv-primary);
+  color: #fff;
+  font: 700 14px 'Nunito Sans', sans-serif;
+  cursor: pointer;
+}
+
+.nova .nv-btn:hover {
+  background: var(--nv-primary-hover);
+}
+
+.nova .nv-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.nova .nv-btn-outline {
+  border: 1px solid var(--nv-border);
+  background: var(--nv-surface);
+  color: var(--nv-text);
+}
+
+.nova .nv-btn-outline:hover {
+  background: var(--nv-header);
+}
+
+.nova .nv-btn-danger {
+  background: var(--nv-danger);
+}
+
+.nova .nv-btn-danger:hover {
+  background: #b91c1c;
+}
+
+.nova .nv-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  background: var(--nv-info-soft);
+  color: var(--nv-primary-hover);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.nova .nv-badge.success {
+  background: var(--nv-success-soft);
+  color: var(--nv-success);
+}
+
+.nova .nv-badge.warning {
+  background: var(--nv-warning-soft);
+  color: var(--nv-warning);
+}
+
+.nova .nv-badge.danger {
+  background: var(--nv-danger-soft);
+  color: var(--nv-danger);
+}
+
+.nova .nv-link {
+  color: var(--nv-primary);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.nova .nv-link:hover {
+  color: var(--nv-primary-hover);
+}
+
+.nova .nv-error {
+  color: var(--nv-danger);
   font-weight: 600;
 }
