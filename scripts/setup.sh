@@ -14,4 +14,4 @@ console lexik:jwt:generate-keypair --skip-if-exists
 console doctrine:migrations:migrate --no-interaction
 console doctrine:migrations:migrate --env=test --no-interaction
 console doctrine:fixtures:load --no-interaction
-docker compose up -d --wait nginx
+docker compose up -d --wait nginx frontend
