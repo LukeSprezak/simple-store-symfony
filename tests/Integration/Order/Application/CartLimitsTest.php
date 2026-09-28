@@ -66,6 +66,7 @@ final class CartLimitsTest extends KernelTestCase
             // Only the concurrency test commits its uniquely identified fixtures.
             if ($this->committedFixtures) {
                 $connection->executeStatement("DELETE o FROM domain_event_outbox o INNER JOIN cart c ON JSON_UNQUOTE(JSON_EXTRACT(o.payload, '$.cartId')) = c.id WHERE c.owner_id = :owner", ['owner' => $this->ownerId->getId()]);
+                $connection->executeStatement("DELETE FROM domain_event_outbox WHERE JSON_UNQUOTE(JSON_EXTRACT(payload, '$.productId')) = :product", ['product' => $this->product->getId()]);
                 $connection->executeStatement('DELETE ci FROM cart_item ci INNER JOIN cart c ON ci.cart_id = c.id WHERE c.owner_id = :owner', ['owner' => $this->ownerId->getId()]);
                 $connection->delete('cart', ['owner_id' => $this->ownerId->getId()]);
                 $connection->delete('product', ['id' => $this->product->getId()]);

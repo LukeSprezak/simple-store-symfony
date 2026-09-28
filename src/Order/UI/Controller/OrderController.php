@@ -27,7 +27,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final readonly class OrderController
 {
     public function __construct(
-        private QueryBus $queryBus
+        private QueryBus $queryBus,
     ) {
     }
 
