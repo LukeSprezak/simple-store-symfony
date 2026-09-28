@@ -11,8 +11,11 @@ use App\Order\Domain\Event\CartExpired;
 use App\Order\Domain\Event\ProductAddedToCart;
 use App\Order\Domain\Event\ProductRemovedFromCart;
 use App\Order\Domain\Exception\CartNotActiveException;
+use App\Order\Domain\Exception\CartQuantityLimitExceededException;
 use App\Order\Domain\Exception\CartTransitionNotAllowedException;
+use App\Order\Domain\Exception\InvalidQuantityException;
 use App\Order\Domain\Exception\ProductNotInCartException;
+use App\Order\Domain\Policy\CartLimits;
 use App\Shared\Domain\Aggregate\AggregateRoot;
 use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
@@ -129,12 +132,7 @@ class Cart extends AggregateRoot
 
     public function addProduct(ProductSnapshot $product, int $quantity): void
     {
-        $this->assertActive();
-
-        if ($quantity <= 0) {
-            throw new \InvalidArgumentException('The quantity must be a positive number.');
-        }
-
+        $this->assertCanAddProduct($product->getId(), $quantity);
         $existingItem = $this->findItemByProductId($product->getId());
 
         if ($existingItem) {
@@ -146,6 +144,21 @@ class Cart extends AggregateRoot
         }
 
         $this->recordThat(new ProductAddedToCart($this->id, $product->getId(), $quantity));
+    }
+
+    public function assertCanAddProduct(string $productId, int $quantity): void
+    {
+        $this->assertActive();
+
+        if ($quantity <= 0) {
+            throw new InvalidQuantityException('The quantity must be a positive number.');
+        }
+
+        $currentQuantity = $this->findItemByProductId($productId)?->getQuantity() ?? 0;
+        // Subtract before comparing so PHP_INT_MAX cannot overflow during addition.
+        if ($quantity > CartLimits::MAX_QUANTITY_PER_PRODUCT - $currentQuantity) {
+            throw new CartQuantityLimitExceededException($productId);
+        }
     }
 
     public function getTotalAmount(): Money

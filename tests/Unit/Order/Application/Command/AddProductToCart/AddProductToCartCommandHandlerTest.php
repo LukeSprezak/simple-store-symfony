@@ -8,13 +8,17 @@ use App\Order\Application\Command\AddProductToCart\AddProductToCartCommand;
 use App\Order\Application\Command\AddProductToCart\AddProductToCartCommandHandler;
 use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\CartNotActiveException;
+use App\Order\Domain\Exception\ActiveCartLimitExceededException;
+use App\Order\Domain\Exception\CartQuantityLimitExceededException;
 use App\Order\Domain\Exception\CartNotFoundException;
 use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
 use App\Order\Domain\Model\ProductSnapshot;
+use App\Order\Domain\Policy\CartLimits;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Order\Domain\Service\StockReservation;
+use App\Order\Domain\Service\CartCreationGuard;
 use App\Product\Domain\Exception\ProductNotFoundException;
 use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
@@ -44,6 +48,7 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $this->handler = new AddProductToCartCommandHandler(
             $this->cartRepository,
             $this->stockReservation,
+            $this->createStub(CartCreationGuard::class),
         );
     }
 
@@ -279,6 +284,32 @@ class AddProductToCartCommandHandlerTest extends TestCase
         $this->expectException(CartNotActiveException::class);
 
         ($this->handler)(new AddProductToCartCommand($cart->getId(), 'product', 1, StatusCart::ACTIVE, $this->userId, false));
+    }
+
+    #[Test]
+    public function shouldRejectExcessQuantityBeforeReservingStock(): void
+    {
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, $this->userId);
+        $cart->addProduct(new ProductSnapshot('product', 'Product', new Money(1000)), CartLimits::MAX_QUANTITY_PER_PRODUCT);
+        $this->cartRepository->expects($this->once())->method('find')->willReturn($cart);
+        $this->cartRepository->expects($this->never())->method('save');
+        $this->stockReservation->expects($this->never())->method('reserve');
+        $this->expectException(CartQuantityLimitExceededException::class);
+
+        ($this->handler)(new AddProductToCartCommand($cart->getId(), 'product', 1, StatusCart::ACTIVE, $this->userId, false));
+    }
+
+    #[Test]
+    public function shouldCheckTheCartLimitBeforeReservingStock(): void
+    {
+        $guard = $this->createMock(CartCreationGuard::class);
+        $guard->expects($this->once())->method('assertCanCreate')->with($this->userId)->willThrowException(new ActiveCartLimitExceededException());
+        $handler = new AddProductToCartCommandHandler($this->cartRepository, $this->stockReservation, $guard);
+        $this->cartRepository->expects($this->never())->method('save');
+        $this->stockReservation->expects($this->never())->method('reserve');
+        $this->expectException(ActiveCartLimitExceededException::class);
+
+        $handler(new AddProductToCartCommand(Uuid::v7()->toRfc4122(), 'product', 1, StatusCart::ACTIVE, $this->userId, true));
     }
 
     private function createProductMock(string $productId, int $stockQuantity, string $name = 'Test Product'): ProductSnapshot

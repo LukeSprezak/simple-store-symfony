@@ -21,6 +21,7 @@ use App\Product\Domain\Model\Product;
 use App\Shared\Domain\ValueObject\Money;
 use App\Shared\Infrastructure\Bus\Messenger\SyncCommandBus;
 use App\User\Domain\ValueObject\UserId;
+use App\User\Infrastructure\Doctrine\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -44,6 +45,15 @@ final class CartLifecycleTest extends KernelTestCase
         $this->cartRepository = self::getContainer()->get(CartRepository::class);
         $this->entityManager->getConnection()->beginTransaction();
         $this->ownerId = UserId::generate();
+        $uniqueName = str_replace('-', '', $this->ownerId->getId());
+        $owner = new User()
+            ->setId($this->ownerId->getId())
+            ->setUsername($uniqueName)
+            ->setEmail(substr($uniqueName, 0, 20).'@test.local')
+            ->setPassword('unused')
+            ->setRepeatPassword('unused')
+            ->setEnabled(true);
+        $this->entityManager->persist($owner);
         $this->cartId = Uuid::v7()->toRfc4122();
         $this->firstProduct = Product::create(Uuid::v7()->toRfc4122(), 'First', 'First product', new Money(1000), 10, $this->ownerId);
         $this->secondProduct = Product::create(Uuid::v7()->toRfc4122(), 'Second', 'Second product', new Money(2500), 8, $this->ownerId);

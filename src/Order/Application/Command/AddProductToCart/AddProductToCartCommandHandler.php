@@ -7,6 +7,7 @@ namespace App\Order\Application\Command\AddProductToCart;
 use App\Order\Domain\Exception\CartNotFoundException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Repository\CartRepositoryInterface;
+use App\Order\Domain\Service\CartCreationGuard;
 use App\Order\Domain\Service\StockReservation;
 use App\Shared\Application\Bus\Command\Sync\CommandHandler;
 use App\Shared\Domain\Exception\ConflictException;
@@ -18,6 +19,7 @@ final readonly class AddProductToCartCommandHandler implements CommandHandler
     public function __construct(
         private CartRepositoryInterface $cartRepository,
         private StockReservation $stockReservation,
+        private CartCreationGuard $cartCreationGuard,
     ) {
     }
 
@@ -32,7 +34,11 @@ final readonly class AddProductToCartCommandHandler implements CommandHandler
                 throw new CartNotFoundException($command->cartId);
             }
 
-            $cart->assertActive();
+            $cart->assertCanAddProduct($command->productId, $command->quantity);
+            if ($command->createCart) {
+                $this->cartCreationGuard->assertCanCreate($command->userId);
+            }
+
             $product = $this->stockReservation->reserve($command->productId, $command->quantity);
             $cart->addProduct($product, $command->quantity);
 

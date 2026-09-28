@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Order\Domain\Model;
 
+use App\Order\Domain\Exception\CartQuantityLimitExceededException;
 use App\Order\Domain\Exception\InvalidQuantityException;
+use App\Order\Domain\Policy\CartLimits;
 use Symfony\Component\Uid\Uuid;
 
 class CartItem
@@ -64,6 +66,10 @@ class CartItem
             throw new InvalidQuantityException('The quantity to be increased must be a positive number.');
         }
 
+        if ($amount > CartLimits::MAX_QUANTITY_PER_PRODUCT - $this->quantity) {
+            throw new CartQuantityLimitExceededException($this->product->getId());
+        }
+
         $this->quantity += $amount;
     }
 
@@ -90,6 +96,10 @@ class CartItem
     {
         if ($quantity < 0) {
             throw new InvalidQuantityException('The quantity cannot be negative.');
+        }
+
+        if ($quantity > CartLimits::MAX_QUANTITY_PER_PRODUCT) {
+            throw new CartQuantityLimitExceededException($this->product->getId());
         }
     }
 

@@ -3,6 +3,9 @@
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
     <entity name="App\Order\Domain\Model\Cart" table="cart">
+        <indexes>
+            <index name="idx_cart_owner_status" columns="owner_id,status"/>
+        </indexes>
         <id name="id" type="guid"/>
         <field name="status" type="string" length="50" enum-type="App\Order\Domain\Enum\StatusCart"/>
         <field name="ownerId" column="owner_id" type="user_id"/>
