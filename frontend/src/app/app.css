@@ -49,6 +49,38 @@
   font-size: 12px;
 }
 
+.staff-bar {
+  padding: 4px 24px;
+  background: var(--staff);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.header.staff {
+  border-bottom: 3px solid var(--staff);
+}
+
+.staff-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.staff-tag {
+  padding: 2px 8px;
+  border: 1px solid var(--text);
+  border-radius: 6px;
+  background: var(--staff);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 .logo-mark {
   width: 28px;
   height: 28px;

@@ -9,17 +9,18 @@ const TOKEN_KEY = 'token';
 export class AuthService {
   private readonly http = inject(HttpClient);
   readonly token = signal(localStorage.getItem(TOKEN_KEY));
+  private readonly claims = computed<{ roles: string[]; email: string } | null>(() => {
+    const token = this.token();
+
+    return token ? JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) : null;
+  });
   // UI hint only; the API enforces the role on every request.
   readonly isAdmin = computed(() => {
-    const token = this.token();
-    if (!token) {
-      return false;
-    }
-
-    const roles: string[] = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).roles;
+    const roles = this.claims()?.roles ?? [];
 
     return roles.includes('ROLE_ADMIN') || roles.includes('ROLE_SUPER_ADMIN');
   });
+  readonly email = computed(() => this.claims()?.email);
 
   login(email: string, password: string): Observable<void> {
     return this.http.post<{ token: string }>('/api/login_check', { email, password }).pipe(

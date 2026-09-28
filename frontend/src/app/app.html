@@ -1,4 +1,7 @@
-<header class="header">
+@if (auth.isAdmin()) {
+  <div class="staff-bar">Staff panel</div>
+}
+<header class="header" [class.staff]="auth.isAdmin()">
   <a class="logo" routerLink="/">
     <span class="logo-mark"></span>
     Example Shop
@@ -14,6 +17,12 @@
       </a>
       <a routerLink="/orders" routerLinkActive="active">Orders</a>
     </nav>
+    @if (auth.isAdmin()) {
+      <span class="staff-user">
+        <span class="staff-tag">Staff</span>
+        {{ auth.email() }}
+      </span>
+    }
     <button class="btn" type="button" (click)="logout()">Log out</button>
   }
 </header>

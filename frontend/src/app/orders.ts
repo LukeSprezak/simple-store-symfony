@@ -1,8 +1,9 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { Observable } from 'rxjs';
+import { finalize, map, Observable, switchMap, take, takeWhile, timer } from 'rxjs';
 import { AuthService } from './auth';
 
 interface Order {
@@ -52,6 +53,11 @@ interface Page<T> {
                   <li>
                     <strong>{{ label(change.fromStatus) }} → {{ label(change.toStatus) }}</strong>
                     <span>{{ change.recordedAt | date: 'medium' }}</span>
+                  </li>
+                }
+                @if (refreshing() === order.id) {
+                  <li class="pending">
+                    <strong><span class="spinner"></span>Updating history…</strong>
                   </li>
                 }
               </ol>
@@ -164,6 +170,31 @@ interface Page<T> {
       background: var(--primary);
     }
 
+    .timeline .pending {
+      color: var(--muted);
+    }
+
+    .timeline .pending::before {
+      background: var(--border);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      margin-right: 8px;
+      border: 2px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
     .timeline span {
       color: var(--muted);
     }
@@ -199,12 +230,14 @@ interface Page<T> {
 })
 export class Orders {
   private readonly http = inject(HttpClient);
+  private readonly destroyRef = inject(DestroyRef);
   protected readonly auth = inject(AuthService);
   protected readonly orders = signal<Order[]>([]);
   protected readonly nextCursor = signal<string | null>(null);
   protected readonly expanded = signal<string | null>(null);
   protected readonly history = signal<Record<string, StatusChange[]>>({});
   protected readonly changing = signal(false);
+  protected readonly refreshing = signal<string | null>(null);
   protected readonly error = signal('');
 
   constructor() {
@@ -239,7 +272,7 @@ export class Orders {
           this.orders.set(page.items);
           this.nextCursor.set(page.nextCursor);
         });
-        this.loadHistory(orderId);
+        this.pollHistory(orderId);
       },
       error: (error: HttpErrorResponse) => {
         this.changing.set(false);
@@ -253,9 +286,32 @@ export class Orders {
   }
 
   private loadHistory(orderId: string): void {
-    this.http
+    this.fetchHistory(orderId).subscribe((items) => this.setHistory(orderId, items));
+  }
+
+  // History is projected asynchronously from the outbox, so poll until the new entry shows up (max 30 s).
+  private pollHistory(orderId: string): void {
+    const known = this.history()[orderId]?.length ?? 0;
+    this.refreshing.set(orderId);
+    timer(0, 2000)
+      .pipe(
+        take(15),
+        switchMap(() => this.fetchHistory(orderId)),
+        takeWhile((items) => items.length <= known, true),
+        takeUntilDestroyed(this.destroyRef),
+        finalize(() => this.refreshing.set(null)),
+      )
+      .subscribe((items) => this.setHistory(orderId, items));
+  }
+
+  private fetchHistory(orderId: string): Observable<StatusChange[]> {
+    return this.http
       .get<Page<StatusChange>>(`/api/order/${orderId}/status-history`, { params: { limit: 100 } })
-      .subscribe((page) => this.history.update((history) => ({ ...history, [orderId]: page.items })));
+      .pipe(map((page) => page.items));
+  }
+
+  private setHistory(orderId: string, items: StatusChange[]): void {
+    this.history.update((history) => ({ ...history, [orderId]: items }));
   }
 
   protected label(status: string): string {
