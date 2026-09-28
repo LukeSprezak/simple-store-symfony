@@ -1,1 +1,10 @@
+<header class="header">
+  <a class="logo" routerLink="/">
+    <span class="logo-mark"></span>
+    CQRS Shop
+  </a>
+  @if (auth.token()) {
+    <button class="btn" type="button" (click)="logout()">Log out</button>
+  }
+</header>
 <router-outlet />

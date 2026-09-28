@@ -1,1 +1,117 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --primary: #4338ca;
+  --primary-hover: #3730a3;
+  --primary-soft: #e0e7ff;
+  --bg: #f5f7ff;
+  --surface: #ffffff;
+  --text: #1e1b4b;
+  --muted: #64748b;
+  --border: #c7d2fe;
+  --field: #eef0f6;
+  --danger: #dc2626;
+  --radius: 8px;
+  --shadow: 2px 2px 0 0 var(--text);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 400 14px/1.5 'Open Sans', sans-serif;
+}
+
+h1,
+h2 {
+  margin: 0 0 16px;
+  font-family: Ubuntu, 'Open Sans', sans-serif;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  font-size: 22px;
+}
+
+.container {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 32px 16px;
+}
+
+.panel {
+  background: var(--surface);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 20px;
+  border: 1px solid var(--text);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background: var(--surface);
+  color: var(--primary);
+  font: 600 14px 'Open Sans', sans-serif;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.btn:hover {
+  background: var(--primary-soft);
+}
+
+.btn:active {
+  transform: translate(2px, 2px);
+  box-shadow: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+.field input {
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: inset 2px 2px 0 2px var(--field);
+  color: var(--text);
+  font: 400 14px 'Open Sans', sans-serif;
+}
+
+.field input:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.error {
+  color: var(--danger);
+  font-weight: 600;
+}

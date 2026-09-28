@@ -7,14 +7,33 @@ import { AuthService } from './auth';
   selector: 'app-login',
   imports: [FormsModule],
   template: `
-    <form (ngSubmit)="submit()">
-      <input name="email" type="email" placeholder="Email" [(ngModel)]="email" required />
-      <input name="password" type="password" placeholder="Password" [(ngModel)]="password" required />
-      <button type="submit">Log in</button>
-      @if (error()) {
-        <p>{{ error() }}</p>
-      }
-    </form>
+    <main class="container">
+      <form class="panel" (ngSubmit)="submit()">
+        <h1>Log in</h1>
+        <label class="field">
+          Email
+          <input name="email" type="email" [(ngModel)]="email" required />
+        </label>
+        <label class="field">
+          Password
+          <input name="password" type="password" [(ngModel)]="password" required />
+        </label>
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+        <button class="btn btn-primary" type="submit">Log in</button>
+      </form>
+    </main>
+  `,
+  styles: `
+    form {
+      max-width: 420px;
+      margin: 48px auto 0;
+    }
+
+    button {
+      width: 100%;
+    }
   `,
 })
 export class Login {
