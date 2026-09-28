@@ -6,8 +6,10 @@ namespace App\Order\Infrastructure\Transformer;
 
 use App\Order\Domain\Enum\StatusOrder;
 use App\Order\Domain\Model\Order as DomainOrder;
+use App\Order\Domain\Model\OrderItem as DomainOrderItem;
 use App\Order\Infrastructure\Doctrine\Entity\Order as EntityOrder;
 use App\Order\Infrastructure\Doctrine\Entity\OrderItem as EntityOrderItem;
+use App\Product\Domain\Model\Product as ProductDomainModel;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\ORM\EntityManagerInterface;
@@ -73,13 +75,17 @@ final readonly class OrderTransformer
         );
 
         foreach ($entityOrder->getItems() as $itemEntity) {
-            $domainOrderItem = OrderItem::fromPersistence(
+            $product = $itemEntity->getProduct();
+            $domainOrderItem = DomainOrderItem::fromPersistence(
                 $itemEntity->getId(),
-                new \App\Order\Domain\Model\Product(
-                    $itemEntity->getProduct()->getId(),
-                    $itemEntity->getProduct()->getName(),
-                    $itemEntity->getProduct()->getDescription(),
-                    $itemEntity->getProduct()->getPrice()
+                ProductDomainModel::fromPersistence(
+                    $product->getId(),
+                    $product->getName(),
+                    $product->getDescription(),
+                    $product->getPrice(),
+                    $product->getStockQuantity(),
+                    new UserId($product->getUser()->getId()),
+                    $product->getStatus(),
                 ),
                 $itemEntity->getQuantity()
             );
