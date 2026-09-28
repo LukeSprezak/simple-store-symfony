@@ -8,7 +8,6 @@ use App\Product\Domain\Exception\ProductCreateException;
 use App\Product\Domain\Model\Product;
 use App\Product\Domain\Repository\ProductRepositoryInterface;
 use App\Shared\Application\Bus\Command\Async\CommandHandler;
-use App\User\Domain\Exception\UserNotFoundException;
 
 final readonly class AddProductCommandHandler implements CommandHandler
 {
@@ -22,7 +21,7 @@ final readonly class AddProductCommandHandler implements CommandHandler
         try {
             $product = Product::create($command->id, $command->name, $command->description, $command->price, $command->stockQuantity, $command->userId);
             $this->productRepository->save($product);
-        } catch (UserNotFoundException|ProductCreateException $exception) {
+        } catch (ProductCreateException $exception) {
             throw $exception;
         } catch (\Exception $exception) {
             throw new \RuntimeException('An unexpected error occurred while adding the product.', 0, $exception);
