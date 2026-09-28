@@ -18,7 +18,7 @@ use Symfony\Component\Uid\Uuid;
 #[CoversClass(RemoveProductCommandHandler::class)]
 class RemoveProductCommandHandlerTest extends TestCase
 {
-    private ProductRepositoryInterface|MockObject $productRepository;
+    private ProductRepositoryInterface&MockObject $productRepository;
     private RemoveProductCommandHandler $handler;
 
     protected function setUp(): void
@@ -61,7 +61,7 @@ class RemoveProductCommandHandlerTest extends TestCase
         $this->productRepository->expects($this->once())
             ->method('get')
             ->with($this->equalTo($productId))
-            ->willReturn($this->createMock(Product::class));
+            ->willReturn($this->createStub(Product::class));
 
         $this->productRepository->expects($this->once())
             ->method('save')

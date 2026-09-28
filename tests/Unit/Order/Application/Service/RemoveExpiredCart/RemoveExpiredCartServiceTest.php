@@ -38,6 +38,8 @@ final class RemoveExpiredCartServiceTest extends TestCase
     #[Test]
     public function shouldCheckWhenThereAreNoCartToExpire(): void
     {
+        $this->stockReservation->expects($this->never())->method('release');
+
         // given
         $now = new \DateTimeImmutable();
         $this->cartRepository
@@ -62,11 +64,11 @@ final class RemoveExpiredCartServiceTest extends TestCase
         $product1 = new ProductSnapshot('prod-1', 'Product 1', new Money(1000));
         $product2 = new ProductSnapshot('prod-2', 'Product 2', new Money(2000));
 
-        $cartItem1 = $this->createConfiguredMock(CartItem::class, [
+        $cartItem1 = $this->createConfiguredStub(CartItem::class, [
             'getProduct' => $product1,
             'getQuantity' => 2,
         ]);
-        $cartItem2 = $this->createConfiguredMock(CartItem::class, [
+        $cartItem2 = $this->createConfiguredStub(CartItem::class, [
             'getProduct' => $product2,
             'getQuantity' => 3,
         ]);
@@ -110,6 +112,8 @@ final class RemoveExpiredCartServiceTest extends TestCase
     #[Test]
     public function shouldExpireCartsWithExceptionDuringProcessing(): void
     {
+        $this->stockReservation->expects($this->never())->method('release');
+
         // given
         $now = new \DateTimeImmutable();
         $exception = new \Exception('Database error');

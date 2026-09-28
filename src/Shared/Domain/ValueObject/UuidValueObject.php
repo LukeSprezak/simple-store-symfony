@@ -31,7 +31,7 @@ abstract class UuidValueObject
 
     public function equals(self|UuidValueObjectInterface $other): bool
     {
-        return $this->id === $other->id;
+        return $this->id === $other->getId();
     }
 
     public function getId(): string

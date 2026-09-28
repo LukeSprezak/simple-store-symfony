@@ -80,9 +80,8 @@ class Order
 
     public function removeItem(OrderItem $item): void
     {
-        if ($this->items->removeElement($item) && $item->getOrder() === $this) {
-            $item->setOrder(null);
-        }
+        // orphanRemoval deletes the item; its required order association stays intact.
+        $this->items->removeElement($item);
     }
 
     public function getCreatedAt(): \DateTimeImmutable

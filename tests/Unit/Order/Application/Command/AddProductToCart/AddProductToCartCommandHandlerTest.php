@@ -9,6 +9,7 @@ use App\Order\Application\Command\AddProductToCart\AddProductToCartCommandHandle
 use App\Order\Domain\Enum\StatusCart;
 use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Order\Domain\Model\Cart;
+use App\Order\Domain\Model\CartItem;
 use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Order\Domain\Service\StockReservation;
@@ -74,10 +75,10 @@ class AddProductToCartCommandHandlerTest extends TestCase
 
         // Then
         self::assertCount(1, $existingCart->getItems());
-        self::assertSame(
-            $quantity,
-            $existingCart->getItemById($existingCart->getItems()->first()->getId())->getQuantity()
-        );
+        $item = $existingCart->getItems()->first();
+        self::assertInstanceOf(CartItem::class, $item);
+        self::assertSame($item, $existingCart->getItemById($item->getId()));
+        self::assertSame($quantity, $item->getQuantity());
     }
 
     #[Test]
@@ -111,6 +112,7 @@ class AddProductToCartCommandHandlerTest extends TestCase
                 }
 
                 $item = $cart->getItems()->first();
+                self::assertInstanceOf(CartItem::class, $item);
                 if ($item->getProduct()->getId() !== $productId) {
                     return false;
                 }

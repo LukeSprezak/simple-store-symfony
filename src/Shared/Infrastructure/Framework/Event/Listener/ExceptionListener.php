@@ -71,6 +71,9 @@ final readonly class ExceptionListener
         $event->setResponse($response);
     }
 
+    /**
+     * @return array{errors: array<string, mixed>}
+     */
     private function prepareValidationErrorResponse(ValidationError $exception): array
     {
         $errors = $exception->getErrors();
@@ -86,6 +89,9 @@ final readonly class ExceptionListener
         return ['errors' => $errors];
     }
 
+    /**
+     * @return array{error: string}
+     */
     private function prepareSimpleErrorResponse(string $message): array
     {
         $error = $this->isProd ? 'An error occurred.' : $message;
@@ -93,6 +99,9 @@ final readonly class ExceptionListener
         return ['error' => $error];
     }
 
+    /**
+     * @return array{error: string, trace?: list<array<string, mixed>>}
+     */
     private function prepareGeneralErrorResponse(\Throwable $exception): array
     {
         if (!$this->isProd) {

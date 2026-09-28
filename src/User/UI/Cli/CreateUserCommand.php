@@ -61,12 +61,12 @@ class CreateUserCommand extends Command
 
     private function askEmail(SymfonyStyle $io): string
     {
-        return $io->ask('Enter email:', self::DEFAULT_EMAIL);
+        return $this->askString($io, 'Enter email:', self::DEFAULT_EMAIL);
     }
 
     private function askUsername(SymfonyStyle $io): string
     {
-        return $io->ask('Enter username:', self::DEFAULT_USERNAME);
+        return $this->askString($io, 'Enter username:', self::DEFAULT_USERNAME);
     }
 
     private function askPassword(SymfonyStyle $io): string
@@ -74,8 +74,8 @@ class CreateUserCommand extends Command
         $question = new Question('Enter password:');
         $question->setHidden(true);
         $question->setMaxAttempts(3);
-        $question->setValidator(function (?string $password) {
-            if (null === $password || '' === trim($password)) {
+        $question->setValidator(function (mixed $password): string {
+            if (!is_string($password) || '' === trim($password)) {
                 throw new \InvalidArgumentException('Password cannot be empty.');
             }
 
@@ -86,13 +86,23 @@ class CreateUserCommand extends Command
             return $password;
         });
 
-        return $io->askQuestion($question);
+        $password = $io->askQuestion($question);
+
+        if (!is_string($password)) {
+            throw new \InvalidArgumentException('Password cannot be empty.');
+        }
+
+        return $password;
     }
 
+    /**
+     * @return list<string>
+     */
     private function askRoles(SymfonyStyle $io): array
     {
         $allowedRoles = array_map(static fn (Role $role) => $role->value, Role::cases());
-        $input = $io->ask(
+        $input = $this->askString(
+            $io,
             'Specify the user roles (separated by commas, e.g. ROLE_USER,ROLE_ADMIN):',
             implode(',', self::DEFAULT_ROLES)
         );
@@ -111,6 +121,20 @@ class CreateUserCommand extends Command
         return array_values($rolesArray);
     }
 
+    private function askString(SymfonyStyle $io, string $question, string $default): string
+    {
+        $answer = $io->ask($question, $default);
+
+        if (!is_string($answer)) {
+            throw new \InvalidArgumentException('The answer must be a string.');
+        }
+
+        return $answer;
+    }
+
+    /**
+     * @param list<string> $roles
+     */
     private function createUser(
         string $email,
         string $username,

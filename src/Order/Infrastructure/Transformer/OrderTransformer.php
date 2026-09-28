@@ -10,6 +10,7 @@ use App\Order\Domain\Model\OrderItem as DomainOrderItem;
 use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Infrastructure\Doctrine\Entity\Order as EntityOrder;
 use App\Order\Infrastructure\Doctrine\Entity\OrderItem as EntityOrderItem;
+use App\Product\Domain\Exception\ProductNotFoundException;
 use App\Product\Domain\Model\Product as ProductEntity;
 use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
@@ -37,19 +38,19 @@ final readonly class OrderTransformer
         }
 
         foreach ($domainOrder->getItems() as $itemDomain) {
+            $productId = $itemDomain->getProduct()->getId();
+            $productEntity = $this->entityManager->getRepository(ProductEntity::class)->find($productId);
+
+            if (null === $productEntity) {
+                throw new ProductNotFoundException($productId);
+            }
+
             if (isset($existingItems[$itemDomain->getId()])) {
                 $itemEntity = $existingItems[$itemDomain->getId()];
-                $itemEntity->setProduct($this->entityManager->getRepository(ProductEntity::class)->find($itemDomain->getProduct()->getId()));
+                $itemEntity->setProduct($productEntity);
                 $itemEntity->setQuantity($itemDomain->getQuantity());
                 unset($existingItems[$itemDomain->getId()]);
             } else {
-                $productEntity = $this->entityManager->getRepository(ProductEntity::class)
-                    ->find($itemDomain->getProduct()->getId());
-
-                if (!$productEntity) {
-                    throw new \InvalidArgumentException("Product with ID {$itemDomain->getProduct()->getId()} not found.");
-                }
-
                 $itemEntity = new EntityOrderItem($itemDomain->getId(), $itemDomain->getQuantity());
                 $itemEntity->setProduct($productEntity);
                 $itemEntity->setQuantity($itemDomain->getQuantity());

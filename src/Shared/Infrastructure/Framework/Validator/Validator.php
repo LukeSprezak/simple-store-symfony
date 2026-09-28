@@ -15,6 +15,9 @@ final readonly class Validator
     ) {
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function valid(RequestInterface $request): array
     {
         $violations = $this->validator->validate($request);
@@ -24,7 +27,7 @@ final readonly class Validator
         }
 
         return array_map(
-            static fn (ConstraintViolationInterface $violation): string => $violation->getMessage(),
+            static fn (ConstraintViolationInterface $violation): string => (string) $violation->getMessage(),
             iterator_to_array($violations)
         );
     }

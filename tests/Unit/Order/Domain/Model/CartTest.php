@@ -51,6 +51,7 @@ class CartTest extends TestCase
         // Then
         self::assertCount(1, $cart->getItems(), 'Cart should contain exactly one item.');
         $cartItem = $cart->getItems()->first();
+        self::assertInstanceOf(CartItem::class, $cartItem);
         self::assertSame(5, $cartItem->getQuantity(), 'Cart item quantity should be 5.');
     }
 

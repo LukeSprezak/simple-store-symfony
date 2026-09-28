@@ -18,6 +18,9 @@ use Symfony\Component\Uid\Uuid;
 #[CoversClass(Order::class)]
 class OrderTest extends TestCase
 {
+    /**
+     * @return iterable<string, array{StatusOrder, StatusOrderTransition}>
+     */
     public static function allowedTransitions(): iterable
     {
         foreach (StatusOrderTransition::cases() as $transition) {

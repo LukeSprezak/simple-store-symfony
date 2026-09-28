@@ -31,6 +31,9 @@ final readonly class CartRepository implements CartRepositoryInterface
         $this->eventBus->publish(...$cart->pullDomainEvents());
     }
 
+    /**
+     * @return list<Cart>
+     */
     public function findExpiredCarts(\DateTimeImmutable $now): array
     {
         return $this->entityManager->getRepository(Cart::class)->createQueryBuilder('c')

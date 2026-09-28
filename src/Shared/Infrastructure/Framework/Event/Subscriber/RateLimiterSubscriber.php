@@ -36,8 +36,9 @@ final readonly class RateLimiterSubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
+        $route = $request->attributes->get(self::ROUTE);
 
-        if (str_starts_with($request->attributes->get(self::ROUTE, ''), self::ROUTE_NAME)) {
+        if (is_string($route) && str_starts_with($route, self::ROUTE_NAME)) {
             $limiter = $this->anonymousApiLimiter->create($request->getClientIp());
 
             $limit = $limiter->consume();

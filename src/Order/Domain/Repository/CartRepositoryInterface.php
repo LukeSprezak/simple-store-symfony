@@ -12,5 +12,8 @@ interface CartRepositoryInterface
 
     public function save(Cart $cart): void;
 
+    /**
+     * @return list<Cart>
+     */
     public function findExpiredCarts(\DateTimeImmutable $now): array;
 }

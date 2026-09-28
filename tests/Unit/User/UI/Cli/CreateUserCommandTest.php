@@ -146,6 +146,8 @@ class CreateUserCommandTest extends TestCase
     #[Test]
     public function shouldFailsWhenPasswordIsEmpty(): void
     {
+        $this->expectNoUserCreation();
+
         $commandTester = $this->getCommandTester([
             '',
             '',
@@ -160,6 +162,8 @@ class CreateUserCommandTest extends TestCase
     #[Test]
     public function shouldDisplayErrorIfPasswordIsTooShort(): void
     {
+        $this->expectNoUserCreation();
+
         $commandTester = $this->getCommandTester([
             '',
             '',
@@ -174,6 +178,9 @@ class CreateUserCommandTest extends TestCase
     #[Test]
     public function informsFailWhenValidatorFails(): void
     {
+        $this->entityManager->expects($this->never())->method('persist');
+        $this->entityManager->expects($this->never())->method('flush');
+
         $commandTester = $this->getCommandTester([
             '',
             '',
@@ -186,7 +193,7 @@ class CreateUserCommandTest extends TestCase
             ->with($this->isInstanceOf(User::class), self::VALID_PASSWORD)
             ->willReturn('hashed_password123');
 
-        $mockConstraintViolation = $this->createMock(ConstraintViolationInterface::class);
+        $mockConstraintViolation = $this->createStub(ConstraintViolationInterface::class);
         $mockConstraintViolation->method('getPropertyPath')->willReturn('email');
         $mockConstraintViolation->method('getMessage')->willReturn('This value is not a valid email.');
         $constraintViolationList = new ConstraintViolationList([$mockConstraintViolation]);
@@ -279,6 +286,17 @@ class CreateUserCommandTest extends TestCase
         ]), $output);
     }
 
+    private function expectNoUserCreation(): void
+    {
+        $this->entityManager->expects($this->never())->method('persist');
+        $this->entityManager->expects($this->never())->method('flush');
+        $this->passwordHasher->expects($this->never())->method('hashPassword');
+        $this->validator->expects($this->never())->method('validate');
+    }
+
+    /**
+     * @param list<string> $inputs
+     */
     private function getCommandTester(array $inputs = []): CommandTester
     {
         $commandTester = new CommandTester($this->application->find(self::COMMAND_NAME));
@@ -291,6 +309,7 @@ class CreateUserCommandTest extends TestCase
     {
         self::assertEquals(Command::FAILURE, $commandTester->getStatusCode());
         $output = preg_replace('/\s+/', ' ', $commandTester->getDisplay());
+        self::assertNotNull($output);
         self::assertStringContainsString($expectedMessage, $output);
     }
 }

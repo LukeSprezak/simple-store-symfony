@@ -19,6 +19,7 @@ class Order extends AggregateRoot
     private string $status;
     private UserId $ownerId;
     private \DateTimeImmutable $createdAt;
+    /** @var Collection<int, OrderItem> */
     private Collection $items;
 
     private function __construct(
@@ -46,6 +47,9 @@ class Order extends AggregateRoot
         return $order;
     }
 
+    /**
+     * @param array<OrderItem> $items
+     */
     public static function fromPersistence(
         string $id,
         string $status,
@@ -90,6 +94,9 @@ class Order extends AggregateRoot
         return $this->createdAt;
     }
 
+    /**
+     * @return Collection<int, OrderItem>
+     */
     public function getItems(): Collection
     {
         return $this->items;

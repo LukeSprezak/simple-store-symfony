@@ -51,7 +51,7 @@ class OrderItem
         return $this->order;
     }
 
-    public function setOrder(?Order $order): void
+    public function setOrder(Order $order): void
     {
         $this->order = $order;
     }

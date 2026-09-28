@@ -27,6 +27,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Column(type: Types::STRING, length: 32, unique: true)]
     private string $email;
 
+    /** @var list<string> */
     #[Column(type: Types::JSON)]
     private array $roles = [];
 
@@ -92,6 +93,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return array_unique([...$this->roles, Role::ROLE_USER->value]);
     }
 
+    /**
+     * @param list<string> $roles
+     */
     public function setRoles(array $roles): self
     {
         $this->roles = $roles;
@@ -147,6 +151,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUserIdentifier(): string
     {
+        if ('' === $this->email) {
+            throw new \LogicException('A user must have a non-empty email to authenticate.');
+        }
+
         return $this->email;
     }
 

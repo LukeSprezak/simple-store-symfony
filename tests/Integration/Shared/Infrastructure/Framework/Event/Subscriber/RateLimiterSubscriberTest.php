@@ -58,8 +58,12 @@ class RateLimiterSubscriberTest extends WebTestCase
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
 
-        $data = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $content = $response->getContent();
+        self::assertIsString($content);
+        $data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        self::assertIsArray($data);
         $this->assertArrayHasKey('token', $data);
+        self::assertIsString($data['token']);
 
         return $data['token'];
     }
@@ -97,7 +101,9 @@ class RateLimiterSubscriberTest extends WebTestCase
         $retryAfter = $response->headers->get('Retry-After');
         $this->assertIsNumeric($retryAfter);
 
-        $content = json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $responseBody = $response->getContent();
+        self::assertIsString($responseBody);
+        $content = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
         $this->assertEquals(['error' => 'Too many requests. Try again in a few moments.'], $content);
     }
 }

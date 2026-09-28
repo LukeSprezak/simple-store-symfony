@@ -12,7 +12,6 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use Symfony\Component\PropertyAccess\Exception\RuntimeException;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 use Symfony\Component\Serializer\Exception\UnexpectedValueException;
-use Symfony\Component\Serializer\Normalizer\AbstractObjectNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 
 final readonly class JsonBodyResolver implements ValueResolverInterface
@@ -26,9 +25,14 @@ final readonly class JsonBodyResolver implements ValueResolverInterface
     ) {
     }
 
+    /**
+     * @return iterable<RequestInterface>
+     */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if (!$this->supports($argument)) {
+        $type = $argument->getType();
+
+        if (null === $type || !$this->supports($argument)) {
             return;
         }
 
@@ -37,17 +41,19 @@ final readonly class JsonBodyResolver implements ValueResolverInterface
         }
 
         $content = $request->getContent() ?: self::DEFAULT_JSON;
-        $type = $argument->getType();
 
         try {
-            yield $this->serializer->deserialize(
+            $payload = $this->serializer->deserialize(
                 $content,
                 $type,
-                self::FORMAT,
-                [
-                    AbstractObjectNormalizer::DISABLE_TYPE_ENFORCEMENT => true,
-                ]
+                self::FORMAT
             );
+
+            if (!$payload instanceof RequestInterface) {
+                throw new UnexpectedValueException('The payload must implement RequestInterface.');
+            }
+
+            yield $payload;
         } catch (UnexpectedValueException|InvalidArgumentException|RuntimeException $exception) {
             throw new ValidationError([ValidationError::GENERAL => 'VALIDATION.INVALID_PAYLOAD'], $exception);
         }

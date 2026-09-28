@@ -19,7 +19,7 @@ use Symfony\Component\Uid\Uuid;
 #[CoversClass(AddProductCommandHandler::class)]
 class AddProductCommandHandlerTest extends TestCase
 {
-    private ProductRepositoryInterface|MockObject $productRepository;
+    private ProductRepositoryInterface&MockObject $productRepository;
     private AddProductCommandHandler $handler;
 
     protected function setUp(): void
