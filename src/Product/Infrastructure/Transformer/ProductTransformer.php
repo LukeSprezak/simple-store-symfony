@@ -6,6 +6,7 @@ namespace App\Product\Infrastructure\Transformer;
 
 use App\Product\Domain\Model\Product;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
+use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use App\User\Infrastructure\Repository\UserRepository;
 use Doctrine\ORM\EntityNotFoundException;
@@ -28,7 +29,7 @@ final readonly class ProductTransformer
         $productEntity->setId($product->getId());
         $productEntity->setName($product->getName());
         $productEntity->setDescription($product->getDescription());
-        $productEntity->setPrice($product->getPrice());
+        $productEntity->setPrice($product->getPrice()->getAmount());
         $productEntity->setStockQuantity($product->getStockQuantity());
         $productEntity->setStatus($product->getStatus());
 
@@ -52,7 +53,7 @@ final readonly class ProductTransformer
             $productEntity->getId(),
             $productEntity->getName(),
             $productEntity->getDescription(),
-            $productEntity->getPrice(),
+            new Money($productEntity->getPrice()),
             $productEntity->getStockQuantity(),
             $userId,
             $productEntity->getStatus(),

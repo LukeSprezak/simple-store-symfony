@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Order\Domain\Model;
 
+use App\Shared\Domain\ValueObject\Money;
 final readonly class ProductSnapshot
 {
     public function __construct(
         private string $id,
         private string $name,
-        private float $price,
+        private Money $price,
     ) {
     }
 
@@ -23,7 +24,7 @@ final readonly class ProductSnapshot
         return $this->name;
     }
 
-    public function getPrice(): float
+    public function getPrice(): Money
     {
         return $this->price;
     }

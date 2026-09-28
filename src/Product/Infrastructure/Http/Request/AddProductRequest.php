@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Product\Infrastructure\Http\Request;
 
 use App\Product\Application\Command\AddProduct\AddProductCommand;
+use App\Shared\Domain\ValueObject\Money;
 use App\Shared\Infrastructure\Utils\Request\RequestInterface;
 use App\User\Domain\ValueObject\UserId;
 use Symfony\Component\Validator\Constraints\GreaterThan;
@@ -38,7 +39,7 @@ final class AddProductRequest implements RequestInterface
             $id,
             $this->name,
             $this->description,
-            $this->price,
+            Money::fromDecimal($this->price),
             $this->stockQuantity,
             new UserId($userId)
         );

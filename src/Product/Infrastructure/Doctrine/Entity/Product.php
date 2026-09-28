@@ -36,8 +36,8 @@ class Product
     #[Column(type: Types::TEXT, length: 2000)]
     private ?string $description;
 
-    #[Column(type: Types::FLOAT)]
-    private float $price;
+    #[Column(type: Types::INTEGER)]
+    private int $price;
 
     #[Column(type: Types::INTEGER)]
     private int $stockQuantity;
@@ -99,12 +99,12 @@ class Product
         $this->description = $description;
     }
 
-    public function getPrice(): float
+    public function getPrice(): int
     {
         return $this->price;
     }
 
-    public function setPrice(float $price): void
+    public function setPrice(int $price): void
     {
         $this->price = $price;
     }

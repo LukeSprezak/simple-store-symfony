@@ -14,6 +14,7 @@ use App\Order\Domain\Exception\CartNotActiveException;
 use App\Order\Domain\Exception\CartTransitionNotAllowedException;
 use App\Order\Domain\Exception\ProductNotInCartException;
 use App\Shared\Domain\Aggregate\AggregateRoot;
+use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -164,12 +165,12 @@ class Cart extends AggregateRoot
         $this->recordThat(new ProductAddedToCart($this->id, $product->getId(), $quantity));
     }
 
-    public function getTotalAmount(): float
+    public function getTotalAmount(): Money
     {
         return array_reduce(
             array: $this->items->toArray(),
-            callback: static fn (float $total, CartItem $item) => $total + ($item->getProduct()->getPrice() * $item->getQuantity()),
-            initial: 0.0
+            callback: static fn (Money $total, CartItem $item) => $total->add($item->getProduct()->getPrice()->multiply($item->getQuantity())),
+            initial: new Money(0)
         );
     }
 

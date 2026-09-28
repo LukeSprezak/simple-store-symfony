@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Product\Domain\Model;
 
 use App\Product\Domain\Enum\StatusProduct;
+use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 
 class Product
@@ -13,7 +14,7 @@ class Product
         private readonly string $id,
         private readonly string $name,
         private readonly string $description,
-        private readonly float $price,
+        private readonly Money $price,
         private int $stockQuantity,
         private readonly UserId $userId,
         private StatusProduct $status = StatusProduct::ACTIVE,
@@ -25,7 +26,7 @@ class Product
         string $id,
         string $name,
         string $description,
-        float $price,
+        Money $price,
         int $stockQuantity,
         UserId $userId,
     ): self {
@@ -36,7 +37,7 @@ class Product
         string $id,
         string $name,
         string $description,
-        float $price,
+        Money $price,
         int $stockQuantity,
         UserId $userId,
         StatusProduct $status,
@@ -60,7 +61,7 @@ class Product
         return $this->description;
     }
 
-    public function getPrice(): float
+    public function getPrice(): Money
     {
         return $this->price;
     }

@@ -11,6 +11,7 @@ use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Infrastructure\Doctrine\Entity\Cart as CartEntity;
 use App\Order\Infrastructure\Doctrine\Entity\CartItem as CartItemEntity;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
+use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -74,7 +75,7 @@ final readonly class CartTransformer
             $product = $itemEntity->getProduct();
             $items[] = CartItemDomain::fromPersistence(
                 $itemEntity->getId(),
-                new ProductSnapshot($product->getId(), $product->getName(), $product->getPrice()),
+                new ProductSnapshot($product->getId(), $product->getName(), new Money($product->getPrice())),
                 $itemEntity->getQuantity(),
                 $itemEntity->getDeletedAt(),
             );
