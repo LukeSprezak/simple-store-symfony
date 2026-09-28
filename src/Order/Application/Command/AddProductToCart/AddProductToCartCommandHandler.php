@@ -32,6 +32,7 @@ final readonly class AddProductToCartCommandHandler implements CommandHandler
                 throw new CartNotFoundException($command->cartId);
             }
 
+            $cart->assertActive();
             $product = $this->stockReservation->reserve($command->productId, $command->quantity);
             $cart->addProduct($product, $command->quantity);
 

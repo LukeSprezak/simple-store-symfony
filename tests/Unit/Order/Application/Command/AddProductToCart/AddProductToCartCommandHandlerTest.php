@@ -7,6 +7,8 @@ namespace App\Tests\Unit\Order\Application\Command\AddProductToCart;
 use App\Order\Application\Command\AddProductToCart\AddProductToCartCommand;
 use App\Order\Application\Command\AddProductToCart\AddProductToCartCommandHandler;
 use App\Order\Domain\Enum\StatusCart;
+use App\Order\Domain\Exception\CartNotActiveException;
+use App\Order\Domain\Exception\CartNotFoundException;
 use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
@@ -17,6 +19,7 @@ use App\Product\Domain\Exception\ProductNotFoundException;
 use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -229,6 +232,53 @@ class AddProductToCartCommandHandlerTest extends TestCase
 
         // When
         $this->handler->__invoke($command);
+    }
+
+    /**
+     * @return iterable<string, array{bool}>
+     */
+    public static function inaccessibleCarts(): iterable
+    {
+        yield 'missing cart' => [false];
+        yield 'another owner' => [true];
+    }
+
+    #[Test]
+    #[DataProvider('inaccessibleCarts')]
+    public function shouldRejectMissingAndForeignCartsBeforeReservingStock(bool $exists): void
+    {
+        $cartId = Uuid::v7()->toRfc4122();
+        $cart = $exists ? Cart::create($cartId, StatusCart::ACTIVE, UserId::generate()) : null;
+        $this->cartRepository->expects($this->once())->method('find')->with($cartId)->willReturn($cart);
+        $this->cartRepository->expects($this->never())->method('save');
+        $this->stockReservation->expects($this->never())->method('reserve');
+        $this->expectException(CartNotFoundException::class);
+
+        ($this->handler)(new AddProductToCartCommand($cartId, 'product', 1, StatusCart::ACTIVE, $this->userId, false));
+    }
+
+    /**
+     * @return iterable<string, array{StatusCart, string}>
+     */
+    public static function unmodifiableCarts(): iterable
+    {
+        yield 'converted' => [StatusCart::CONVERTED_TO_ORDER, '+1 day'];
+        yield 'expired' => [StatusCart::EXPIRED, '+1 day'];
+        yield 'abandoned' => [StatusCart::ABANDONED, '+1 day'];
+        yield 'deadline passed before scheduler runs' => [StatusCart::ACTIVE, '-1 day'];
+    }
+
+    #[Test]
+    #[DataProvider('unmodifiableCarts')]
+    public function shouldRejectInactiveCartsBeforeReservingStock(StatusCart $status, string $expiry): void
+    {
+        $cart = new Cart(Uuid::v7()->toRfc4122(), $status, $this->userId, new \DateTimeImmutable('-2 days'), new \DateTimeImmutable($expiry));
+        $this->cartRepository->expects($this->once())->method('find')->willReturn($cart);
+        $this->cartRepository->expects($this->never())->method('save');
+        $this->stockReservation->expects($this->never())->method('reserve');
+        $this->expectException(CartNotActiveException::class);
+
+        ($this->handler)(new AddProductToCartCommand($cart->getId(), 'product', 1, StatusCart::ACTIVE, $this->userId, false));
     }
 
     private function createProductMock(string $productId, int $stockQuantity, string $name = 'Test Product'): ProductSnapshot

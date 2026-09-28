@@ -52,12 +52,13 @@ class Cart extends AggregateRoot
 
     public static function create(string $id, StatusCart $status, UserId $ownerId): self
     {
+        $createdAt = new \DateTimeImmutable();
         $cart = new self(
             id: $id,
             status: $status,
             ownerId: $ownerId,
-            createdAt: new \DateTimeImmutable(),
-            expiresAt: new \DateTimeImmutable()->modify('+24 hours')
+            createdAt: $createdAt,
+            expiresAt: $createdAt->modify('+24 hours')
         );
         $cart->recordThat(new CartCreated($id, $ownerId->getId()));
 
@@ -112,6 +113,8 @@ class Cart extends AggregateRoot
 
     public function removeProduct(string $productId): int
     {
+        $this->assertActive();
+
         $item = $this->findItemByProductId($productId);
 
         if (!$item) {
@@ -126,9 +129,7 @@ class Cart extends AggregateRoot
 
     public function addProduct(ProductSnapshot $product, int $quantity): void
     {
-        if (StatusCart::ACTIVE !== $this->status || $this->isExpired()) {
-            throw new CartNotActiveException($this->id);
-        }
+        $this->assertActive();
 
         if ($quantity <= 0) {
             throw new \InvalidArgumentException('The quantity must be a positive number.');
@@ -150,7 +151,7 @@ class Cart extends AggregateRoot
     public function getTotalAmount(): Money
     {
         return array_reduce(
-            array: $this->items->toArray(),
+            array: $this->getActiveItems()->toArray(),
             callback: static fn (Money $total, CartItem $item) => $total->add($item->getProduct()->getPrice()->multiply($item->getQuantity())),
             initial: new Money(0)
         );
@@ -160,6 +161,10 @@ class Cart extends AggregateRoot
     {
         if (!in_array($this->status, [StatusCart::ACTIVE, StatusCart::ABANDONED], true)) {
             throw new CartTransitionNotAllowedException('convert', $this->status->value);
+        }
+
+        if ($this->isExpired()) {
+            throw new CartNotActiveException($this->id);
         }
 
         $this->status = StatusCart::CONVERTED_TO_ORDER;
@@ -173,7 +178,14 @@ class Cart extends AggregateRoot
 
     public function isExpired(): bool
     {
-        return new \DateTimeImmutable() > $this->expiresAt;
+        return new \DateTimeImmutable() >= $this->expiresAt;
+    }
+
+    public function assertActive(): void
+    {
+        if (StatusCart::ACTIVE !== $this->status || $this->isExpired()) {
+            throw new CartNotActiveException($this->id);
+        }
     }
 
     public function expire(): void

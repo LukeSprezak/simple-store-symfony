@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Unit\Order\Domain\Model;
 
 use App\Order\Domain\Enum\StatusCart;
+use App\Order\Domain\Exception\CartNotActiveException;
 use App\Order\Domain\Exception\CartTransitionNotAllowedException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
@@ -132,6 +133,50 @@ class CartTest extends TestCase
 
         // When
         $cart->convert();
+    }
+
+    #[Test]
+    public function shouldExcludeRemovedItemsFromTheTotalAndEmptyCheck(): void
+    {
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
+        self::assertTrue($cart->isEmpty());
+        $cart->addProduct(new ProductSnapshot('first', 'First', new Money(1000)), 2);
+        $cart->addProduct(new ProductSnapshot('second', 'Second', new Money(2500)), 1);
+
+        $cart->removeProduct('first');
+
+        self::assertFalse($cart->isEmpty());
+        self::assertSame(2500, $cart->getTotalAmount()->getAmount());
+
+        $cart->removeProduct('second');
+
+        self::assertTrue($cart->isEmpty());
+        self::assertSame(0, $cart->getTotalAmount()->getAmount());
+        self::assertCount(2, $cart->getItems());
+    }
+
+    #[Test]
+    public function shouldNotConvertAfterTheReservationDeadline(): void
+    {
+        $cart = new Cart(
+            Uuid::v7()->toRfc4122(),
+            StatusCart::ACTIVE,
+            UserId::generate(),
+            new \DateTimeImmutable('-2 days'),
+            new \DateTimeImmutable('-1 day'),
+        );
+
+        $this->expectException(CartNotActiveException::class);
+
+        $cart->convert();
+    }
+
+    #[Test]
+    public function shouldSetTheReservationDeadlineFromTheCreationTime(): void
+    {
+        $cart = Cart::create(Uuid::v7()->toRfc4122(), StatusCart::ACTIVE, UserId::generate());
+
+        self::assertEquals($cart->getCreatedAt()->modify('+24 hours'), $cart->getExpiresAt());
     }
 
     private function createProductMock(string $productId, float $price, int $stockQuantity, string $name = 'Test Product'): ProductSnapshot

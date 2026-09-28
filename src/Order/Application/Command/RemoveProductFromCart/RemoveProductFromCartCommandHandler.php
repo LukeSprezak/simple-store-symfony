@@ -9,6 +9,7 @@ use App\Order\Domain\Exception\ProductRemoveFromCartException;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Order\Domain\Service\StockReservation;
 use App\Shared\Application\Bus\Command\Sync\CommandHandler;
+use App\Shared\Domain\Exception\ConflictException;
 use App\Shared\Domain\Exception\NotFoundException;
 
 final readonly class RemoveProductFromCartCommandHandler implements CommandHandler
@@ -28,7 +29,7 @@ final readonly class RemoveProductFromCartCommandHandler implements CommandHandl
 
         try {
             $quantity = $cart->removeProduct($command->productId);
-        } catch (NotFoundException $exception) {
+        } catch (NotFoundException|ConflictException $exception) {
             throw $exception;
         } catch (\Exception $exception) {
             throw new ProductRemoveFromCartException($command->productId, 'Cannot remove product: '.$exception->getMessage());
