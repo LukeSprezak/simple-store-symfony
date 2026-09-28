@@ -199,11 +199,6 @@ class Cart extends AggregateRoot
         $this->recordThat(new CartExpired($this->id));
     }
 
-    public function clearItems(): void
-    {
-        $this->items->clear();
-    }
-
     public function clearItemQuantities(): void
     {
         foreach ($this->items as $item) {

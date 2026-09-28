@@ -51,13 +51,4 @@ class OrderItem
     {
         return $this->quantity;
     }
-
-    public function toOrderItem(): OrderItem
-    {
-        return self::create(
-            $this->id,
-            $this->product,
-            $this->quantity
-        );
-    }
 }

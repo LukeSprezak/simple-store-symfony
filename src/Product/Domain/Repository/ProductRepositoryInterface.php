@@ -8,8 +8,6 @@ use App\Product\Domain\Model\Product;
 
 interface ProductRepositoryInterface
 {
-    public function getNextId(): string;
-    public function findByIds(array $ids): array;
     public function save(Product $product): void;
     public function get(string $id): Product;
 }

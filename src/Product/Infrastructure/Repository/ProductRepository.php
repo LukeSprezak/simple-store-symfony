@@ -11,7 +11,6 @@ use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
 use App\Product\Infrastructure\Transformer\ProductTransformer;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Uid\Uuid;
 
 final readonly class ProductRepository implements ProductDomainRepository
 {
@@ -19,23 +18,6 @@ final readonly class ProductRepository implements ProductDomainRepository
         private EntityManagerInterface $entityManager,
         private ProductTransformer $transformer,
     ) {
-    }
-
-    public function getNextId(): string
-    {
-        return (string) Uuid::v7();
-    }
-
-    public function findByIds(array $ids): array
-    {
-        $entities = $this->entityManager->getRepository(ProductEntity::class)
-            ->createQueryBuilder('p')
-            ->where('p.id IN (:ids)')
-            ->setParameter('ids', $ids)
-            ->getQuery()
-            ->getResult();
-
-        return array_map(fn (ProductEntity $entity) => $this->transformer->toDomain($entity), $entities);
     }
 
     public function save(Product $product): void
