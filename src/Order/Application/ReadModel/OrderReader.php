@@ -8,5 +8,8 @@ use App\User\Domain\ValueObject\UserId;
 
 interface OrderReader
 {
-    public function findOwnedPage(UserId $ownerId, int $limit, ?string $after): OrderPage;
+    /**
+     * @param UserId|null $ownerId null returns orders of all owners
+     */
+    public function findPage(?UserId $ownerId, int $limit, ?string $after): OrderPage;
 }

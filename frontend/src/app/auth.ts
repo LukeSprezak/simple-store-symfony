@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { catchError, map, Observable, throwError } from 'rxjs';
 
@@ -9,6 +9,17 @@ const TOKEN_KEY = 'token';
 export class AuthService {
   private readonly http = inject(HttpClient);
   readonly token = signal(localStorage.getItem(TOKEN_KEY));
+  // UI hint only; the API enforces the role on every request.
+  readonly isAdmin = computed(() => {
+    const token = this.token();
+    if (!token) {
+      return false;
+    }
+
+    const roles: string[] = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).roles;
+
+    return roles.includes('ROLE_ADMIN') || roles.includes('ROLE_SUPER_ADMIN');
+  });
 
   login(email: string, password: string): Observable<void> {
     return this.http.post<{ token: string }>('/api/login_check', { email, password }).pipe(

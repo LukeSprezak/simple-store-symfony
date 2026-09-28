@@ -17,6 +17,6 @@ final readonly class GetOrdersQueryHandler implements QueryHandler
 
     public function __invoke(GetOrdersQuery $query): OrderPage
     {
-        return $this->reader->findOwnedPage($query->ownerId, $query->limit, $query->after);
+        return $this->reader->findPage($query->ownerId, $query->limit, $query->after);
     }
 }

@@ -17,19 +17,22 @@ final readonly class DbalOrderStatusHistoryReader implements OrderStatusHistoryR
     {
     }
 
-    public function findOwnedBy(string $orderId, UserId $ownerId, int $limit, ?string $after): ?OrderStatusHistoryPage
+    public function findOwnedBy(string $orderId, ?UserId $ownerId, int $limit, ?string $after): ?OrderStatusHistoryPage
     {
-        if (false === $this->connection->fetchOne('SELECT id FROM `order` WHERE id = :order AND owner_id = :owner', ['order' => $orderId, 'owner' => $ownerId->getId()])) {
+        $ownerCondition = null === $ownerId ? '' : ' AND owner_id = :owner';
+        $ownerParams = null === $ownerId ? [] : ['owner' => $ownerId->getId()];
+
+        if (false === $this->connection->fetchOne('SELECT id FROM `order` WHERE id = :order'.$ownerCondition, ['order' => $orderId] + $ownerParams)) {
             return null;
         }
 
         /** @var list<array{event_id: string, transition: string, from_status: string, to_status: string, recorded_at: string}> $rows */
         $rows = $this->connection->fetchAllAssociative(
-            'SELECT h.event_id, h.transition, h.from_status, h.to_status, h.recorded_at
-             FROM order_status_history h INNER JOIN `order` o ON o.id = h.order_id
-             WHERE o.id = :order AND o.owner_id = :owner AND h.event_id > :after
-             ORDER BY h.event_id LIMIT :limit',
-            ['order' => $orderId, 'owner' => $ownerId->getId(), 'after' => $after ?? '', 'limit' => $limit + 1],
+            'SELECT event_id, transition, from_status, to_status, recorded_at
+             FROM order_status_history
+             WHERE order_id = :order AND event_id > :after
+             ORDER BY event_id LIMIT :limit',
+            ['order' => $orderId, 'after' => $after ?? '', 'limit' => $limit + 1],
             ['limit' => ParameterType::INTEGER]
         );
         $hasMore = count($rows) > $limit;

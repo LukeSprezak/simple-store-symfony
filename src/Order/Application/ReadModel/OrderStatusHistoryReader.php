@@ -8,5 +8,8 @@ use App\User\Domain\ValueObject\UserId;
 
 interface OrderStatusHistoryReader
 {
-    public function findOwnedBy(string $orderId, UserId $ownerId, int $limit, ?string $after): ?OrderStatusHistoryPage;
+    /**
+     * @param UserId|null $ownerId null skips the ownership check
+     */
+    public function findOwnedBy(string $orderId, ?UserId $ownerId, int $limit, ?string $after): ?OrderStatusHistoryPage;
 }

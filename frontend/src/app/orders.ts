@@ -1,13 +1,16 @@
 import { CurrencyPipe, DatePipe } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Observable } from 'rxjs';
+import { AuthService } from './auth';
 
 interface Order {
   id: string;
   status: string;
   createdAt: string;
   totalAmountInCents: number;
+  transitions: string[];
 }
 
 interface StatusChange {
@@ -52,6 +55,25 @@ interface Page<T> {
                   </li>
                 }
               </ol>
+              @if (auth.isAdmin() && order.transitions.length) {
+                <div class="actions">
+                  <span>Change status:</span>
+                  @for (transition of order.transitions; track transition) {
+                    <button
+                      class="btn"
+                      [class.btn-primary]="transition !== 'cancel' && transition !== 'fail_payment'"
+                      type="button"
+                      [disabled]="changing()"
+                      (click)="changeStatus(order.id, transition)"
+                    >
+                      {{ label(transition) }}
+                    </button>
+                  }
+                </div>
+              }
+              @if (error()) {
+                <p class="error">{{ error() }}</p>
+              }
             }
           </div>
         } @empty {
@@ -146,6 +168,21 @@ interface Page<T> {
       color: var(--muted);
     }
 
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+
+    .actions button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .empty {
       text-align: center;
     }
@@ -162,30 +199,60 @@ interface Page<T> {
 })
 export class Orders {
   private readonly http = inject(HttpClient);
+  protected readonly auth = inject(AuthService);
   protected readonly orders = signal<Order[]>([]);
   protected readonly nextCursor = signal<string | null>(null);
   protected readonly expanded = signal<string | null>(null);
   protected readonly history = signal<Record<string, StatusChange[]>>({});
+  protected readonly changing = signal(false);
+  protected readonly error = signal('');
 
   constructor() {
     this.load();
   }
 
   protected load(): void {
-    const after = this.nextCursor();
-    this.http.get<Page<Order>>('/api/order', { params: after ? { limit: 20, after } : { limit: 20 } }).subscribe((page) => {
+    this.fetchPage(this.nextCursor()).subscribe((page) => {
       this.orders.update((orders) => [...orders, ...page.items]);
       this.nextCursor.set(page.nextCursor);
     });
   }
 
   protected toggle(orderId: string): void {
+    this.error.set('');
     if (this.expanded() === orderId) {
       this.expanded.set(null);
       return;
     }
 
     this.expanded.set(orderId);
+    this.loadHistory(orderId);
+  }
+
+  protected changeStatus(orderId: string, transition: string): void {
+    this.changing.set(true);
+    this.error.set('');
+    this.http.post<void>(`/api/order/${orderId}/status`, { transition }).subscribe({
+      next: () => {
+        this.changing.set(false);
+        this.fetchPage(null).subscribe((page) => {
+          this.orders.set(page.items);
+          this.nextCursor.set(page.nextCursor);
+        });
+        this.loadHistory(orderId);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.changing.set(false);
+        this.error.set(error.error?.error ?? 'Could not change the order status.');
+      },
+    });
+  }
+
+  private fetchPage(after: string | null): Observable<Page<Order>> {
+    return this.http.get<Page<Order>>('/api/order', { params: after ? { limit: 20, after } : { limit: 20 } });
+  }
+
+  private loadHistory(orderId: string): void {
     this.http
       .get<Page<StatusChange>>(`/api/order/${orderId}/status-history`, { params: { limit: 100 } })
       .subscribe((page) => this.history.update((history) => ({ ...history, [orderId]: page.items })));
