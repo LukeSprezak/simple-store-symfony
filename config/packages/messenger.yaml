@@ -2,6 +2,7 @@ framework:
     messenger:
         default_bus: command.sync.bus
         buses:
+            query.bus: ~
             command.sync.bus:
                 middleware:
                     - doctrine_close_connection

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Order\UI\Controller;
 
 use App\Order\Application\Command\ConvertCartToOrder\ConvertCartToOrderCommand;
+use App\Order\Application\Query\GetCart\GetCartQuery;
 use App\Order\Infrastructure\Request\AddProductToCartRequest;
 use App\Order\Infrastructure\Request\RemoveProductFromCartRequest;
+use App\Shared\Application\Bus\Query\QueryBus;
 use App\Shared\Domain\Enum\Routes;
 use App\Shared\Infrastructure\Bus\Messenger\SyncCommandBus;
 use App\User\Domain\Enum\Role;
@@ -18,6 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Uid\Uuid;
@@ -29,12 +32,20 @@ final readonly class CartController
 {
     public function __construct(
         private SyncCommandBus $syncCommandBus,
+        private QueryBus $queryBus,
     ) {
+    }
+
+    #[Route(path: '/{cartId}', name: 'get', requirements: ['cartId' => Requirement::UUID], methods: [Request::METHOD_GET])]
+    public function get(string $cartId, #[CurrentUser] User $user): JsonResponse
+    {
+        return new JsonResponse($this->queryBus->ask(new GetCartQuery($cartId, new UserId($user->getId()))));
     }
 
     #[Route(
         path: Routes::ADD_PRODUCT_TO_CART_PATH->value,
         name: Routes::ADD_PRODUCT_TO_CART_NAME->value,
+        requirements: ['cartId' => Requirement::UUID],
         defaults: ['cartId' => null],
         methods: [Request::METHOD_POST]
     )]
@@ -54,6 +65,7 @@ final readonly class CartController
     #[Route(
         path: Routes::CONVERT_PRODUCT_TO_ORDER_PATH->value,
         name: Routes::CONVERT_PRODUCT_TO_ORDER_NAME->value,
+        requirements: ['cartId' => Requirement::UUID],
         methods: [Request::METHOD_POST]
     )]
     public function convertToOrder(string $cartId, #[CurrentUser] User $user): JsonResponse

@@ -19,6 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Uid\Uuid;
@@ -60,6 +61,7 @@ final readonly class ProductController
     #[Route(
         path: Routes::PRODUCT_REMOVE_PATH->value,
         name: Routes::PRODUCT_REMOVE_NAME->value,
+        requirements: ['id' => Requirement::UUID],
         methods: [Request::METHOD_DELETE]
     )]
     public function remove(string $id): JsonResponse

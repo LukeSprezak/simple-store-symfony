@@ -9,7 +9,7 @@ use App\Shared\Domain\Exception\NotFoundException;
 use App\Shared\Infrastructure\Framework\Validator\ValidationError;
 use Doctrine\ORM\OptimisticLockException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\Exception\BadRequestException;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,13 +21,11 @@ use Symfony\Component\HttpKernel\KernelEvents;
 #[AsEventListener(event: KernelEvents::EXCEPTION, method: 'onKernelException')]
 final readonly class ExceptionListener
 {
-    private bool $isProd;
-
     public function __construct(
         private LoggerInterface $logger,
-        private ParameterBagInterface $params,
+        #[Autowire('%kernel.debug%')]
+        private bool $debug,
     ) {
-        $this->isProd = 'prod' === $params->get('kernel.environment');
     }
 
     public function onKernelException(ExceptionEvent $event): void
@@ -78,7 +76,7 @@ final readonly class ExceptionListener
     {
         $errors = $exception->getErrors();
 
-        if (!$this->isProd) {
+        if ($this->debug) {
             $errors['server'] = [
                 'exception' => $exception::class,
                 'message' => $exception->getMessage(),
@@ -94,7 +92,7 @@ final readonly class ExceptionListener
      */
     private function prepareSimpleErrorResponse(string $message): array
     {
-        $error = $this->isProd ? 'An error occurred.' : $message;
+        $error = $this->debug ? $message : 'An error occurred.';
 
         return ['error' => $error];
     }
@@ -104,7 +102,7 @@ final readonly class ExceptionListener
      */
     private function prepareGeneralErrorResponse(\Throwable $exception): array
     {
-        if (!$this->isProd) {
+        if ($this->debug) {
             return [
                 'error' => 'Unexpected error: '.$exception->getMessage(),
                 'trace' => $exception->getTrace(),
