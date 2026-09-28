@@ -5,14 +5,17 @@ framework:
             query.bus: ~
             command.sync.bus:
                 middleware:
+                    - App\Shared\Infrastructure\Bus\Messenger\Middleware\CorrelationIdMiddleware
                     - doctrine_close_connection
                     - doctrine_transaction
             command.async.bus:
                 middleware:
+                    - App\Shared\Infrastructure\Bus\Messenger\Middleware\CorrelationIdMiddleware
                     - doctrine_close_connection
                     - doctrine_transaction
             event.bus:
                 middleware:
+                    - App\Shared\Infrastructure\Bus\Messenger\Middleware\CorrelationIdMiddleware
                     - doctrine_transaction
                 default_middleware:
                     enabled: true

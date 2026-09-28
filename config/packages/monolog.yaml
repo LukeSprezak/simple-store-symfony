@@ -60,3 +60,10 @@ when@prod:
                 channels: [deprecation]
                 path: php://stderr
                 formatter: monolog.formatter.json
+            # The fingers_crossed main handler drops warnings from requests without an error.
+            security:
+                type: stream
+                channels: [security]
+                level: warning
+                path: php://stderr
+                formatter: monolog.formatter.json
