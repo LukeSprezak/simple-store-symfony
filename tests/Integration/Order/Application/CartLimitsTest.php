@@ -277,7 +277,6 @@ final class CartLimitsTest extends KernelTestCase
             ->setUsername($uniqueName)
             ->setEmail(substr($uniqueName, 0, 20).'@test.local')
             ->setPassword('unused')
-            ->setRepeatPassword('unused')
             ->setEnabled(true);
         $this->entityManager->persist($owner);
 

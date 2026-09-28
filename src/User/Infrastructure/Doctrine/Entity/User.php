@@ -12,9 +12,12 @@ use Doctrine\ORM\Mapping\Id;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Ignore;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[Entity]
-#[UniqueEntity(fields: ['username', 'email'])]
+#[UniqueEntity(fields: ['username'])]
+#[UniqueEntity(fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[Id]
@@ -24,30 +27,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Column(type: Types::STRING, length: 32, unique: true)]
     private string $username;
 
-    #[Column(type: Types::STRING, length: 32, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Email]
+    #[Assert\Length(max: 254)]
+    #[Column(type: Types::STRING, length: 254, unique: true)]
     private string $email;
 
     /** @var list<string> */
     #[Column(type: Types::JSON)]
     private array $roles = [];
 
+    #[Ignore]
     #[Column]
     private string $password;
 
-    #[Column]
-    private string $repeatPassword;
-
-    #[Column(nullable: true)]
+    #[Ignore]
     private ?string $plainPassword = null;
 
     #[Column(type: Types::BOOLEAN)]
     private bool $enabled;
 
-    #[Column(type: Types::STRING, nullable: true)]
-    private ?string $token;
+    #[Ignore]
+    #[Column(type: Types::STRING, length: 64, nullable: true)]
+    private ?string $tokenHash = null;
 
-    #[Column(type: Types::STRING, nullable: true)]
-    private ?string $resetPasswordToken;
+    #[Ignore]
+    #[Column(type: Types::STRING, length: 64, nullable: true)]
+    private ?string $resetPasswordTokenHash = null;
 
     #[Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $lastPasswordChange = null;
@@ -115,24 +121,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getRepeatPassword(): string
-    {
-        return $this->repeatPassword;
-    }
-
-    public function setRepeatPassword(string $repeatPassword): self
-    {
-        $this->repeatPassword = $repeatPassword;
-
-        return $this;
-    }
-
     public function getPlainPassword(): ?string
     {
         return $this->plainPassword;
     }
 
-    public function setPlainPassword(?string $plainPassword): self
+    public function setPlainPassword(#[\SensitiveParameter] ?string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
 
@@ -175,26 +169,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getToken(): ?string
+    public function getTokenHash(): ?string
     {
-        return $this->token;
+        return $this->tokenHash;
     }
 
-    public function setToken(?string $token): self
+    public function setToken(#[\SensitiveParameter] ?string $token): self
     {
-        $this->token = $token;
+        $this->tokenHash = null === $token || '' === $token ? null : hash('sha256', $token);
 
         return $this;
     }
 
-    public function getResetPasswordToken(): ?string
+    public function matchesToken(#[\SensitiveParameter] string $token): bool
     {
-        return $this->resetPasswordToken;
+        return null !== $this->tokenHash && '' !== $token && hash_equals($this->tokenHash, hash('sha256', $token));
     }
 
-    public function setResetPasswordToken(?string $resetPasswordToken): void
+    public function getResetPasswordTokenHash(): ?string
     {
-        $this->resetPasswordToken = $resetPasswordToken;
+        return $this->resetPasswordTokenHash;
+    }
+
+    public function setResetPasswordToken(#[\SensitiveParameter] ?string $resetPasswordToken): void
+    {
+        $this->resetPasswordTokenHash = null === $resetPasswordToken || '' === $resetPasswordToken ? null : hash('sha256', $resetPasswordToken);
+    }
+
+    public function matchesResetPasswordToken(#[\SensitiveParameter] string $resetPasswordToken): bool
+    {
+        return null !== $this->resetPasswordTokenHash && '' !== $resetPasswordToken && hash_equals($this->resetPasswordTokenHash, hash('sha256', $resetPasswordToken));
     }
 
     public function getLastPasswordChange(): ?\DateTimeImmutable

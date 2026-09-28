@@ -37,7 +37,6 @@ final class CartLimitsTest extends WebTestCase
             ->setUsername($uniqueName)
             ->setEmail(substr($uniqueName, 0, 20).'@test.local')
             ->setPassword('unused')
-            ->setRepeatPassword('unused')
             ->setEnabled(true);
         $this->productId = Uuid::v7()->toRfc4122();
         $product = Product::create($this->productId, 'Product', 'Description', new Money(1000), 100, $ownerId);

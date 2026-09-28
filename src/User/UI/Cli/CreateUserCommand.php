@@ -149,7 +149,6 @@ class CreateUserCommand extends Command
             ->setEmail($email)
             ->setRoles($roles)
             ->setPassword($hashedPassword)
-            ->setRepeatPassword($hashedPassword)
             ->setEnabled(true);
 
         return $user;

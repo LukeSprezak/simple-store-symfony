@@ -40,7 +40,6 @@ class RateLimiterSubscriberTest extends WebTestCase
             ->setEmail('test@example.com')
             ->setRoles(['ROLE_USER'])
             ->setPassword($hashedPassword)
-            ->setRepeatPassword($hashedPassword)
             ->setEnabled(true);
 
         $entityManager->persist($user);

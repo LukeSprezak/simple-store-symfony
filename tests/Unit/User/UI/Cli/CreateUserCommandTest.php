@@ -116,7 +116,6 @@ class CreateUserCommandTest extends TestCase
                     && self::VALID_EMAIL === $user->getEmail()
                     && self::VALID_USERNAME === $user->getUsername()
                     && 'hashed_Luke1234' === $user->getPassword()
-                    && 'hashed_Luke1234' === $user->getRepeatPassword()
                     && true === $user->getEnabled()
                     && $user->getRoles() === [
                         Role::ROLE_ADMIN->value,
@@ -261,7 +260,6 @@ class CreateUserCommandTest extends TestCase
                     && self::VALID_EMAIL === $user->getEmail()
                     && self::VALID_USERNAME === $user->getUsername()
                     && 'hashed_password' === $user->getPassword()
-                    && 'hashed_password' === $user->getRepeatPassword()
                     && true === $user->getEnabled()
                     && $user->getRoles() === [
                         Role::ROLE_ADMIN->value,
