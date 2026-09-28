@@ -11,7 +11,6 @@ use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Domain\Service\StockReservation;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -22,19 +21,16 @@ final class RemoveExpiredCartServiceTest extends TestCase
 {
     private CartRepositoryInterface&MockObject $cartRepository;
     private StockReservation&MockObject $stockReservation;
-    private EntityManagerInterface&MockObject $entityManager;
     private RemoveExpiredCartService $service;
 
     protected function setUp(): void
     {
         $this->cartRepository = $this->createMock(CartRepositoryInterface::class);
         $this->stockReservation = $this->createMock(StockReservation::class);
-        $this->entityManager = $this->createMock(EntityManagerInterface::class);
 
         $this->service = new RemoveExpiredCartService(
             cartRepository: $this->cartRepository,
             stockReservation: $this->stockReservation,
-            entityManager: $this->entityManager,
         );
     }
 
@@ -49,9 +45,9 @@ final class RemoveExpiredCartServiceTest extends TestCase
             ->with($now)
             ->willReturn([]);
 
-        $this->entityManager
+        $this->cartRepository
             ->expects($this->never())
-            ->method('flush');
+            ->method('save');
         // when
         $this->service->expireCarts($now);
     }
@@ -103,10 +99,6 @@ final class RemoveExpiredCartServiceTest extends TestCase
                 $released[$productId] = $quantity;
             });
 
-        $this->entityManager
-            ->expects($this->once())
-            ->method('flush');
-
         // when
         $this->service->expireCarts($now);
 
@@ -135,11 +127,7 @@ final class RemoveExpiredCartServiceTest extends TestCase
         $this->cartRepository
             ->expects($this->once())
             ->method('save')
-            ->with($cart);
-
-        $this->entityManager
-            ->expects($this->once())
-            ->method('flush')
+            ->with($cart)
             ->willThrowException($exception);
 
         // then

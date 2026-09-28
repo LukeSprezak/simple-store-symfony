@@ -26,7 +26,6 @@ final readonly class ProductRepository implements ProductDomainRepository
         $this->transformer->fromDomain($product, $entity);
 
         $this->entityManager->persist($entity);
-        $this->entityManager->flush();
     }
 
     public function get(string $id): Product

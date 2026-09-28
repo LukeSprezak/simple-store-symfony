@@ -33,7 +33,6 @@ final readonly class OrderRepository implements OrderRepositoryInterface
         $this->orderTransformer->fromDomain($order, $entityOrder);
 
         $this->entityManager->persist($entityOrder);
-        $this->entityManager->flush();
 
         $this->eventBus->publish(...$order->pullDomainEvents());
     }

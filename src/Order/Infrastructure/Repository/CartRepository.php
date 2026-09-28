@@ -36,7 +36,6 @@ final readonly class CartRepository implements CartRepositoryInterface
         $this->transformer->fromDomain($cart, $entity);
 
         $this->entityManager->persist($entity);
-        $this->entityManager->flush();
 
         $this->eventBus->publish(...$cart->pullDomainEvents());
     }
