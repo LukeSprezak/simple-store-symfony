@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Product\Infrastructure\Doctrine\Entity;
 
+use App\Product\Domain\Model\Product;
 use App\User\Infrastructure\Doctrine\Entity\User;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;
@@ -25,7 +26,7 @@ class Review
     #[Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
 
-    #[ManyToOne(targetEntity: Product::class, inversedBy: 'reviews')]
+    #[ManyToOne(targetEntity: Product::class)]
     #[JoinColumn(nullable: false)]
     private Product $product;
 

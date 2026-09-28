@@ -10,9 +10,8 @@ use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Infrastructure\Doctrine\Entity\Cart as CartEntity;
 use App\Order\Infrastructure\Doctrine\Entity\CartItem as CartItemEntity;
 use App\Order\Infrastructure\Transformer\CartTransformer;
-use App\Product\Domain\Enum\StatusProduct;
-use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
-use App\User\Infrastructure\Doctrine\Entity\User;
+use App\Product\Domain\Model\Product as ProductEntity;
+use App\Shared\Domain\ValueObject\Money;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -50,15 +49,7 @@ class CartTransformerTest extends TestCase
         $productId1 = Uuid::v7()->toRfc4122();
         $productEntity1->method('getId')->willReturn($productId1);
         $productEntity1->method('getName')->willReturn('Product 1');
-        $productEntity1->method('getDescription')->willReturn('Description 1');
-        $productEntity1->method('getPrice')->willReturn(10000);
-        $productEntity1->method('getStatus')->willReturn(StatusProduct::ACTIVE);
-        $productEntity1->method('getStockQuantity')->willReturn(12);
-
-        $userEntity1 = $this->createMock(User::class);
-        $userId1 = Uuid::v7()->toRfc4122();
-        $userEntity1->method('getId')->willReturn($userId1);
-        $productEntity1->method('getUser')->willReturn($userEntity1);
+        $productEntity1->method('getPrice')->willReturn(new Money(10000));
 
         $cartItemEntity1 = $this->createMock(CartItemEntity::class);
         $cartItemId1 = Uuid::v7()->toRfc4122();
@@ -70,15 +61,7 @@ class CartTransformerTest extends TestCase
         $productId2 = Uuid::v7()->toRfc4122();
         $productEntity2->method('getId')->willReturn($productId2);
         $productEntity2->method('getName')->willReturn('Product 2');
-        $productEntity2->method('getDescription')->willReturn('Description 2');
-        $productEntity2->method('getPrice')->willReturn(8000);
-        $productEntity2->method('getStatus')->willReturn(StatusProduct::ACTIVE);
-        $productEntity2->method('getStockQuantity')->willReturn(15);
-
-        $userEntity2 = $this->createMock(User::class);
-        $userId2 = Uuid::v7()->toRfc4122();
-        $userEntity2->method('getId')->willReturn($userId2);
-        $productEntity2->method('getUser')->willReturn($userEntity2);
+        $productEntity2->method('getPrice')->willReturn(new Money(8000));
 
         $cartItemEntity2 = $this->createMock(CartItemEntity::class);
         $cartItemId2 = Uuid::v7()->toRfc4122();

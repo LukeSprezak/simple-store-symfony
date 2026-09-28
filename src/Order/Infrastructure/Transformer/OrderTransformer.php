@@ -10,7 +10,7 @@ use App\Order\Domain\Model\OrderItem as DomainOrderItem;
 use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Infrastructure\Doctrine\Entity\Order as EntityOrder;
 use App\Order\Infrastructure\Doctrine\Entity\OrderItem as EntityOrderItem;
-use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
+use App\Product\Domain\Model\Product as ProductEntity;
 use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\ORM\EntityManagerInterface;

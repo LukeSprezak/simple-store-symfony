@@ -18,7 +18,7 @@ class Product
         private int $stockQuantity,
         private readonly UserId $userId,
         private StatusProduct $status = StatusProduct::ACTIVE,
-        private readonly ?int $version = null,
+        private ?int $version = null,
     ) {
     }
 

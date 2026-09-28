@@ -205,7 +205,7 @@ parameters:
 			path: src/Order/Infrastructure/Doctrine/Entity/CartItem.php
 
 		-
-			message: '#^Property App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:\$product type mapping mismatch\: database can contain App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\|null but property expects App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\.$#'
+			message: '#^Property App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:\$product type mapping mismatch\: database can contain App\\Product\\Domain\\Model\\Product\|null but property expects App\\Product\\Domain\\Model\\Product\.$#'
 			identifier: doctrine.associationType
 			count: 1
 			path: src/Order/Infrastructure/Doctrine/Entity/CartItem.php
@@ -313,12 +313,6 @@ parameters:
 			path: src/Order/Infrastructure/Transformer/CartTransformer.php
 
 		-
-			message: '#^Parameter \#1 \$amount of class App\\Shared\\Domain\\ValueObject\\Money constructor expects int, mixed given\.$#'
-			identifier: argument.type
-			count: 1
-			path: src/Order/Infrastructure/Transformer/CartTransformer.php
-
-		-
 			message: '#^Parameter \#1 \$deleted of method App\\Order\\Infrastructure\\Doctrine\\Entity\\CartItem\:\:setDeleted\(\) expects bool, mixed given\.$#'
 			identifier: argument.type
 			count: 1
@@ -374,6 +368,12 @@ parameters:
 
 		-
 			message: '#^Parameter \#2 \$name of class App\\Order\\Domain\\Model\\ProductSnapshot constructor expects string, mixed given\.$#'
+			identifier: argument.type
+			count: 1
+			path: src/Order/Infrastructure/Transformer/CartTransformer.php
+
+		-
+			message: '#^Parameter \#3 \$price of class App\\Order\\Domain\\Model\\ProductSnapshot constructor expects App\\Shared\\Domain\\ValueObject\\Money, mixed given\.$#'
 			identifier: argument.type
 			count: 1
 			path: src/Order/Infrastructure/Transformer/CartTransformer.php
@@ -527,42 +527,6 @@ parameters:
 			identifier: offsetAccess.invalidOffset
 			count: 4
 			path: src/Order/Infrastructure/Transformer/OrderTransformer.php
-
-		-
-			message: '#^Method App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:getDescription\(\) should return string but returns string\|null\.$#'
-			identifier: return.type
-			count: 1
-			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
-
-		-
-			message: '#^Method App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:getReviews\(\) return type with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
-
-		-
-			message: '#^Property App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:\$description type mapping mismatch\: property can contain string\|null but database expects string\.$#'
-			identifier: doctrine.columnType
-			count: 1
-			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
-
-		-
-			message: '#^Property App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:\$reviews is never written, only read\.$#'
-			identifier: property.onlyRead
-			count: 1
-			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
-
-		-
-			message: '#^Property App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:\$reviews type mapping mismatch\: property can contain Doctrine\\Common\\Collections\\Collection but database expects Doctrine\\Common\\Collections\\Collection&iterable\<App\\Product\\Infrastructure\\Doctrine\\Entity\\Review\>\.$#'
-			identifier: doctrine.associationType
-			count: 1
-			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
-
-		-
-			message: '#^Property App\\Product\\Infrastructure\\Doctrine\\Entity\\Product\:\:\$reviews with generic interface Doctrine\\Common\\Collections\\Collection does not specify its types\: TKey, T$#'
-			identifier: missingType.generics
-			count: 1
-			path: src/Product/Infrastructure/Doctrine/Entity/Product.php
 
 		-
 			message: '#^Access to an undefined property App\\Shared\\Domain\\ValueObject\\UuidValueObject\|App\\Shared\\Domain\\ValueObject\\UuidValueObjectInterface\:\:\$id\.$#'

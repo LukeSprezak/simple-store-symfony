@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Order\Infrastructure\Doctrine\Entity;
 
-use App\Product\Infrastructure\Doctrine\Entity\Product;
+use App\Product\Domain\Model\Product;
 use App\Shared\Infrastructure\Doctrine\Entity\SoftDeleteTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping\Column;

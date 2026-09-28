@@ -7,6 +7,9 @@ doctrine:
         #server_version: '16'
 
         profiling_collect_backtrace: '%kernel.debug%'
+        types:
+            user_id: App\User\Infrastructure\Doctrine\Type\UserIdType
+            money: App\Shared\Infrastructure\Doctrine\Type\MoneyType
     orm:
         validate_xml_mapping: true
         naming_strategy: doctrine.orm.naming_strategy.underscore_number_aware
@@ -25,6 +28,13 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Product/Infrastructure/Doctrine/Entity'
                 prefix: 'App\Product\Infrastructure\Doctrine\Entity'
                 alias: App\Product
+
+            App\Product\Domain:
+                type: xml
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Product/Infrastructure/Doctrine/Mapping'
+                prefix: 'App\Product\Domain\Model'
+                alias: App\Product\Domain
 
             App\Shared:
                 type: attribute
