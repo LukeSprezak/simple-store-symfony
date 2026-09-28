@@ -9,6 +9,7 @@ use App\Order\Domain\Model\Cart as CartDomain;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Order\Infrastructure\Doctrine\Entity\Cart as CartEntity;
 use App\Order\Infrastructure\Transformer\CartTransformer;
+use App\Shared\Application\Bus\Event\EventBus;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,6 +18,7 @@ final readonly class CartRepository implements CartRepositoryInterface
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
+        private EventBus $eventBus,
         private CartTransformer $transformer,
     ) {
     }
@@ -35,6 +37,8 @@ final readonly class CartRepository implements CartRepositoryInterface
 
         $this->entityManager->persist($entity);
         $this->entityManager->flush();
+
+        $this->eventBus->publish(...$cart->pullDomainEvents());
     }
 
     public function findExpiredCarts(\DateTimeImmutable $now): array

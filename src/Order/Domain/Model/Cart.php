@@ -5,15 +5,21 @@ declare(strict_types=1);
 namespace App\Order\Domain\Model;
 
 use App\Order\Domain\Enum\StatusCart;
+use App\Order\Domain\Event\CartConverted;
+use App\Order\Domain\Event\CartCreated;
+use App\Order\Domain\Event\CartExpired;
+use App\Order\Domain\Event\ProductAddedToCart;
+use App\Order\Domain\Event\ProductRemovedFromCart;
 use App\Order\Domain\Exception\CartNotActiveException;
 use App\Order\Domain\Exception\CartTransitionNotAllowedException;
 use App\Order\Domain\Exception\ProductNotInCartException;
+use App\Shared\Domain\Aggregate\AggregateRoot;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Uid\Uuid;
 
-class Cart
+class Cart extends AggregateRoot
 {
     private readonly string $id;
     private StatusCart $status;
@@ -40,13 +46,16 @@ class Cart
 
     public static function create(string $id, StatusCart $status, UserId $ownerId): self
     {
-        return new self(
+        $cart = new self(
             id: $id,
             status: $status,
             ownerId: $ownerId,
             createdAt: new \DateTimeImmutable(),
             expiresAt: new \DateTimeImmutable()->modify('+24 hours')
         );
+        $cart->recordThat(new CartCreated($id, $ownerId->getId()));
+
+        return $cart;
     }
 
     public static function fromPersistence(
@@ -127,6 +136,7 @@ class Cart
         }
 
         $item->softDelete();
+        $this->recordThat(new ProductRemovedFromCart($this->id, $productId, $item->getQuantity()));
 
         return $item->getQuantity();
     }
@@ -150,6 +160,8 @@ class Cart
             $cartItem = CartItem::create($itemId, $product, $quantity);
             $this->items->add($cartItem);
         }
+
+        $this->recordThat(new ProductAddedToCart($this->id, $product->getId(), $quantity));
     }
 
     public function getTotalAmount(): float
@@ -168,6 +180,7 @@ class Cart
         }
 
         $this->status = StatusCart::CONVERTED_TO_ORDER;
+        $this->recordThat(new CartConverted($this->id));
     }
 
     public function isEmpty(): bool
@@ -183,6 +196,7 @@ class Cart
     public function expire(): void
     {
         $this->status = StatusCart::EXPIRED;
+        $this->recordThat(new CartExpired($this->id));
     }
 
     public function clearItems(): void

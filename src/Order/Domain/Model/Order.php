@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Order\Domain\Model;
 
+use App\Order\Domain\Event\OrderPlaced;
+use App\Shared\Domain\Aggregate\AggregateRoot;
 use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
-class Order
+class Order extends AggregateRoot
 {
     private string $id;
     private string $status;
@@ -35,7 +37,10 @@ class Order
         UserId $ownerId,
         \DateTimeImmutable $createdAt,
     ): self {
-        return new self($id, $status, $ownerId, $createdAt);
+        $order = new self($id, $status, $ownerId, $createdAt);
+        $order->recordThat(new OrderPlaced($id, $ownerId->getId()));
+
+        return $order;
     }
 
     public static function fromPersistence(

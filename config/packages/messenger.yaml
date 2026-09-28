@@ -10,6 +10,10 @@ framework:
                 middleware:
                     - doctrine_close_connection
                     - doctrine_transaction
+            event.bus:
+                default_middleware:
+                    enabled: true
+                    allow_no_handlers: true
         serializer:
             default_serializer: messenger.transport.symfony_serializer
             symfony_serializer:
