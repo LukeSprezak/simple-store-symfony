@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Order\UI\Controller;
 
+use App\Order\Application\Query\GetOrders\GetOrdersQuery;
 use App\Order\Application\Query\GetOrderStatusHistory\GetOrderStatusHistoryQuery;
+use App\Order\Infrastructure\Request\OrderListRequest;
 use App\Order\Infrastructure\Request\OrderStatusHistoryRequest;
 use App\Shared\Application\Bus\Query\QueryBus;
 use App\Shared\Domain\Enum\Routes;
@@ -29,6 +31,12 @@ final readonly class OrderController
     public function __construct(
         private QueryBus $queryBus,
     ) {
+    }
+
+    #[Route(path: '', name: 'list', methods: [Request::METHOD_GET])]
+    public function list(#[CurrentUser] User $user, #[MapQueryString(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)] OrderListRequest $page = new OrderListRequest()): JsonResponse
+    {
+        return new JsonResponse($this->queryBus->ask(new GetOrdersQuery(new UserId($user->getId()), $page->limit, $page->after)));
     }
 
     #[Route(path: '/{orderId}/status-history', name: 'status_history', requirements: ['orderId' => Requirement::UUID], methods: [Request::METHOD_GET])]
