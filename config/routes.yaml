@@ -1,9 +1,6 @@
 api_login_check:
     path: /api/login_check
 
-api_logout:
-    path: /api/logout
-
 order:
     resource:
         path: ../src/Order/UI/Controller/

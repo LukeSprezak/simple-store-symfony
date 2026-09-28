@@ -18,7 +18,7 @@ services:
       retries: 30
       start_period: 30s
     ports:
-      - "13306:3306"
+      - "127.0.0.1:13306:3306"
     networks:
       - app
 
@@ -31,7 +31,7 @@ services:
       - .:/var/www
       - ./etc/docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     ports:
-      - "8080:80"
+      - "127.0.0.1:8080:80"
     networks:
       - app
 
@@ -50,8 +50,6 @@ services:
       - .:/var/www
       - ./etc/docker/php-fpm/php.ini:/usr/local/etc/php/conf.d/99-overrides.ini
       - ./etc/docker/php-fpm/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
-    ports:
-      - "9001:9000"
     depends_on:
       mysql:
         condition: service_healthy
@@ -67,7 +65,7 @@ services:
       PMA_HOST: mysql
       PMA_PORT: 3306
     ports:
-      - "8883:80"
+      - "127.0.0.1:8883:80"
     networks:
       - app
 
@@ -80,7 +78,7 @@ services:
       timeout: 5s
       retries: 10
     ports:
-      - "6379:6379"
+      - "127.0.0.1:6379:6379"
     networks:
       - app
 
@@ -95,7 +93,7 @@ services:
       retries: 30
       start_period: 30s
     ports:
-      - '15672:15672'
+      - '127.0.0.1:15672:15672'
     environment:
       RABBITMQ_DEFAULT_USER: 'user'
       RABBITMQ_DEFAULT_PASS: 'password'
@@ -104,78 +102,10 @@ services:
     networks:
       - app
 
-  mongo:
-    image: mongo
-    container_name: 'mongodb'
-    restart: always
-    environment:
-      MONGO_INITDB_DATABASE: "admin"
-      MONGO_INITDB_ROOT_USERNAME: "root"
-      MONGO_INITDB_ROOT_PASSWORD: "password"
-    ports:
-      - '27017:27017'
-    volumes:
-      - ./etc/docker/volumes/mongo:/data/db
-    networks:
-      - app
-
-  mongo-express:
-    image: mongo-express
-    container_name: 'mongo_express'
-    restart: always
-    ports:
-      - "8081:8081"
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:password@mongo:27017/
-      ME_CONFIG_BASICAUTH: false
-    networks:
-      - app
-
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.25
-    container_name: elasticsearch
-    volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
-    ports:
-      - "9200:9200"
-    restart: always
-    environment:
-      - xpack.security.enabled=false
-      - discovery.type=single-node
-      - cluster.name=docker-cluster-app
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    networks:
-      - app
-
-  kibana:
-    depends_on:
-      - elasticsearch
-    image: docker.elastic.co/kibana/kibana:7.17.25
-    container_name: kibana
-    volumes:
-      - kibana-data:/usr/share/kibana/data
-    ports:
-      - "5601:5601"
-    restart: always
-    environment:
-      SERVER_NAME: localhost
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-    networks:
-      - app
-
 networks:
   app:
     driver: bridge
 
 volumes:
-  elasticsearch-data:
-    driver: local
-  kibana-data:
-    driver: local
   mysql_storage:
   rabbitmq_storage:
