@@ -122,6 +122,11 @@ class Cart
         return $this->items;
     }
 
+    public function getActiveItems(): Collection
+    {
+        return $this->items->filter(static fn (CartItem $item) => !$item->isDeleted());
+    }
+
     public function addItem(CartItem $item): void
     {
         $existingItem = $this->findItemByProductId($item->getProduct()->getId());
@@ -203,7 +208,7 @@ class Cart
 
     public function isEmpty(): bool
     {
-        return !$this->items->exists(static fn (int $key, CartItem $item) => !$item->isDeleted());
+        return $this->getActiveItems()->isEmpty();
     }
 
     public function isExpired(): bool
