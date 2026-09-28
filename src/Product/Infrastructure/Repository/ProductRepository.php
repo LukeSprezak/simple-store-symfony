@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Product\Infrastructure\Repository;
 
+use App\Product\Domain\Exception\ProductNotFoundException;
 use App\Product\Domain\Model\Product;
 use App\Product\Domain\Repository\ProductRepositoryInterface as ProductDomainRepository;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
 use App\Product\Infrastructure\Transformer\ProductTransformer;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Uid\Uuid;
 
 final readonly class ProductRepository implements ProductDomainRepository
@@ -51,7 +51,7 @@ final readonly class ProductRepository implements ProductDomainRepository
         $productEntity = $this->entityManager->getRepository(ProductEntity::class)->findOneBy(['id' => $id]);
 
         if (!$productEntity) {
-            throw new NotFoundHttpException("Product with ID {$id} not found.");
+            throw new ProductNotFoundException($id);
         }
 
         return $this->transformer->toDomain($productEntity);
@@ -62,7 +62,7 @@ final readonly class ProductRepository implements ProductDomainRepository
         $productEntity = $this->entityManager->getRepository(ProductEntity::class)->find($product->getId());
 
         if (!$productEntity) {
-            throw new NotFoundHttpException("Product with ID {$product->getId()} not found.");
+            throw new ProductNotFoundException($product->getId());
         }
 
         $this->entityManager->remove($productEntity);

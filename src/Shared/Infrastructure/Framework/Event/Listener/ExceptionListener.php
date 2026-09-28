@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Shared\Infrastructure\Framework\Event\Listener;
 
+use App\Order\Domain\Exception\CartNotFoundException;
+use App\Product\Domain\Exception\ProductNotFoundException;
 use App\Shared\Infrastructure\Framework\Validator\ValidationError;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -39,6 +41,12 @@ final readonly class ExceptionListener
 
             $exception instanceof BadRequestException => [
                 Response::HTTP_BAD_REQUEST,
+                $this->prepareSimpleErrorResponse($exception->getMessage()),
+            ],
+
+            $exception instanceof CartNotFoundException,
+            $exception instanceof ProductNotFoundException => [
+                Response::HTTP_NOT_FOUND,
                 $this->prepareSimpleErrorResponse($exception->getMessage()),
             ],
 

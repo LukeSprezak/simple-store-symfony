@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Order\Infrastructure\Transformer;
 
-use App\Order\Domain\Exception\ProductNotFoundException;
+use App\Product\Domain\Exception\ProductNotFoundException;
 use App\Order\Domain\Model\Cart as CartDomain;
 use App\Order\Domain\Model\CartItem as CartItemDomain;
 use App\Order\Infrastructure\Doctrine\Entity\Cart as CartEntity;
@@ -44,7 +44,7 @@ final readonly class CartTransformer
                     ->find($itemDomain->getProduct()->getId());
 
                 if (!$productEntity) {
-                    throw new ProductNotFoundException('Product not found: '.$itemDomain->getProduct()->getId());
+                    throw new ProductNotFoundException($itemDomain->getProduct()->getId());
                 }
 
                 $itemEntity = new CartItemEntity();

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Order\Application\Command\RemoveProductFromCart;
 
 use App\Order\Domain\Exception\CartNotFoundException;
-use App\Order\Domain\Exception\ProductNotFoundException;
+use App\Product\Domain\Exception\ProductNotFoundException;
 use App\Order\Domain\Exception\ProductRemoveFromCartException;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Product\Domain\Repository\ProductRepositoryInterface;

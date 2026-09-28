@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Order\Domain\Exception;
+namespace App\Product\Domain\Exception;
 
 final class ProductNotFoundException extends \RuntimeException
 {

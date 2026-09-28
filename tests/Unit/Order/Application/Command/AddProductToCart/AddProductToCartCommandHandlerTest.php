@@ -7,7 +7,7 @@ namespace App\Tests\Unit\Order\Application\Command\AddProductToCart;
 use App\Order\Application\Command\AddProductToCart\AddProductToCartCommand;
 use App\Order\Application\Command\AddProductToCart\AddProductToCartCommandHandler;
 use App\Order\Domain\Enum\StatusCart;
-use App\Order\Domain\Exception\ProductNotFoundException;
+use App\Product\Domain\Exception\ProductNotFoundException;
 use App\Order\Domain\Exception\ProductUnavailableException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Repository\CartRepositoryInterface;
