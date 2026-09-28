@@ -14,6 +14,7 @@ use App\Order\Domain\Repository\OrderRepositoryInterface;
 use App\Shared\Application\Bus\Command\Sync\CommandHandler;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Workflow\WorkflowInterface;
 
 final readonly class ConvertCartToOrderCommandHandler implements CommandHandler
@@ -41,7 +42,7 @@ final readonly class ConvertCartToOrderCommandHandler implements CommandHandler
 
             $cart->applyTransition(StatusCartTransition::CONVERT->value, $this->cartStateWorkflow);
 
-            $order = Order::create($cart->getId(), StatusOrder::CREATED->value, $cart->getOwnerId(), new \DateTimeImmutable());
+            $order = Order::create(Uuid::v7()->toRfc4122(), StatusOrder::CREATED->value, $cart->getOwnerId(), new \DateTimeImmutable());
             foreach ($cart->getActiveItems() as $cartItem) {
                 $orderItem = $cartItem->toOrderItem();
                 $order->addItem($orderItem);

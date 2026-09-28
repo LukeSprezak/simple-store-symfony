@@ -7,6 +7,7 @@ namespace App\Order\Domain\Model;
 use App\Order\Domain\Exception\InvalidQuantityException;
 use App\Product\Domain\Model\Product;
 use App\Shared\Infrastructure\Doctrine\Entity\SoftDeleteTrait;
+use Symfony\Component\Uid\Uuid;
 
 class CartItem
 {
@@ -81,7 +82,7 @@ class CartItem
     public function toOrderItem(): OrderItem
     {
         return OrderItem::create(
-            $this->id,
+            Uuid::v7()->toRfc4122(),
             $this->product,
             $this->quantity
         );
