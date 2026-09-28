@@ -27,7 +27,7 @@ class RemoveExpiredCartService
 
         $productQuantities = [];
         foreach ($cartsToExpire as $cart) {
-            foreach ($cart->getItems() as $item) {
+            foreach ($cart->getActiveItems() as $item) {
                 $productId = $item->getProduct()->getId();
                 $quantity = $item->getQuantity();
                 $productQuantities[$productId] = ($productQuantities[$productId] ?? 0) + $quantity;

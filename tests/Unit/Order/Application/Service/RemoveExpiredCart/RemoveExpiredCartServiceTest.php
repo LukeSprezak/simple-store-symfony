@@ -81,7 +81,7 @@ final class RemoveExpiredCartServiceTest extends TestCase
         ]);
 
         $cart = $this->createMock(Cart::class);
-        $cart->method('getItems')->willReturn(new ArrayCollection([$cartItem1, $cartItem2]));
+        $cart->method('getActiveItems')->willReturn(new ArrayCollection([$cartItem1, $cartItem2]));
 
         $this->cartRepository
             ->expects($this->once())
@@ -154,7 +154,7 @@ final class RemoveExpiredCartServiceTest extends TestCase
         $exception = new \Exception('Database error');
 
         $cart = $this->createMock(Cart::class);
-        $cart->method('getItems')->willReturn(new ArrayCollection());
+        $cart->method('getActiveItems')->willReturn(new ArrayCollection());
         $cart->expects($this->once())->method('expire');
         $cart->expects($this->once())->method('clearItemQuantities');
 

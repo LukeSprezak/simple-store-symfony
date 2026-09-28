@@ -142,6 +142,7 @@ class Cart
 
         if ($item) {
             $item->softDelete();
+            $product->increaseStock($item->getQuantity());
         } else {
             throw new ProductNotInCartException($product->getId());
         }

@@ -36,5 +36,6 @@ final readonly class RemoveProductFromCartCommandHandler implements CommandHandl
         }
 
         $this->cartRepository->save($cart);
+        $this->productRepository->save($product);
     }
 }
