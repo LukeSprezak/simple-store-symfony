@@ -13,6 +13,7 @@ use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Order\Domain\Service\StockReservation;
 use App\Order\Domain\Model\ProductSnapshot;
+use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -230,6 +231,6 @@ class AddProductToCartCommandHandlerTest extends TestCase
 
     private function createProductMock(string $productId, int $stockQuantity, string $name = 'Test Product'): ProductSnapshot
     {
-        return new ProductSnapshot($productId, $name, 10.0);
+        return new ProductSnapshot($productId, $name, new Money(1000));
     }
 }

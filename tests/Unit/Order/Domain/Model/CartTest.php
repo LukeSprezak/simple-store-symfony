@@ -9,6 +9,7 @@ use App\Order\Domain\Exception\CartTransitionNotAllowedException;
 use App\Order\Domain\Model\Cart;
 use App\Order\Domain\Model\CartItem;
 use App\Order\Domain\Model\ProductSnapshot;
+use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -68,7 +69,7 @@ class CartTest extends TestCase
         $total = $cart->getTotalAmount();
 
         // Then
-        self::assertSame(200.0, $total, 'Total amount should be 200.0.');
+        self::assertSame(20000, $total->getAmount(), 'Total amount should be 200.00.');
     }
 
     #[Test]
@@ -135,6 +136,6 @@ class CartTest extends TestCase
 
     private function createProductMock(string $productId, float $price, int $stockQuantity, string $name = 'Test Product'): ProductSnapshot
     {
-        return new ProductSnapshot($productId, $name, $price);
+        return new ProductSnapshot($productId, $name, Money::fromDecimal($price));
     }
 }

@@ -12,6 +12,7 @@ use App\Order\Infrastructure\Transformer\CartTransformer;
 use App\Product\Domain\Enum\StatusProduct;
 use App\Order\Domain\Model\ProductSnapshot;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
+use App\Shared\Domain\ValueObject\Money;
 use App\User\Infrastructure\Doctrine\Entity\User;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
@@ -51,7 +52,7 @@ class CartTransformerTest extends TestCase
         $productEntity1->method('getId')->willReturn($productId1);
         $productEntity1->method('getName')->willReturn('Product 1');
         $productEntity1->method('getDescription')->willReturn('Description 1');
-        $productEntity1->method('getPrice')->willReturn(100.0);
+        $productEntity1->method('getPrice')->willReturn(10000);
         $productEntity1->method('getStatus')->willReturn(StatusProduct::ACTIVE);
         $productEntity1->method('getStockQuantity')->willReturn(12);
 
@@ -71,7 +72,7 @@ class CartTransformerTest extends TestCase
         $productEntity2->method('getId')->willReturn($productId2);
         $productEntity2->method('getName')->willReturn('Product 2');
         $productEntity2->method('getDescription')->willReturn('Description 2');
-        $productEntity2->method('getPrice')->willReturn(80.0);
+        $productEntity2->method('getPrice')->willReturn(8000);
         $productEntity2->method('getStatus')->willReturn(StatusProduct::ACTIVE);
         $productEntity2->method('getStockQuantity')->willReturn(15);
 
@@ -110,7 +111,7 @@ class CartTransformerTest extends TestCase
         self::assertInstanceOf(ProductSnapshot::class, $productDomain1);
         self::assertSame($productId1, $productDomain1->getId());
         self::assertSame('Product 1', $productDomain1->getName());
-        self::assertSame(100.0, $productDomain1->getPrice());
+        self::assertSame(10000, $productDomain1->getPrice()->getAmount());
 
         $itemDomain2 = $items->last();
         self::assertSame($cartItemId2, $itemDomain2->getId());
@@ -120,6 +121,6 @@ class CartTransformerTest extends TestCase
         self::assertInstanceOf(ProductSnapshot::class, $productDomain2);
         self::assertSame($productId2, $productDomain2->getId());
         self::assertSame('Product 2', $productDomain2->getName());
-        self::assertSame(80.0, $productDomain2->getPrice());
+        self::assertSame(8000, $productDomain2->getPrice()->getAmount());
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Integration\Product\Application\Command\AddProduct;
 
 use App\Product\Application\Command\AddProduct\AddProductCommand;
+use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use PHPUnit\Framework\Attributes\Test;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -34,7 +35,7 @@ class AddProductCommandHandlerTest extends KernelTestCase
             Uuid::v7()->toRfc4122(),
             'Test Product',
             'Test Description',
-            100.00,
+            new Money(10000),
             12,
             new UserId($userId)
         );
@@ -46,7 +47,7 @@ class AddProductCommandHandlerTest extends KernelTestCase
         self::assertNotNull($message);
         self::assertEquals('Test Product', $message->name);
         self::assertEquals('Test Description', $message->description);
-        self::assertEquals(100.00, $message->price);
+        self::assertSame(10000, $message->price->getAmount());
         self::assertEquals(12, $message->stockQuantity);
         self::assertEquals($userId, $message->userId->equals(new UserId($userId)));
 

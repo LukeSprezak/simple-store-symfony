@@ -8,6 +8,7 @@ use App\Product\Domain\Enum\StatusProduct;
 use App\Product\Domain\Model\Product;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
 use App\Product\Infrastructure\Transformer\ProductTransformer;
+use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use App\User\Infrastructure\Doctrine\Entity\User as UserEntity;
 use App\User\Infrastructure\Repository\UserRepository;
@@ -38,7 +39,7 @@ class ProductTransformerTest extends TestCase
             Uuid::v7()->toRfc4122(),
             'Product name',
             'Description text',
-            100.00,
+            new Money(10000),
             12,
             new UserId($uuid)
         );
@@ -50,7 +51,7 @@ class ProductTransformerTest extends TestCase
         self::assertEquals($product->getId(), $productEntity->getId());
         self::assertEquals($product->getName(), $productEntity->getName());
         self::assertEquals($product->getDescription(), $productEntity->getDescription());
-        self::assertEquals($product->getPrice(), $productEntity->getPrice());
+        self::assertSame($product->getPrice()->getAmount(), $productEntity->getPrice());
         self::assertEquals($product->getStockQuantity(), $productEntity->getStockQuantity());
         self::assertEquals($product->getStatus(), $productEntity->getStatus());
         self::assertEquals($userEntity, $productEntity->getUser());
@@ -68,7 +69,7 @@ class ProductTransformerTest extends TestCase
         $productEntity->setId($uuid);
         $productEntity->setName('Product name');
         $productEntity->setDescription('Description text');
-        $productEntity->setPrice(100.00);
+        $productEntity->setPrice(10000);
         $productEntity->setStockQuantity(12);
         $productEntity->setStatus(StatusProduct::ACTIVE);
         $productEntity->setUser($userEntity);
@@ -84,7 +85,7 @@ class ProductTransformerTest extends TestCase
         self::assertEquals($productEntity->getId(), $product->getId());
         self::assertEquals($productEntity->getName(), $product->getName());
         self::assertEquals($productEntity->getDescription(), $product->getDescription());
-        self::assertEquals($productEntity->getPrice(), $product->getPrice());
+        self::assertSame($productEntity->getPrice(), $product->getPrice()->getAmount());
         self::assertEquals($productEntity->getStockQuantity(), $product->getStockQuantity());
         self::assertEquals($productEntity->getStatus(), $product->getStatus());
         self::assertEquals($uuid, $product->getUserId()->getId());
@@ -109,7 +110,7 @@ class ProductTransformerTest extends TestCase
             Uuid::v7()->toRfc4122(),
             'Product name',
             'Description text',
-            100.00,
+            new Money(10000),
             12,
             new UserId($uuid)
         );

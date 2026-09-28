@@ -7,6 +7,7 @@ namespace App\Tests\Unit\Order\Domain\Model;
 use App\Order\Domain\Exception\InvalidQuantityException;
 use App\Order\Domain\Model\CartItem;
 use App\Order\Domain\Model\ProductSnapshot;
+use App\Shared\Domain\ValueObject\Money;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -23,7 +24,7 @@ class CartItemTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = 2;
 
-        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
+        $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
         // When
         $cartItem = CartItem::create($itemId, $product, $quantity);
@@ -42,7 +43,7 @@ class CartItemTest extends TestCase
         $productId = Uuid::v7()->toRfc4122();
         $quantity = -1;
 
-        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
+        $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
         // Then
         $this->expectException(InvalidQuantityException::class);
@@ -61,7 +62,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 1;
         $increaseAmount = 2;
 
-        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
+        $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 
@@ -81,7 +82,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 1;
         $increaseAmount = 0;
 
-        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
+        $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 
@@ -102,7 +103,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 5;
         $decreaseAmount = 3;
 
-        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
+        $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 
@@ -122,7 +123,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 2;
         $decreaseAmount = 3;
 
-        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
+        $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 
@@ -143,7 +144,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 4;
         $newQuantity = 2;
 
-        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
+        $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 
@@ -163,7 +164,7 @@ class CartItemTest extends TestCase
         $initialQuantity = 3;
         $newQuantity = -2;
 
-        $product = new ProductSnapshot($productId, 'Test Product', 10.0);
+        $product = new ProductSnapshot($productId, 'Test Product', new Money(1000));
 
         $cartItem = CartItem::create($itemId, $product, $initialQuantity);
 

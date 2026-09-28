@@ -10,6 +10,7 @@ use App\Order\Domain\Model\CartItem;
 use App\Order\Domain\Repository\CartRepositoryInterface;
 use App\Order\Domain\Model\ProductSnapshot;
 use App\Order\Domain\Service\StockReservation;
+use App\Shared\Domain\ValueObject\Money;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -58,8 +59,8 @@ final class RemoveExpiredCartServiceTest extends TestCase
         // given
         $now = new \DateTimeImmutable();
 
-        $product1 = new ProductSnapshot('prod-1', 'Product 1', 10.0);
-        $product2 = new ProductSnapshot('prod-2', 'Product 2', 20.0);
+        $product1 = new ProductSnapshot('prod-1', 'Product 1', new Money(1000));
+        $product2 = new ProductSnapshot('prod-2', 'Product 2', new Money(2000));
 
         $cartItem1 = $this->createConfiguredMock(CartItem::class, [
             'getProduct' => $product1,

@@ -8,6 +8,7 @@ use App\Product\Application\Command\AddProduct\AddProductCommand;
 use App\Product\Application\Command\AddProduct\AddProductCommandHandler;
 use App\Product\Domain\Model\Product;
 use App\Product\Domain\Repository\ProductRepositoryInterface;
+use App\Shared\Domain\ValueObject\Money;
 use App\User\Domain\ValueObject\UserId;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Test;
@@ -36,7 +37,7 @@ class AddProductCommandHandlerTest extends TestCase
         $userId = Uuid::v7()->toRfc4122();
         $expectedName = 'Test Product';
         $expectedDescription = 'Test Description';
-        $expectedPrice = 100.00;
+        $expectedPrice = new Money(10000);
         $expectedStockQuantity = 12;
 
         $this->productRepository->expects($this->once())
@@ -44,7 +45,7 @@ class AddProductCommandHandlerTest extends TestCase
             ->with($this->callback(function (Product $product) use ($userId, $expectedName, $expectedDescription, $expectedPrice, $expectedStockQuantity) {
                 return $product->getName() === $expectedName
                     && $product->getDescription() === $expectedDescription
-                    && $product->getPrice() === $expectedPrice
+                    && $product->getPrice()->getAmount() === $expectedPrice->getAmount()
                     && $product->getStockQuantity() === $expectedStockQuantity
                     && $product->getUserId()->getId() === $userId;
             }));
@@ -75,7 +76,7 @@ class AddProductCommandHandlerTest extends TestCase
             Uuid::v7()->toRfc4122(),
             'Product name',
             'Description text',
-            100.00,
+            new Money(10000),
             12,
             new UserId($userId)
         );
