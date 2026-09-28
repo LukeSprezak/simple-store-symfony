@@ -1,6 +1,6 @@
 import { CurrencyPipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { afterNextRender, Component, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { CartService } from './cart';
 
 interface Product {
@@ -19,6 +19,11 @@ interface ProductPage {
 @Component({
   selector: 'app-products',
   imports: [CurrencyPipe],
+  host: {
+    '(window:scroll)': 'onScroll()',
+    '(window:wheel)': 'onScroll($event)',
+    '(window:touchmove)': 'onScroll()',
+  },
   template: `
     <main class="container">
       <h1>Products</h1>
@@ -27,7 +32,7 @@ interface ProductPage {
       }
       <section class="grid">
         @for (product of products(); track product.id) {
-          <article class="panel card">
+          <article class="panel card" [style.animation-delay.ms]="($index % 12) * 60">
             <h2>{{ product.name }}</h2>
             <p class="description">{{ product.description }}</p>
             <div class="footer">
@@ -72,6 +77,20 @@ interface ProductPage {
       border-width: 1px;
       border-color: var(--border);
       box-shadow: var(--shadow);
+      animation: appear 0.5s ease-out both;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card {
+        animation: none;
+      }
     }
 
     h2 {
@@ -150,21 +169,20 @@ export class Products {
   protected readonly loading = signal(false);
   protected readonly adding = signal<string | null>(null);
   protected readonly error = signal('');
-  private observer?: IntersectionObserver;
 
   constructor() {
     this.load();
+  }
 
-    const destroyRef = inject(DestroyRef);
-    afterNextRender(() => {
-      this.observer = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting && this.nextCursor()) {
-          this.load();
-        }
-      }, { rootMargin: '200px' });
-      this.observer.observe(this.sentinel().nativeElement);
-      destroyRef.onDestroy(() => this.observer?.disconnect());
-    });
+  // Loads only on user scroll intent (not on visibility), so the first 3 rows stay alone even when they don't fill the screen.
+  protected onScroll(event?: WheelEvent): void {
+    if (event && event.deltaY <= 0) {
+      return;
+    }
+
+    if (this.nextCursor() && this.sentinel().nativeElement.getBoundingClientRect().top < innerHeight + 200) {
+      this.load();
+    }
   }
 
   private load(): void {
@@ -178,10 +196,6 @@ export class Products {
       this.products.update((products) => [...products, ...page.items]);
       this.nextCursor.set(page.nextCursor);
       this.loading.set(false);
-      // The observer only fires on visibility changes; re-observing re-checks it after the new cards render.
-      const sentinel = this.sentinel().nativeElement;
-      this.observer?.unobserve(sentinel);
-      this.observer?.observe(sentinel);
     });
   }
 
