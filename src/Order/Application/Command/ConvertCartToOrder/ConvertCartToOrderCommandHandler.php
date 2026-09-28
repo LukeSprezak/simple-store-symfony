@@ -41,7 +41,7 @@ final readonly class ConvertCartToOrderCommandHandler implements CommandHandler
 
             $cart->applyTransition(StatusCartTransition::CONVERT->value, $this->cartStateWorkflow);
 
-            $order = Order::create($cart->getId(), StatusOrder::CREATED->value, new \DateTimeImmutable());
+            $order = Order::create($cart->getId(), StatusOrder::CREATED->value, $cart->getOwnerId(), new \DateTimeImmutable());
             foreach ($cart->getItems() as $cartItem) {
                 $orderItem = $cartItem->toOrderItem();
                 $order->addItem($orderItem);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Order\Domain\Model;
 
+use App\User\Domain\ValueObject\UserId;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -11,16 +12,19 @@ class Order
 {
     private string $id;
     private string $status;
+    private UserId $ownerId;
     private \DateTimeImmutable $createdAt;
     private Collection $items;
 
     private function __construct(
         string $id,
         string $status,
+        UserId $ownerId,
         \DateTimeImmutable $createdAt,
     ) {
         $this->id = $id;
         $this->status = $status;
+        $this->ownerId = $ownerId;
         $this->createdAt = $createdAt;
         $this->items = new ArrayCollection();
     }
@@ -28,18 +32,20 @@ class Order
     public static function create(
         string $id,
         string $status,
+        UserId $ownerId,
         \DateTimeImmutable $createdAt,
     ): self {
-        return new self($id, $status, $createdAt);
+        return new self($id, $status, $ownerId, $createdAt);
     }
 
     public static function fromPersistence(
         string $id,
         string $status,
+        UserId $ownerId,
         \DateTimeImmutable $createdAt,
         array $items,
     ): self {
-        $order = new self($id, $status, $createdAt);
+        $order = new self($id, $status, $ownerId, $createdAt);
         foreach ($items as $item) {
             $order->addItem($item);
         }
@@ -50,6 +56,11 @@ class Order
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function getOwnerId(): UserId
+    {
+        return $this->ownerId;
     }
 
     public function getStatus(): string

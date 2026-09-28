@@ -9,6 +9,7 @@ use App\Order\Domain\Model\Order as DomainOrder;
 use App\Order\Infrastructure\Doctrine\Entity\Order as EntityOrder;
 use App\Order\Infrastructure\Doctrine\Entity\OrderItem as EntityOrderItem;
 use App\Product\Infrastructure\Doctrine\Entity\Product as ProductEntity;
+use App\User\Domain\ValueObject\UserId;
 use Doctrine\ORM\EntityManagerInterface;
 
 final readonly class OrderTransformer
@@ -24,6 +25,7 @@ final readonly class OrderTransformer
 
         $entityOrder->setId($domainOrder->getId());
         $entityOrder->setStatus($statusEnum);
+        $entityOrder->setOwnerId($domainOrder->getOwnerId()->getId());
         $entityOrder->setCreatedAt($domainOrder->getCreatedAt());
 
         $existingItems = [];
@@ -65,6 +67,7 @@ final readonly class OrderTransformer
         $domainOrder = DomainOrder::fromPersistence(
             $entityOrder->getId(),
             $entityOrder->getStatus(),
+            new UserId($entityOrder->getOwnerId()),
             $entityOrder->getCreatedAt(),
             []
         );

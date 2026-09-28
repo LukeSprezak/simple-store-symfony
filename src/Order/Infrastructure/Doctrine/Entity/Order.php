@@ -40,6 +40,9 @@ class Order
     #[Column(type: Types::STRING, length: 50)]
     private string $status;
 
+    #[Column(type: Types::GUID)]
+    private string $ownerId;
+
     public function __construct(?string $id = null)
     {
         $this->id = $id ?? Uuid::v4()->toRfc4122();
@@ -96,6 +99,16 @@ class Order
     public function setUpdatedAt(\DateTimeImmutable $updatedAt): void
     {
         $this->updatedAt = $updatedAt;
+    }
+
+    public function getOwnerId(): string
+    {
+        return $this->ownerId;
+    }
+
+    public function setOwnerId(string $ownerId): void
+    {
+        $this->ownerId = $ownerId;
     }
 
     public function getStatus(): string
