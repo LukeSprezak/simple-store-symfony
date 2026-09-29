@@ -14,6 +14,7 @@ final readonly class CategoryNode
         public string $name,
         public string $slug,
         public ?string $icon,
+        public int $productCount,
         public array $children,
     ) {
     }

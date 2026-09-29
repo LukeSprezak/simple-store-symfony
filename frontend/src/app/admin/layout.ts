@@ -25,6 +25,7 @@ import { UnreadMessages } from './messages';
       <aside class="sidebar">
         <p class="section">Resources</p>
         <a routerLink="/admin/orders" routerLinkActive="active">Orders</a>
+        <a routerLink="/admin/categories" routerLinkActive="active">Categories</a>
         <a routerLink="/admin/messages" routerLinkActive="active">
           Messages
           @if (unread.count()) {

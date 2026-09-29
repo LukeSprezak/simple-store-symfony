@@ -19,6 +19,8 @@ enum Routes: string
     // Category
     case CATEGORY_PATH = '/api/category';
     case CATEGORY_NAME = 'api_category_';
+    case ADMIN_CATEGORY_PATH = '/api/admin/category';
+    case ADMIN_CATEGORY_NAME = 'api_admin_category_';
     // Cart
     case CART_PATH = '/api/cart';
     case CART_NAME = 'api_cart_';

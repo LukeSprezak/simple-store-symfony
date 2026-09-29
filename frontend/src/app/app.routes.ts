@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AdminCategories } from './admin/categories';
 import { AdminLayout } from './admin/layout';
 import { AdminLogin } from './admin/login';
 import { AdminMessages } from './admin/messages';
@@ -25,6 +26,7 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'orders' },
       { path: 'orders', component: AdminOrders },
       { path: 'orders/:id', component: AdminOrderDetail },
+      { path: 'categories', component: AdminCategories },
       { path: 'messages', component: AdminMessages },
       { path: 'settings', component: AdminSettings },
     ],

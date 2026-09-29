@@ -34,4 +34,17 @@ class Category
     {
         return $this->id;
     }
+
+    public function getParentId(): ?string
+    {
+        return $this->parentId;
+    }
+
+    public function update(?string $parentId, string $name, string $slug, ?string $icon): void
+    {
+        $this->parentId = $parentId;
+        $this->name = $name;
+        $this->slug = $slug;
+        $this->icon = $icon;
+    }
 }
