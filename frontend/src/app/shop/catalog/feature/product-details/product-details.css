@@ -115,7 +115,7 @@ h2 {
   flex-direction: column;
   gap: 16px;
   margin-top: -240px;
-  box-shadow: 4px 4px 0 0 var(--text);
+  box-shadow: var(--shadow-raised);
 }
 
 .price {

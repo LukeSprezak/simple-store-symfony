@@ -133,7 +133,6 @@ textarea {
   padding: 12px 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: inset 2px 2px 0 2px var(--field);
   color: var(--text);
   font: 400 14px 'Open Sans', sans-serif;
   resize: vertical;

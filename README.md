@@ -15,6 +15,14 @@ scripts/setup.sh
 
 Users (password `password`): `admin@example.com` (`ROLE_ADMIN`), `user@example.com` (`ROLE_USER`).
 
+## Screenshots
+
+| Shop | Category menu |
+|---|---|
+| ![Shop home page](docs/screenshots/shop-home.png) | ![Browse menu](docs/screenshots/shop-browse-menu.png) |
+| **Product page** | **Staff panel (`/admin`)** |
+| ![Product page](docs/screenshots/shop-product.png) | ![Order details in the staff panel](docs/screenshots/admin-order.png) |
+
 ## Tests
 
 ```sh

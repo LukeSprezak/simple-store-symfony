@@ -6,11 +6,11 @@
   --surface: #ffffff;
   --text: #1e1b4b;
   --muted: #64748b;
-  --border: #c7d2fe;
-  --field: #eef0f6;
+  --border: #e0e4f2;
   --danger: #dc2626;
   --radius: 8px;
-  --shadow: 2px 2px 0 0 var(--text);
+  --shadow: 0 1px 2px rgb(30 27 75 / 0.04), 0 2px 8px rgb(30 27 75 / 0.05);
+  --shadow-raised: 0 12px 32px rgb(30 27 75 / 0.12);
 }
 
 *,
@@ -49,7 +49,7 @@ h2 {
 
 .panel {
   background: var(--surface);
-  border: 2px solid var(--primary);
+  border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px;
 }
@@ -66,7 +66,7 @@ h2 {
   gap: 8px;
   height: 40px;
   padding: 0 20px;
-  border: 1px solid var(--text);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   background: var(--surface);
@@ -81,11 +81,12 @@ h2 {
 }
 
 .btn:active {
-  transform: translate(2px, 2px);
+  transform: translateY(1px);
   box-shadow: none;
 }
 
 .btn-primary {
+  border-color: var(--primary);
   background: var(--primary);
   color: #fff;
 }
@@ -107,7 +108,7 @@ h2 {
   padding: 0 14px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  box-shadow: inset 2px 2px 0 2px var(--field);
+  background: var(--surface);
   color: var(--text);
   font: 400 14px 'Open Sans', sans-serif;
 }

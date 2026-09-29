@@ -23,7 +23,7 @@
   display: grid;
   grid-template-columns: 240px 200px 400px;
   padding: 0;
-  box-shadow: 4px 4px 0 0 var(--text);
+  box-shadow: var(--shadow-raised);
   animation: drop 0.15s ease-out;
 }
 
@@ -131,7 +131,7 @@ h4 {
   gap: 8px;
   min-height: 88px;
   padding: 14px;
-  border: 1px solid var(--text);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   background: var(--surface);
