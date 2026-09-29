@@ -27,7 +27,7 @@ import { AdminAuthService } from '../auth';
         @if (error()) {
           <p class="nv-error">{{ error() }}</p>
         }
-        <button class="nv-btn" type="submit">Log in</button>
+        <button class="nv-btn" type="submit"><span class="material-symbols-rounded" aria-hidden="true">login</span>Log in</button>
       </form>
     </div>
   `,

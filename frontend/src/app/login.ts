@@ -21,7 +21,10 @@ import { AuthService } from './auth';
         @if (error()) {
           <p class="error">{{ error() }}</p>
         }
-        <button class="btn btn-primary" type="submit">Log in</button>
+        <button class="btn btn-primary" type="submit">
+          <span class="material-symbols-rounded" aria-hidden="true">login</span>
+          Log in
+        </button>
       </form>
     </main>
   `,

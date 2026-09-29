@@ -5,7 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { finalize, map, Observable, switchMap, take, takeWhile, timer } from 'rxjs';
 import { AdminOrder } from './orders';
-import { statusLabel, statusTone } from './status';
+import { statusLabel, statusTone, transitionIcon } from './status';
 
 interface StatusChange {
   eventId: string;
@@ -33,6 +33,7 @@ interface StatusChange {
                 [disabled]="changing()"
                 (click)="changeStatus(transition)"
               >
+                <span class="material-symbols-rounded" aria-hidden="true">{{ icon(transition) }}</span>
                 {{ label(transition) }}
               </button>
             }
@@ -186,6 +187,7 @@ export class AdminOrderDetail implements OnInit {
   protected readonly error = signal('');
   protected readonly label = statusLabel;
   protected readonly tone = statusTone;
+  protected readonly icon = transitionIcon;
 
   ngOnInit(): void {
     this.loadOrder();

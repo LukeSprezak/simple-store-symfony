@@ -43,7 +43,7 @@ interface Page {
               <td><span class="nv-badge" [class]="tone(order.status)">{{ label(order.status) }}</span></td>
               <td class="right">{{ order.totalAmountInCents / 100 | currency }}</td>
               <td class="muted">{{ order.createdAt | date: 'medium' }}</td>
-              <td class="right"><a class="view" [routerLink]="['/admin/orders', order.id]" title="View">View</a></td>
+              <td class="right"><a class="view" [routerLink]="['/admin/orders', order.id]" title="View"><span class="material-symbols-rounded" aria-hidden="true">visibility</span></a></td>
             </tr>
           } @empty {
             <tr>
@@ -55,7 +55,7 @@ interface Page {
       <div class="pagination">
         <span class="muted">{{ orders().length }} loaded</span>
         @if (nextCursor()) {
-          <button class="nv-btn nv-btn-outline" type="button" (click)="load()">Load more</button>
+          <button class="nv-btn nv-btn-outline" type="button" (click)="load()"><span class="material-symbols-rounded" aria-hidden="true">expand_more</span>Load more</button>
         }
       </div>
     </div>

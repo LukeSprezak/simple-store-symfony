@@ -57,13 +57,13 @@ interface Page<T> {
         } @empty {
           <div class="empty">
             <p>You have no orders yet.</p>
-            <a class="btn btn-primary" routerLink="/">Browse products</a>
+            <a class="btn btn-primary" routerLink="/"><span class="material-symbols-rounded" aria-hidden="true">storefront</span>Browse products</a>
           </div>
         }
       </section>
       @if (nextCursor()) {
         <div class="more">
-          <button class="btn" type="button" (click)="load()">Load more</button>
+          <button class="btn" type="button" (click)="load()"><span class="material-symbols-rounded" aria-hidden="true">expand_more</span>Load more</button>
         </div>
       }
     </main>

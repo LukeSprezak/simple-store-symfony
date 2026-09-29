@@ -38,7 +38,7 @@ interface ProductPage {
             <div class="footer">
               <strong class="price">{{ product.priceInCents / 100 | currency }}</strong>
               @if (product.stockQuantity > 0) {
-                <span class="stock">In stock: {{ product.stockQuantity }}</span>
+                <span class="stock">In stock</span>
               } @else {
                 <span class="stock out">Out of stock</span>
               }
@@ -49,6 +49,7 @@ interface ProductPage {
               [disabled]="product.stockQuantity === 0 || adding() === product.id"
               (click)="add(product)"
             >
+              <span class="material-symbols-rounded" aria-hidden="true">add_shopping_cart</span>
               Add to cart
             </button>
           </article>

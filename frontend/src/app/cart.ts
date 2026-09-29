@@ -88,7 +88,7 @@ export class CartService {
                 <span>{{ item.unitPriceInCents / 100 | currency }} × {{ item.quantity }}</span>
               </div>
               <strong>{{ item.totalAmountInCents / 100 | currency }}</strong>
-              <button class="btn" type="button" (click)="cart.remove(item.productId)">Remove</button>
+              <button class="btn" type="button" (click)="cart.remove(item.productId)"><span class="material-symbols-rounded" aria-hidden="true">delete</span>Remove</button>
             </div>
           } @empty {
             <p>Your cart is empty.</p>
@@ -102,7 +102,7 @@ export class CartService {
           }
           @if (view.items.length) {
             <div class="actions">
-              <button class="btn btn-primary" type="button" [disabled]="placing()" (click)="placeOrder()">Place order</button>
+              <button class="btn btn-primary" type="button" [disabled]="placing()" (click)="placeOrder()"><span class="material-symbols-rounded" aria-hidden="true">check_circle</span>Place order</button>
             </div>
           }
         </section>
@@ -111,14 +111,14 @@ export class CartService {
           <h2>Order placed</h2>
           <p>Thank you! Your order has been created.</p>
           <div class="links">
-            <a class="btn" routerLink="/orders">View orders</a>
-            <a class="btn btn-primary" routerLink="/">Continue shopping</a>
+            <a class="btn" routerLink="/orders"><span class="material-symbols-rounded" aria-hidden="true">receipt_long</span>View orders</a>
+            <a class="btn btn-primary" routerLink="/"><span class="material-symbols-rounded" aria-hidden="true">storefront</span>Continue shopping</a>
           </div>
         </section>
       } @else {
         <section class="panel empty">
           <p>Your cart is empty.</p>
-          <a class="btn btn-primary" routerLink="/">Browse products</a>
+          <a class="btn btn-primary" routerLink="/"><span class="material-symbols-rounded" aria-hidden="true">storefront</span>Browse products</a>
         </section>
       }
     </main>

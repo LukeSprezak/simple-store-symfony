@@ -15,7 +15,7 @@ import { AdminAuthService } from '../auth';
       <div class="user">
         <span class="avatar">{{ auth.email()?.charAt(0)?.toUpperCase() }}</span>
         <span>{{ auth.email() }}</span>
-        <button class="nv-btn nv-btn-outline" type="button" (click)="logout()">Log out</button>
+        <button class="nv-btn nv-btn-outline" type="button" (click)="logout()"><span class="material-symbols-rounded" aria-hidden="true">logout</span>Log out</button>
       </div>
     </header>
     <div class="body">

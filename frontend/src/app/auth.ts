@@ -21,12 +21,12 @@ abstract class Session {
   }
 
   login(email: string, password: string): Observable<void> {
-    return this.http.post<{ token: string }>(this.loginUrl, { email, password }).pipe(
-      map(({ token }) => {
-        localStorage.setItem(this.storageKey, token);
-        this.token.set(token);
-      }),
-    );
+    return this.http.post<{ token: string }>(this.loginUrl, { email, password }).pipe(map(({ token }) => this.setToken(token)));
+  }
+
+  setToken(token: string): void {
+    localStorage.setItem(this.storageKey, token);
+    this.token.set(token);
   }
 
   logout(): void {

@@ -22,8 +22,12 @@ import { CartService } from './cart';
             }
           </a>
           <a routerLink="/orders" routerLinkActive="active">Orders</a>
+          <a routerLink="/settings" routerLinkActive="active">Settings</a>
         </nav>
-        <button class="btn" type="button" (click)="logout()">Log out</button>
+        <button class="btn" type="button" (click)="logout()">
+          <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+          Log out
+        </button>
       }
     </header>
     <router-outlet />
