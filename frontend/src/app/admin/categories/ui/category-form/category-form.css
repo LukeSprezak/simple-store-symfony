@@ -1,0 +1,74 @@
+form {
+  margin-bottom: 32px;
+}
+
+h2 {
+  margin: 0;
+  padding: 20px 24px 8px;
+  font: 400 20px 'Nunito Sans', sans-serif;
+}
+
+.detail {
+  display: flex;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--nv-border);
+}
+
+.detail > span:first-child {
+  width: 25%;
+  color: var(--nv-muted);
+  font-weight: 700;
+}
+
+input,
+select {
+  flex: 1;
+  max-width: 400px;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid var(--nv-border);
+  border-radius: 6px;
+  background: var(--nv-header);
+  color: var(--nv-text);
+  font: inherit;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid var(--nv-primary);
+  outline-offset: 0;
+}
+
+.icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--nv-border);
+  border-radius: 6px;
+  background: var(--nv-surface);
+  color: var(--nv-muted);
+  cursor: pointer;
+}
+
+.icon.selected {
+  border-color: var(--nv-primary);
+  background: var(--nv-info-soft);
+  color: var(--nv-primary);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 24px;
+  background: var(--nv-header);
+}

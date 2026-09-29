@@ -4,7 +4,7 @@ import localePl from '@angular/common/locales/pl';
 import { ApplicationConfig, DEFAULT_CURRENCY_CODE, LOCALE_ID, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { routes } from './app.routes';
-import { authInterceptor } from './auth';
+import { authInterceptor } from './core/auth';
 
 registerLocaleData(localePl);
 

@@ -1,0 +1,39 @@
+<h1>Settings</h1>
+<div class="nv-card section">
+  @if (account(); as account) {
+    <div class="detail"><span>Email</span><span>{{ account.email }}</span></div>
+    <div class="detail"><span>Username</span><span>{{ account.username }}</span></div>
+    <div class="detail">
+      <span>Roles</span>
+      <span class="roles">
+        @for (role of account.roles; track role) {
+          <span class="nv-badge">{{ role }}</span>
+        }
+      </span>
+    </div>
+  }
+</div>
+
+<h2>Change password</h2>
+<form class="nv-card section" #form="ngForm" (ngSubmit)="changePassword(form)">
+  <label class="detail">
+    <span>Current password</span>
+    <input name="currentPassword" type="password" autocomplete="current-password" ngModel required />
+  </label>
+  <label class="detail">
+    <span>New password</span>
+    <input name="newPassword" type="password" autocomplete="new-password" minlength="8" ngModel required />
+  </label>
+  <div class="footer">
+    @if (error()) {
+      <span class="nv-error">{{ error() }}</span>
+    }
+    @if (saved()) {
+      <span class="success">Password changed.</span>
+    }
+    <button class="nv-btn" type="submit" [disabled]="saving()">
+      <span class="material-symbols-rounded" aria-hidden="true">lock_reset</span>
+      Change password
+    </button>
+  </div>
+</form>

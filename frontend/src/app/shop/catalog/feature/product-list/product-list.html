@@ -1,0 +1,51 @@
+<main class="container">
+  @if (slug(); as slug) {
+    <nav class="breadcrumb">
+      <a routerLink="/">Products</a>
+      @if (current()?.parent; as parent) {
+        <span>/</span>
+        <a [routerLink]="['/category', parent.slug]">{{ parent.name }}</a>
+      }
+      <span>/</span>
+      <span>{{ current()?.category?.name ?? slug }}</span>
+    </nav>
+    <h1 #heading>{{ current()?.category?.name ?? 'Products' }}</h1>
+    @if (current()?.category?.children?.length) {
+      <div class="chips">
+        @for (child of current()!.category.children; track child.id) {
+          <a class="chip" [routerLink]="['/category', child.slug]">{{ child.name }}</a>
+        }
+      </div>
+    }
+  } @else {
+    <section class="hero">
+      <h1>Welcome to Example Shop</h1>
+      <p class="lead">Tech gear for your desk and beyond.</p>
+      <button class="btn btn-primary" type="button" (click)="heading.scrollIntoView({ behavior: 'smooth' })">
+        <span class="material-symbols-rounded" aria-hidden="true">storefront</span>
+        Shop now
+      </button>
+    </section>
+    <h1 #heading>Products</h1>
+  }
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+  <section class="grid">
+    @for (product of products(); track product.id) {
+      <app-product-card
+        [product]="product"
+        [adding]="adding() === product.id"
+        [style.animation-delay.ms]="($index % 12) * 60"
+        (add)="add($event)"
+      />
+    } @empty {
+      <p>No products.</p>
+    }
+  </section>
+  <div #sentinel class="more">
+    @if (loading()) {
+      <app-spinner />
+    }
+  </div>
+</main>

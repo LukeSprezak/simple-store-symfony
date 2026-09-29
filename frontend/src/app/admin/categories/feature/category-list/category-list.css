@@ -1,0 +1,80 @@
+.heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  padding: 10px 16px;
+  background: var(--nv-header);
+  border-bottom: 1px solid var(--nv-border);
+  color: var(--nv-muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--nv-border);
+  vertical-align: middle;
+}
+
+.top .name {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+}
+
+.glyph {
+  color: var(--nv-primary);
+}
+
+.child {
+  padding-left: 50px;
+}
+
+.muted {
+  color: var(--nv-muted);
+}
+
+.right {
+  text-align: right;
+}
+
+.actions {
+  width: 96px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.actions button {
+  padding: 4px;
+  border: 0;
+  background: none;
+  color: var(--nv-muted);
+  cursor: pointer;
+}
+
+.actions button:hover:not(:disabled) {
+  color: var(--nv-primary);
+}
+
+.actions button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.empty {
+  padding: 32px;
+  color: var(--nv-muted);
+  text-align: center;
+}

@@ -1,0 +1,86 @@
+.back {
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.fields {
+  margin-bottom: 32px;
+}
+
+.detail {
+  display: flex;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--nv-border);
+}
+
+.detail:last-child {
+  border-bottom: 0;
+}
+
+.detail > span:first-child {
+  width: 25%;
+  color: var(--nv-muted);
+  font-weight: 700;
+}
+
+h2 {
+  margin: 0 0 16px;
+  font: 400 20px 'Nunito Sans', sans-serif;
+}
+
+.timeline {
+  margin: 0;
+  padding: 24px 24px 12px 40px;
+  list-style: none;
+}
+
+.timeline li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0 0 16px 20px;
+  border-left: 2px solid var(--nv-border);
+}
+
+.timeline li::before {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: -7px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--nv-primary);
+}
+
+.timeline span {
+  color: var(--nv-muted);
+}
+
+.timeline .pending {
+  color: var(--nv-muted);
+}
+
+.timeline .pending strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeline .pending::before {
+  background: var(--nv-border);
+}

@@ -1,0 +1,30 @@
+<header class="topbar">
+  <a class="brand" routerLink="/admin">
+    <span class="brand-mark"></span>
+    Example Shop <span class="brand-tag">Staff</span>
+  </a>
+  <div class="user">
+    <span class="avatar">{{ session.email()?.charAt(0)?.toUpperCase() }}</span>
+    <span>{{ session.email() }}</span>
+    <button class="nv-btn nv-btn-outline" type="button" (click)="logout()"><span class="material-symbols-rounded" aria-hidden="true">logout</span>Log out</button>
+  </div>
+</header>
+<div class="body">
+  <aside class="sidebar">
+    <p class="section">Resources</p>
+    <a routerLink="/admin/orders" routerLinkActive="active">Orders</a>
+    <a routerLink="/admin/categories" routerLinkActive="active">Categories</a>
+    <a routerLink="/admin/messages" routerLinkActive="active">
+      Messages
+      @if (unread.count()) {
+        <span class="count" [attr.aria-label]="unread.count() + ' unread'">{{ unread.count() }}</span>
+      }
+    </a>
+    <p class="section">Account</p>
+    <a routerLink="/admin/settings" routerLinkActive="active">Settings</a>
+  </aside>
+  <main class="content">
+    <router-outlet />
+    <footer class="footer">Example Shop · Staff panel</footer>
+  </main>
+</div>

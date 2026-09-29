@@ -1,0 +1,7 @@
+<button type="button" aria-label="Decrease quantity" [disabled]="value() === 1" (click)="value.set(value() - 1)">
+  <span class="material-symbols-rounded" aria-hidden="true">remove</span>
+</button>
+<output aria-live="polite">{{ value() }}</output>
+<button type="button" aria-label="Increase quantity" [disabled]="value() >= max()" (click)="value.set(value() + 1)">
+  <span class="material-symbols-rounded" aria-hidden="true">add</span>
+</button>

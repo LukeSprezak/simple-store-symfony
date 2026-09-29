@@ -1,0 +1,33 @@
+<header class="header">
+  <a class="logo" routerLink="/">
+    <span class="logo-mark"></span>
+    Example Shop
+  </a>
+  @if (session.token()) {
+    <app-mega-menu />
+    <nav class="menu">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Products</a>
+      <a routerLink="/cart" routerLinkActive="active">
+        Cart
+        @if (cart.itemCount()) {
+          <span class="badge">{{ cart.itemCount() }}</span>
+        }
+      </a>
+      <a routerLink="/orders" routerLinkActive="active">Orders</a>
+      <a routerLink="/contact" routerLinkActive="active">Contact</a>
+    </nav>
+    <div class="account">
+      <a class="btn icon-btn" routerLink="/settings" routerLinkActive="active" title="Settings" aria-label="Settings">
+        <span class="material-symbols-rounded" aria-hidden="true">settings</span>
+      </a>
+      <button class="btn" type="button" (click)="logout()">
+        <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+        Log out
+      </button>
+    </div>
+  }
+</header>
+<div class="page">
+  <router-outlet />
+</div>
+<app-footer />

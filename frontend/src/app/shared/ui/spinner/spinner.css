@@ -1,0 +1,16 @@
+/* Colours come from the surrounding theme: shop tokens by default, staff panel tokens inside .nova. */
+:host {
+  display: inline-block;
+  flex-shrink: 0;
+  border-style: solid;
+  border-color: var(--spinner-track, var(--border));
+  border-top-color: var(--spinner-color, var(--primary));
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

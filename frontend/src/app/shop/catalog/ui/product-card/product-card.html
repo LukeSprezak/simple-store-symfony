@@ -1,0 +1,14 @@
+<h2><a [routerLink]="['/products', product().id]">{{ product().name }}</a></h2>
+<p class="description">{{ product().description }}</p>
+<div class="footer">
+  <strong class="price">{{ product().priceInCents | cents | currency }}</strong>
+  @if (inStock()) {
+    <span class="stock">In stock</span>
+  } @else {
+    <span class="stock out">Out of stock</span>
+  }
+</div>
+<button class="btn btn-primary add" type="button" [disabled]="!inStock() || adding()" (click)="add.emit(product())">
+  <span class="material-symbols-rounded" aria-hidden="true">add_shopping_cart</span>
+  Add to cart
+</button>

@@ -1,0 +1,52 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.name {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.name span {
+  color: var(--muted);
+}
+
+.total {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 16px;
+  font: 700 20px Ubuntu, sans-serif;
+}
+
+.total strong {
+  color: var(--primary);
+}
+
+.actions {
+  margin-top: 24px;
+  text-align: right;
+}
+
+.actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.empty {
+  text-align: center;
+}
+
+a.btn {
+  text-decoration: none;
+}
+
+.links {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}

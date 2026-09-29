@@ -1,0 +1,21 @@
+<div class="wrapper">
+  <div class="brand">
+    <span class="brand-mark"></span>
+    Example Shop <span class="brand-tag">Staff</span>
+  </div>
+  <form class="nv-card" (ngSubmit)="submit()">
+    <h1>Welcome back!</h1>
+    <label>
+      Email address
+      <input name="email" type="email" [(ngModel)]="email" required />
+    </label>
+    <label>
+      Password
+      <input name="password" type="password" [(ngModel)]="password" required />
+    </label>
+    @if (error()) {
+      <p class="nv-error">{{ error() }}</p>
+    }
+    <button class="nv-btn" type="submit"><span class="material-symbols-rounded" aria-hidden="true">login</span>Log in</button>
+  </form>
+</div>

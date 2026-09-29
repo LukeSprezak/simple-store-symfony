@@ -1,0 +1,40 @@
+<main class="container">
+  <h1>Orders</h1>
+  <section class="panel">
+    @for (order of orders(); track order.id) {
+      <div class="order">
+        <button class="row" type="button" (click)="toggle(order.id)">
+          <span class="id">#{{ number(order) }}</span>
+          <span class="date">{{ order.createdAt | date: 'medium' }}</span>
+          <span class="status">{{ label(order.status) }}</span>
+          <strong class="total">{{ order.totalAmountInCents | cents | currency }}</strong>
+          <span class="chevron" [class.open]="expanded() === order.id">›</span>
+        </button>
+        @if (expanded() === order.id) {
+          <ol class="timeline">
+            <li>
+              <strong>Created</strong>
+              <span>{{ order.createdAt | date: 'medium' }}</span>
+            </li>
+            @for (change of history()[order.id] ?? []; track change.eventId) {
+              <li>
+                <strong>{{ label(change.fromStatus) }} → {{ label(change.toStatus) }}</strong>
+                <span>{{ change.recordedAt | date: 'medium' }}</span>
+              </li>
+            }
+          </ol>
+        }
+      </div>
+    } @empty {
+      <div class="empty">
+        <p>You have no orders yet.</p>
+        <a class="btn btn-primary" routerLink="/"><span class="material-symbols-rounded" aria-hidden="true">storefront</span>Browse products</a>
+      </div>
+    }
+  </section>
+  @if (nextCursor()) {
+    <div class="more">
+      <button class="btn" type="button" (click)="load()"><span class="material-symbols-rounded" aria-hidden="true">expand_more</span>Load more</button>
+    </div>
+  }
+</main>

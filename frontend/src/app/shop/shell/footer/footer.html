@@ -1,0 +1,39 @@
+<footer>
+  <div class="inner">
+    <div class="top">
+      <div class="brand">
+        <a class="logo" routerLink="/">
+          <span class="logo-mark"></span>
+          Example Shop
+        </a>
+        <p>Tech gear for your desk and beyond — ordered in minutes, tracked until delivery.</p>
+      </div>
+      <nav class="columns">
+        <div>
+          <h4>Shop</h4>
+          <a routerLink="/">Products</a>
+          <a routerLink="/cart">Cart</a>
+          <a routerLink="/orders">Orders</a>
+        </div>
+        <div>
+          <h4>Account</h4>
+          <a routerLink="/settings">Settings</a>
+          <a routerLink="/login">Log in</a>
+        </div>
+        <div>
+          <h4>Help</h4>
+          <a routerLink="/contact">Contact</a>
+          <a [href]="'mailto:' + supportEmail">Email us</a>
+        </div>
+      </nav>
+    </div>
+    <div class="contact">
+      <h4>Contact</h4>
+      <a [href]="'mailto:' + supportEmail">{{ supportEmail }}</a>
+    </div>
+    <div class="bottom">
+      <a routerLink="/contact">Contact</a>
+      <span>© {{ year }} Example Shop. All rights reserved.</span>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,36 @@
+<main class="container">
+  <h1>Settings</h1>
+  <section class="panel">
+    <h2>Account</h2>
+    @if (account(); as account) {
+      <dl>
+        <dt>Email</dt>
+        <dd>{{ account.email }}</dd>
+        <dt>Username</dt>
+        <dd>{{ account.username }}</dd>
+      </dl>
+    }
+  </section>
+
+  <form class="panel" #form="ngForm" (ngSubmit)="changePassword(form)">
+    <h2>Change password</h2>
+    <label class="field">
+      Current password
+      <input name="currentPassword" type="password" autocomplete="current-password" ngModel required />
+    </label>
+    <label class="field">
+      New password
+      <input name="newPassword" type="password" autocomplete="new-password" minlength="8" ngModel required />
+    </label>
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+    @if (saved()) {
+      <p class="success">Password changed.</p>
+    }
+    <button class="btn btn-primary" type="submit" [disabled]="saving()">
+      <span class="material-symbols-rounded" aria-hidden="true">lock_reset</span>
+      Change password
+    </button>
+  </form>
+</main>

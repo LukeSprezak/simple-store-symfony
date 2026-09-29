@@ -139,6 +139,8 @@ h2 {
   --nv-danger: #dc2626;
   --nv-danger-soft: #fee2e2;
   --nv-info-soft: #e0f2fe;
+  --spinner-track: var(--nv-border);
+  --spinner-color: var(--nv-primary);
 
   display: block;
   min-height: 100vh;

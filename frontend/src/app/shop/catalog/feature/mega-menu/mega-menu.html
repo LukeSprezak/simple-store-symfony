@@ -1,0 +1,50 @@
+<button class="btn browse" type="button" aria-haspopup="true" [attr.aria-expanded]="open()" (click)="toggle()">
+  Browse
+  <span class="material-symbols-rounded chevron" [class.up]="open()" aria-hidden="true">expand_more</span>
+</button>
+@if (open()) {
+  <div class="panel menu" role="menu">
+    <nav class="categories">
+      @for (category of categories.tree(); track category.id) {
+        <a
+          [routerLink]="['/category', category.slug]"
+          [class.active]="active()?.id === category.id"
+          (mouseenter)="activate(category)"
+          (focus)="activate(category)"
+        >
+          <span class="material-symbols-rounded" aria-hidden="true">{{ category.icon }}</span>
+          <span class="name">{{ category.name }}</span>
+          <span class="material-symbols-rounded arrow" aria-hidden="true">chevron_right</span>
+        </a>
+      }
+      <hr />
+      <a routerLink="/">
+        <span class="material-symbols-rounded" aria-hidden="true">storefront</span>
+        <span class="name">All products</span>
+      </a>
+    </nav>
+    @if (active(); as category) {
+      <div class="subcategories">
+        <h4>{{ category.name }}</h4>
+        @for (child of category.children; track child.id) {
+          <a [routerLink]="['/category', child.slug]">{{ child.name }}</a>
+        }
+        <a class="all" [routerLink]="['/category', category.slug]">
+          See all
+          <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+        </a>
+      </div>
+      <div class="featured">
+        <h4>Featured</h4>
+        <div class="cards">
+          @for (product of featured()[category.slug] ?? []; track product.id) {
+            <a class="product" [routerLink]="['/products', product.id]">
+              <strong>{{ product.name }}</strong>
+              <span>{{ product.priceInCents | cents | currency }}</span>
+            </a>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

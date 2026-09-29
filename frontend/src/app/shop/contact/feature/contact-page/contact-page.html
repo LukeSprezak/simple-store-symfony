@@ -1,0 +1,91 @@
+<section class="hero">
+  <div class="inner">
+    <h1>We're always here to help — get in touch!</h1>
+    <p class="lead">
+      Have a question about a product, your cart or an order? Send us a message and our team will get back to you.
+    </p>
+    <div class="actions">
+      <button class="btn btn-primary" type="button" (click)="formSection.scrollIntoView({ behavior: 'smooth' })">
+        <span class="material-symbols-rounded" aria-hidden="true">description</span>
+        Write to us
+      </button>
+      <a class="btn outline" routerLink="/orders">
+        <span class="material-symbols-rounded" aria-hidden="true">receipt_long</span>
+        Your orders
+      </a>
+    </div>
+    <p class="support">
+      <strong>Customer support:</strong>
+      <a [href]="'mailto:' + supportEmail">{{ supportEmail }}</a>
+    </p>
+  </div>
+</section>
+
+<section class="methods">
+  <div class="inner">
+    <h2>Choose the most convenient way to reach us</h2>
+    <div class="cards">
+      <article class="panel card">
+        <span class="icon material-symbols-rounded" aria-hidden="true">description</span>
+        <h3>Contact form</h3>
+        <p>Describe your question in detail and we will reply by email.</p>
+        <button class="btn btn-primary" type="button" (click)="formSection.scrollIntoView({ behavior: 'smooth' })">
+          Fill in the form
+        </button>
+      </article>
+      <article class="panel card">
+        <span class="icon material-symbols-rounded" aria-hidden="true">mail</span>
+        <h3>Email</h3>
+        <p>Prefer your own mail client? Write to us directly.</p>
+        <a class="btn btn-primary" [href]="'mailto:' + supportEmail">Send an email</a>
+      </article>
+      <article class="panel card">
+        <span class="icon material-symbols-rounded" aria-hidden="true">receipt_long</span>
+        <h3>Order status</h3>
+        <p>Check the status history of your orders at any time.</p>
+        <a class="btn btn-primary" routerLink="/orders">Go to orders</a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="form-section" #formSection>
+  <div class="inner narrow">
+    <h2>Contact form</h2>
+    <p class="subtitle">All fields are required.</p>
+    @if (sent()) {
+      <div class="panel sent">
+        <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
+        <p>Thanks for your message! We'll get back to you by email.</p>
+      </div>
+    } @else {
+      <form #form="ngForm" (ngSubmit)="send(form)">
+        <label class="field">
+          Name
+          <input name="name" maxlength="100" autocomplete="name" ngModel required />
+        </label>
+        <label class="field">
+          Email
+          <input name="email" type="email" maxlength="254" autocomplete="email" [ngModel]="session.email()" required />
+        </label>
+        <label class="field">
+          Subject
+          <input name="subject" maxlength="150" ngModel required />
+        </label>
+        <label class="field">
+          Message
+          <textarea name="message" rows="6" minlength="10" maxlength="5000" ngModel required></textarea>
+        </label>
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+        <div class="submit">
+          <button class="btn btn-primary" type="submit" [disabled]="sending()">
+            <span class="material-symbols-rounded" aria-hidden="true">send</span>
+            Send message
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</section>

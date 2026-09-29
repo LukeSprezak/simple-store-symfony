@@ -1,0 +1,110 @@
+@if (product(); as product) {
+  <section class="hero">
+    <div class="inner">
+      <div class="intro">
+        <nav class="breadcrumb">
+          <a routerLink="/">Products</a>
+          <span>/</span>
+          <span>{{ product.name }}</span>
+        </nav>
+        @if (inStock()) {
+          <span class="tag">In stock</span>
+        } @else {
+          <span class="tag out">Out of stock</span>
+        }
+        <h1>{{ product.name }}</h1>
+        <p class="lead">{{ product.description }}</p>
+        <ul class="meta">
+          <li>Code {{ code() }}</li>
+          <li>Price {{ product.priceInCents | cents | currency }}</li>
+          <li>Order tracking</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="inner body">
+    <main>
+      <h2>Details worth knowing</h2>
+      <ul class="panel details">
+        <li>
+          <span class="material-symbols-rounded" aria-hidden="true">inventory_2</span>
+          {{ inStock() ? 'Available to order now' : 'Currently out of stock' }}
+        </li>
+        <li>
+          <span class="material-symbols-rounded" aria-hidden="true">payments</span>
+          {{ product.priceInCents | cents | currency }} per item
+        </li>
+        <li>
+          <span class="material-symbols-rounded" aria-hidden="true">sell</span>
+          Product code {{ code() }}
+        </li>
+        <li>
+          <span class="material-symbols-rounded" aria-hidden="true">receipt_long</span>
+          Status updates in your orders
+        </li>
+      </ul>
+    </main>
+
+    <aside class="buy panel">
+      <strong class="price">{{ product.priceInCents | cents | currency }}</strong>
+      @if (maxQuantity() > 0) {
+        <div class="quantity">
+          <span>Quantity</span>
+          <app-quantity-stepper [(value)]="quantity" [max]="maxQuantity()" />
+        </div>
+      }
+      <button
+        class="btn btn-primary"
+        type="button"
+        [disabled]="quantity() > maxQuantity() || adding()"
+        (click)="add(product)"
+      >
+        <span class="material-symbols-rounded" aria-hidden="true">add_shopping_cart</span>
+        Add to cart
+      </button>
+      @if (added()) {
+        <p class="note success">
+          <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
+          Added to your cart.
+        </p>
+      } @else if (inStock() && maxQuantity() === 0) {
+        <p class="note">
+          <span class="material-symbols-rounded" aria-hidden="true">shopping_cart</span>
+          You already have the maximum of {{ maxPerProduct }} in your cart.
+        </p>
+      } @else if (inStock()) {
+        <p class="note">
+          <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
+          Available now · stock is reserved once it's in your cart
+        </p>
+      }
+      @if (inCart()) {
+        <p class="note">In your cart: {{ inCart() }}</p>
+      }
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+      <div class="links">
+        <a class="btn" routerLink="/cart">
+          <span class="material-symbols-rounded" aria-hidden="true">shopping_cart</span>
+          Go to cart
+        </a>
+        <a class="btn" routerLink="/">
+          <span class="material-symbols-rounded" aria-hidden="true">storefront</span>
+          All products
+        </a>
+      </div>
+    </aside>
+  </div>
+} @else if (notFound()) {
+  <main class="container">
+    <section class="panel missing">
+      <h1>Product not found</h1>
+      <a class="btn btn-primary" routerLink="/">
+        <span class="material-symbols-rounded" aria-hidden="true">storefront</span>
+        Browse products
+      </a>
+    </section>
+  </main>
+}

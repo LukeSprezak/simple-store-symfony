@@ -1,0 +1,56 @@
+<a class="back nv-link" routerLink="/admin/orders">← Orders</a>
+@if (order(); as order) {
+  <div class="heading">
+    <h1>Order Details: {{ number(order) }}</h1>
+    @if (order.transitions.length) {
+      <div class="actions">
+        @for (transition of order.transitions; track transition) {
+          <button
+            class="nv-btn"
+            [class.nv-btn-danger]="destructive(transition)"
+            type="button"
+            [disabled]="changing()"
+            (click)="changeStatus(transition)"
+          >
+            <span class="material-symbols-rounded" aria-hidden="true">{{ icon(transition) }}</span>
+            {{ label(transition) }}
+          </button>
+        }
+      </div>
+    }
+  </div>
+  @if (error()) {
+    <p class="nv-error">{{ error() }}</p>
+  }
+  <div class="nv-card fields">
+    <div class="detail"><span>ID</span><span>{{ order.id }}</span></div>
+    <div class="detail"><span>Customer</span><span>{{ order.customerEmail }}</span></div>
+    <div class="detail">
+      <span>Status</span>
+      <span><app-status-badge [status]="order.status" /></span>
+    </div>
+    <div class="detail"><span>Total</span><span>{{ order.totalAmountInCents | cents | currency }}</span></div>
+    <div class="detail"><span>Created</span><span>{{ order.createdAt | date: 'medium' }}</span></div>
+  </div>
+
+  <h2>Status history</h2>
+  <div class="nv-card">
+    <ol class="timeline">
+      <li>
+        <strong>Created</strong>
+        <span>{{ order.createdAt | date: 'medium' }}</span>
+      </li>
+      @for (change of history(); track change.eventId) {
+        <li>
+          <strong>{{ label(change.fromStatus) }} → {{ label(change.toStatus) }}</strong>
+          <span>{{ label(change.transition) }} · {{ change.recordedAt | date: 'medium' }}</span>
+        </li>
+      }
+      @if (refreshing()) {
+        <li class="pending">
+          <strong><app-spinner [size]="12" />Updating history…</strong>
+        </li>
+      }
+    </ol>
+  </div>
+}

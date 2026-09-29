@@ -1,0 +1,48 @@
+<form class="nv-card form" (ngSubmit)="submitted.emit()">
+  <h2>{{ draft().id ? 'Update category' : 'Create category' }}</h2>
+  <label class="detail">
+    <span>Name</span>
+    <input name="name" [ngModel]="draft().name" (ngModelChange)="rename($event)" required maxlength="100" />
+  </label>
+  <label class="detail">
+    <span>Slug</span>
+    <input name="slug" [ngModel]="draft().slug" (ngModelChange)="reslug($event)" required maxlength="100" />
+  </label>
+  <label class="detail">
+    <span>Parent</span>
+    <select name="parentId" [ngModel]="draft().parentId" (ngModelChange)="patch({ parentId: $event })">
+      <option value="">— Top-level category —</option>
+      @for (option of parents(); track option.id) {
+        <option [value]="option.id">{{ option.name }}</option>
+      }
+    </select>
+  </label>
+  @if (!draft().parentId) {
+    <div class="detail">
+      <span>Icon</span>
+      <div class="icons">
+        @for (icon of icons; track icon) {
+          <button
+            type="button"
+            class="icon"
+            [class.selected]="draft().icon === icon"
+            [title]="icon"
+            (click)="patch({ icon })"
+          >
+            <span class="material-symbols-rounded" aria-hidden="true">{{ icon }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+  <div class="footer">
+    @if (error()) {
+      <span class="nv-error">{{ error() }}</span>
+    }
+    <button class="nv-btn nv-btn-outline" type="button" (click)="cancelled.emit()">Cancel</button>
+    <button class="nv-btn" type="submit" [disabled]="saving()">
+      <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
+      {{ draft().id ? 'Update' : 'Create' }}
+    </button>
+  </div>
+</form>

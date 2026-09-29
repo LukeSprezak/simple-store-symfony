@@ -1,0 +1,66 @@
+<h1>Messages</h1>
+<div class="nv-card">
+  <table>
+    <thead>
+      <tr>
+        <th>From</th>
+        <th>Subject</th>
+        <th>Status</th>
+        <th>Received</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (message of messages(); track message.id) {
+        <tr class="row" [class.unread]="!message.readAt" (click)="toggle(message)">
+          <td>
+            <strong>{{ message.name }}</strong>
+            <span class="muted">{{ message.email }}</span>
+          </td>
+          <td class="subject">{{ message.subject }}</td>
+          <td>
+            @if (message.readAt) {
+              <span class="nv-badge read" [title]="'Read ' + (message.readAt | date: 'medium')">Read</span>
+            } @else {
+              <span class="nv-badge">New</span>
+            }
+          </td>
+          <td class="muted">{{ message.createdAt | date: 'medium' }}</td>
+          <td class="right">
+            <span class="chevron material-symbols-rounded" [class.open]="expanded() === message.id" aria-hidden="true">expand_more</span>
+          </td>
+        </tr>
+        @if (expanded() === message.id) {
+          <tr class="body">
+            <td colspan="5">
+              <p>{{ message.message }}</p>
+              <div class="actions">
+                <a class="nv-btn" [href]="replyLink(message)">
+                  <span class="material-symbols-rounded" aria-hidden="true">mail</span>
+                  Reply by email
+                </a>
+                <button class="nv-btn nv-btn-outline" type="button" (click)="markUnread(message)">
+                  <span class="material-symbols-rounded" aria-hidden="true">mark_email_unread</span>
+                  Mark as unread
+                </button>
+              </div>
+            </td>
+          </tr>
+        }
+      } @empty {
+        <tr>
+          <td class="empty" colspan="5">No messages yet.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <div class="pagination">
+    <span class="muted">{{ messages().length }} loaded</span>
+    @if (nextCursor()) {
+      <button class="nv-btn nv-btn-outline" type="button" (click)="load()">
+        <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+        Load more
+      </button>
+    }
+  </div>
+</div>
