@@ -22,12 +22,16 @@ import { CartService } from './cart';
             }
           </a>
           <a routerLink="/orders" routerLinkActive="active">Orders</a>
-          <a routerLink="/settings" routerLinkActive="active">Settings</a>
         </nav>
-        <button class="btn" type="button" (click)="logout()">
+        <div class="account">
+          <a class="btn icon-btn" routerLink="/settings" routerLinkActive="active" title="Settings" aria-label="Settings">
+            <span class="material-symbols-rounded" aria-hidden="true">settings</span>
+          </a>
+          <button class="btn" type="button" (click)="logout()">
           <span class="material-symbols-rounded" aria-hidden="true">logout</span>
           Log out
-        </button>
+          </button>
+        </div>
       }
     </header>
     <router-outlet />
@@ -73,6 +77,21 @@ import { CartService } from './cart';
     .menu a.active {
       background: var(--primary-soft);
       color: var(--primary);
+    }
+
+    .account {
+      display: flex;
+      gap: 12px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      padding: 0;
+      text-decoration: none;
+    }
+
+    .icon-btn.active {
+      background: var(--primary-soft);
     }
 
     .badge {

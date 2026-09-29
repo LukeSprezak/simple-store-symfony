@@ -8,6 +8,7 @@ import { adminGuard, authGuard } from './auth';
 import { Cart } from './cart';
 import { Login } from './login';
 import { Orders } from './orders';
+import { ProductPage } from './product';
 import { Products } from './products';
 import { Settings } from './settings';
 import { Shop } from './shop';
@@ -31,6 +32,7 @@ export const routes: Routes = [
     children: [
       { path: 'login', component: Login },
       { path: '', component: Products, canActivate: [authGuard] },
+      { path: 'products/:id', component: ProductPage, canActivate: [authGuard] },
       { path: 'cart', component: Cart, canActivate: [authGuard] },
       { path: 'orders', component: Orders, canActivate: [authGuard] },
       { path: 'settings', component: Settings, canActivate: [authGuard] },

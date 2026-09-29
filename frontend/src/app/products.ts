@@ -1,6 +1,7 @@
 import { CurrencyPipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { CartService } from './cart';
 
 interface Product {
@@ -18,7 +19,7 @@ interface ProductPage {
 
 @Component({
   selector: 'app-products',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, RouterLink],
   host: {
     '(window:scroll)': 'onScroll()',
     '(window:wheel)': 'onScroll($event)',
@@ -26,14 +27,22 @@ interface ProductPage {
   },
   template: `
     <main class="container">
-      <h1>Products</h1>
+      <section class="hero">
+        <h1>Welcome to Example Shop</h1>
+        <p class="lead">Tech gear for your desk and beyond.</p>
+        <button class="btn btn-primary" type="button" (click)="heading.scrollIntoView({ behavior: 'smooth' })">
+          <span class="material-symbols-rounded" aria-hidden="true">storefront</span>
+          Shop now
+        </button>
+      </section>
+      <h1 #heading>Products</h1>
       @if (error()) {
         <p class="error">{{ error() }}</p>
       }
       <section class="grid">
         @for (product of products(); track product.id) {
           <article class="panel card" [style.animation-delay.ms]="($index % 12) * 60">
-            <h2>{{ product.name }}</h2>
+            <h2><a [routerLink]="['/products', product.id]">{{ product.name }}</a></h2>
             <p class="description">{{ product.description }}</p>
             <div class="footer">
               <strong class="price">{{ product.priceInCents / 100 | currency }}</strong>
@@ -65,6 +74,36 @@ interface ProductPage {
     </main>
   `,
   styles: `
+    .hero {
+      margin-bottom: 48px;
+      padding: 64px 24px;
+      border: 2px solid var(--primary);
+      border-radius: 12px;
+      background: var(--primary-soft);
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin-bottom: 12px;
+      font-size: 44px;
+    }
+
+    .lead {
+      margin: 0 0 32px;
+      color: var(--muted);
+      font-size: 20px;
+    }
+
+    .hero .btn {
+      height: 48px;
+      padding: 0 28px;
+      font-size: 16px;
+    }
+
+    h1 {
+      scroll-margin-top: 24px;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -96,6 +135,15 @@ interface ProductPage {
 
     h2 {
       margin-bottom: 8px;
+    }
+
+    h2 a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    h2 a:hover {
+      color: var(--primary);
     }
 
     .description {
