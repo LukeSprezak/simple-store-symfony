@@ -15,7 +15,11 @@ export class CategoryStore {
     }
 
     this.requested = true;
-    this.api.tree().subscribe((tree) => this.tree.set(tree));
+    this.api.tree().subscribe({
+      next: (tree) => this.tree.set(tree),
+      // E.g. a 401 before logging in: allow the next load() to try again.
+      error: () => (this.requested = false),
+    });
   }
 
   find(slug: string): CategoryMatch | null {
