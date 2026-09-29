@@ -3,12 +3,16 @@
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
     <entity name="App\Product\Domain\Model\Product" table="product">
+        <indexes>
+            <index name="idx_product_category" columns="category_id"/>
+        </indexes>
         <id name="id" type="guid"/>
         <field name="name" type="string" length="255"/>
         <field name="description" type="text" length="2000"/>
         <field name="price" type="money"/>
         <field name="stockQuantity" type="integer"/>
         <field name="userId" column="user_id" type="user_id"/>
+        <field name="categoryId" column="category_id" type="guid" nullable="true"/>
         <field name="status" type="string" length="50" enum-type="App\Product\Domain\Enum\StatusProduct"/>
         <field name="version" type="integer" version="true"/>
     </entity>

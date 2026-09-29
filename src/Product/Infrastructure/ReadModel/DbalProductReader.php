@@ -28,14 +28,20 @@ final readonly class DbalProductReader implements ProductReader
         return false === $row ? null : new ProductView($row['id'], $row['name'], $row['description'], (int) $row['price'], (int) $row['stock_quantity']);
     }
 
-    public function findActivePage(int $limit, ?string $after): ProductPage
+    public function findActivePage(int $limit, ?string $after, ?string $categorySlug): ProductPage
     {
+        // A top-level category also covers its subcategories.
+        $categoryCondition = null === $categorySlug ? '' : ' AND category_id IN (
+            SELECT c.id FROM category c LEFT JOIN category p ON p.id = c.parent_id
+            WHERE c.slug = :category OR p.slug = :category
+        )';
+
         /** @var list<array{id: string, name: string, description: string, price: int|string, stock_quantity: int|string}> $rows */
         $rows = $this->connection->fetchAllAssociative(
             'SELECT id, name, description, price, stock_quantity FROM product
-             WHERE status = :status AND id > :after
+             WHERE status = :status AND id > :after'.$categoryCondition.'
              ORDER BY id LIMIT :limit',
-            ['status' => StatusProduct::ACTIVE->value, 'after' => $after ?? '', 'limit' => $limit + 1],
+            ['status' => StatusProduct::ACTIVE->value, 'after' => $after ?? '', 'limit' => $limit + 1] + (null === $categorySlug ? [] : ['category' => $categorySlug]),
             ['limit' => ParameterType::INTEGER]
         );
         $hasMore = count($rows) > $limit;

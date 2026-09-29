@@ -30,7 +30,7 @@ final readonly class ProductReadController
     #[Route(path: Routes::PRODUCT_PATH->value, name: 'api_product_list', methods: [Request::METHOD_GET])]
     public function list(#[MapQueryString(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)] ProductListRequest $page = new ProductListRequest()): JsonResponse
     {
-        return new JsonResponse($this->queryBus->ask(new GetProductsQuery($page->limit, $page->after)));
+        return new JsonResponse($this->queryBus->ask(new GetProductsQuery($page->limit, $page->after, $page->category)));
     }
 
     #[Route(path: Routes::PRODUCT_PATH->value.'/{id}', name: 'api_product_get', requirements: ['id' => Requirement::UUID], methods: [Request::METHOD_GET])]

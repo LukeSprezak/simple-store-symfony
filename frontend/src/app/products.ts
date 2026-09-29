@@ -1,8 +1,10 @@
 import { CurrencyPipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, effect, ElementRef, inject, input, signal, untracked, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { CartService } from './cart';
+import { CategoryService } from './categories';
 
 interface Product {
   id: string;
@@ -27,15 +29,35 @@ interface ProductPage {
   },
   template: `
     <main class="container">
-      <section class="hero">
-        <h1>Welcome to Example Shop</h1>
-        <p class="lead">Tech gear for your desk and beyond.</p>
-        <button class="btn btn-primary" type="button" (click)="heading.scrollIntoView({ behavior: 'smooth' })">
-          <span class="material-symbols-rounded" aria-hidden="true">storefront</span>
-          Shop now
-        </button>
-      </section>
-      <h1 #heading>Products</h1>
+      @if (slug(); as slug) {
+        <nav class="breadcrumb">
+          <a routerLink="/">Products</a>
+          @if (current()?.parent; as parent) {
+            <span>/</span>
+            <a [routerLink]="['/category', parent.slug]">{{ parent.name }}</a>
+          }
+          <span>/</span>
+          <span>{{ current()?.category?.name ?? slug }}</span>
+        </nav>
+        <h1 #heading>{{ current()?.category?.name ?? 'Products' }}</h1>
+        @if (current()?.category?.children?.length) {
+          <div class="chips">
+            @for (child of current()!.category.children; track child.id) {
+              <a class="chip" [routerLink]="['/category', child.slug]">{{ child.name }}</a>
+            }
+          </div>
+        }
+      } @else {
+        <section class="hero">
+          <h1>Welcome to Example Shop</h1>
+          <p class="lead">Tech gear for your desk and beyond.</p>
+          <button class="btn btn-primary" type="button" (click)="heading.scrollIntoView({ behavior: 'smooth' })">
+            <span class="material-symbols-rounded" aria-hidden="true">storefront</span>
+            Shop now
+          </button>
+        </section>
+        <h1 #heading>Products</h1>
+      }
       @if (error()) {
         <p class="error">{{ error() }}</p>
       }
@@ -74,6 +96,45 @@ interface ProductPage {
     </main>
   `,
   styles: `
+    .breadcrumb {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .breadcrumb a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      color: var(--primary);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .chip {
+      padding: 6px 14px;
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .chip:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
     .hero {
       margin-bottom: 48px;
       padding: 64px 24px;
@@ -210,17 +271,37 @@ interface ProductPage {
   `,
 })
 export class Products {
+  readonly slug = input<string>();
   private readonly http = inject(HttpClient);
   private readonly cart = inject(CartService);
+  private readonly categories = inject(CategoryService);
   private readonly sentinel = viewChild.required<ElementRef<HTMLElement>>('sentinel');
+  protected readonly current = computed(() => {
+    const slug = this.slug();
+
+    return slug ? this.categories.find(slug) : null;
+  });
   protected readonly products = signal<Product[]>([]);
   protected readonly nextCursor = signal<string | null>(null);
   protected readonly loading = signal(false);
   protected readonly adding = signal<string | null>(null);
   protected readonly error = signal('');
+  private request?: Subscription;
 
   constructor() {
-    this.load();
+    this.categories.load();
+
+    // The same component instance is reused when navigating between categories.
+    effect(() => {
+      this.slug();
+      untracked(() => {
+        this.request?.unsubscribe();
+        this.products.set([]);
+        this.nextCursor.set(null);
+        this.loading.set(false);
+        this.load();
+      });
+    });
   }
 
   // Loads only on user scroll intent (not on visibility), so the first 3 rows stay alone even when they don't fill the screen.
@@ -240,12 +321,15 @@ export class Products {
     }
 
     const after = this.nextCursor();
+    const slug = this.slug();
     this.loading.set(true);
-    this.http.get<ProductPage>('/api/product', { params: after ? { limit: 12, after } : { limit: 12 } }).subscribe((page) => {
-      this.products.update((products) => [...products, ...page.items]);
-      this.nextCursor.set(page.nextCursor);
-      this.loading.set(false);
-    });
+    this.request = this.http
+      .get<ProductPage>('/api/product', { params: { limit: 12, ...(after ? { after } : {}), ...(slug ? { category: slug } : {}) } })
+      .subscribe((page) => {
+        this.products.update((products) => [...products, ...page.items]);
+        this.nextCursor.set(page.nextCursor);
+        this.loading.set(false);
+      });
   }
 
   protected add(product: Product): void {

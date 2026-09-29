@@ -3,10 +3,11 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { AuthService } from './auth';
 import { CartService } from './cart';
 import { Footer } from './footer';
+import { MegaMenu } from './mega-menu';
 
 @Component({
   selector: 'app-shop',
-  imports: [Footer, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [Footer, MegaMenu, RouterLink, RouterLinkActive, RouterOutlet],
   template: `
     <header class="header">
       <a class="logo" routerLink="/">
@@ -14,6 +15,7 @@ import { Footer } from './footer';
         Example Shop
       </a>
       @if (auth.token()) {
+        <app-mega-menu />
         <nav class="menu">
           <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Products</a>
           <a routerLink="/cart" routerLinkActive="active">

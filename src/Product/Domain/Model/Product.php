@@ -22,6 +22,7 @@ class Product extends AggregateRoot
         private readonly Money $price,
         private int $stockQuantity,
         private readonly UserId $userId,
+        private readonly ?string $categoryId,
         private StatusProduct $status = StatusProduct::ACTIVE,
     ) {
     }
@@ -33,8 +34,14 @@ class Product extends AggregateRoot
         Money $price,
         int $stockQuantity,
         UserId $userId,
+        ?string $categoryId = null,
     ): self {
-        return new self($id, $name, $description, $price, $stockQuantity, $userId);
+        return new self($id, $name, $description, $price, $stockQuantity, $userId, $categoryId);
+    }
+
+    public function getCategoryId(): ?string
+    {
+        return $this->categoryId;
     }
 
     public function getId(): string

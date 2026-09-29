@@ -17,6 +17,6 @@ final readonly class GetProductsQueryHandler implements QueryHandler
 
     public function __invoke(GetProductsQuery $query): ProductPage
     {
-        return $this->productReader->findActivePage($query->limit, $query->after);
+        return $this->productReader->findActivePage($query->limit, $query->after, $query->categorySlug);
     }
 }

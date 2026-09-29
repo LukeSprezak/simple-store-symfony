@@ -13,6 +13,8 @@ final readonly class ProductListRequest
         public int $limit = 50,
         #[Assert\Uuid]
         public ?string $after = null,
+        #[Assert\Regex('/^[a-z0-9-]+$/')]
+        public ?string $category = null,
     ) {
     }
 }
