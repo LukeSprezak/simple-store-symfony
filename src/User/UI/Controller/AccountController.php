@@ -19,8 +19,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+// Also exposed under /api/admin so the staff panel authenticates with its own session.
 #[AsController]
-#[Route(path: Routes::ACCOUNT_PATH->value, name: Routes::ACCOUNT_NAME->value)]
 #[IsGranted(attribute: Role::ROLE_USER->value, message: 'Lack of a suitable role.')]
 final readonly class AccountController
 {
@@ -31,7 +31,8 @@ final readonly class AccountController
     ) {
     }
 
-    #[Route(path: '', name: 'get', methods: [Request::METHOD_GET])]
+    #[Route(path: Routes::ACCOUNT_PATH->value, name: Routes::ACCOUNT_NAME->value.'get', methods: [Request::METHOD_GET])]
+    #[Route(path: Routes::ADMIN_ACCOUNT_PATH->value, name: Routes::ADMIN_ACCOUNT_NAME->value.'get', methods: [Request::METHOD_GET])]
     public function get(#[CurrentUser] User $user): JsonResponse
     {
         return new JsonResponse([
@@ -43,7 +44,8 @@ final readonly class AccountController
     }
 
     // Changing the password revokes every earlier token, so the caller gets a fresh one.
-    #[Route(path: '/password', name: 'change_password', methods: [Request::METHOD_POST])]
+    #[Route(path: Routes::ACCOUNT_PATH->value.'/password', name: Routes::ACCOUNT_NAME->value.'change_password', methods: [Request::METHOD_POST])]
+    #[Route(path: Routes::ADMIN_ACCOUNT_PATH->value.'/password', name: Routes::ADMIN_ACCOUNT_NAME->value.'change_password', methods: [Request::METHOD_POST])]
     public function changePassword(#[CurrentUser] User $user, #[MapRequestPayload] ChangePasswordRequest $request): JsonResponse
     {
         $user->setPassword($this->passwordHasher->hashPassword($user, $request->newPassword));

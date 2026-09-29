@@ -22,6 +22,8 @@ import { AdminAuthService } from '../auth';
       <aside class="sidebar">
         <p class="section">Resources</p>
         <a routerLink="/admin/orders" routerLinkActive="active">Orders</a>
+        <p class="section">Account</p>
+        <a routerLink="/admin/settings" routerLinkActive="active">Settings</a>
       </aside>
       <main class="content">
         <router-outlet />
@@ -93,11 +95,11 @@ import { AdminAuthService } from '../auth';
 
     .sidebar {
       width: 224px;
-      padding: 24px 16px;
+      padding: 0 16px 24px;
     }
 
     .section {
-      margin: 0 0 8px;
+      margin: 24px 0 8px;
       padding: 0 12px;
       color: var(--nv-muted);
       font-size: 12px;

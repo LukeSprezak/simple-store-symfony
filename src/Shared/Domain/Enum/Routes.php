@@ -33,4 +33,6 @@ enum Routes: string
     // Account
     case ACCOUNT_PATH = '/api/me';
     case ACCOUNT_NAME = 'api_account_';
+    case ADMIN_ACCOUNT_PATH = '/api/admin/me';
+    case ADMIN_ACCOUNT_NAME = 'api_admin_account_';
 }

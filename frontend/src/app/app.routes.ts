@@ -3,6 +3,7 @@ import { AdminLayout } from './admin/layout';
 import { AdminLogin } from './admin/login';
 import { AdminOrderDetail } from './admin/order';
 import { AdminOrders } from './admin/orders';
+import { AdminSettings } from './admin/settings';
 import { adminGuard, authGuard } from './auth';
 import { Cart } from './cart';
 import { Login } from './login';
@@ -21,6 +22,7 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'orders' },
       { path: 'orders', component: AdminOrders },
       { path: 'orders/:id', component: AdminOrderDetail },
+      { path: 'settings', component: AdminSettings },
     ],
   },
   {
