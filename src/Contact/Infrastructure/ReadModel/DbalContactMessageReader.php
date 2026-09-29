@@ -13,6 +13,14 @@ final readonly class DbalContactMessageReader
     {
     }
 
+    public function countUnread(): int
+    {
+        /** @var int|string $count */
+        $count = $this->connection->fetchOne('SELECT COUNT(*) FROM contact_message WHERE read_at IS NULL');
+
+        return (int) $count;
+    }
+
     /**
      * Newest first: message IDs are UUIDv7, so descending ID order is creation order.
      *

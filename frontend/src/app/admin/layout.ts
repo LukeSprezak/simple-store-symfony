@@ -1,6 +1,9 @@
 import { Component, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { timer } from 'rxjs';
 import { AdminAuthService } from '../auth';
+import { UnreadMessages } from './messages';
 
 @Component({
   selector: 'app-admin-layout',
@@ -22,7 +25,12 @@ import { AdminAuthService } from '../auth';
       <aside class="sidebar">
         <p class="section">Resources</p>
         <a routerLink="/admin/orders" routerLinkActive="active">Orders</a>
-        <a routerLink="/admin/messages" routerLinkActive="active">Messages</a>
+        <a routerLink="/admin/messages" routerLinkActive="active">
+          Messages
+          @if (unread.count()) {
+            <span class="count" [attr.aria-label]="unread.count() + ' unread'">{{ unread.count() }}</span>
+          }
+        </a>
         <p class="section">Account</p>
         <a routerLink="/admin/settings" routerLinkActive="active">Settings</a>
       </aside>
@@ -110,7 +118,9 @@ import { AdminAuthService } from '../auth';
     }
 
     .sidebar a {
-      display: block;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       padding: 6px 12px;
       border-radius: 6px;
       color: var(--nv-muted);
@@ -125,6 +135,18 @@ import { AdminAuthService } from '../auth';
     .sidebar a.active {
       color: var(--nv-primary);
       font-weight: 800;
+    }
+
+    .count {
+      min-width: 20px;
+      padding: 0 6px;
+      border-radius: 9999px;
+      background: var(--nv-primary);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 20px;
+      text-align: center;
     }
 
     .content {
@@ -145,7 +167,15 @@ import { AdminAuthService } from '../auth';
 })
 export class AdminLayout {
   protected readonly auth = inject(AdminAuthService);
+  protected readonly unread = inject(UnreadMessages);
   private readonly router = inject(Router);
+
+  constructor() {
+    // Picks up messages sent by customers while the panel is open.
+    timer(0, 60_000)
+      .pipe(takeUntilDestroyed())
+      .subscribe(() => this.unread.refresh());
+  }
 
   protected logout(): void {
     this.auth.logout();

@@ -1,6 +1,18 @@
 import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, Injectable, signal } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
+export class UnreadMessages {
+  private readonly http = inject(HttpClient);
+  readonly count = signal(0);
+
+  refresh(): void {
+    this.http
+      .get<{ count: number }>('/api/admin/contact-message/unread-count')
+      .subscribe(({ count }) => this.count.set(count));
+  }
+}
 
 interface Message {
   id: string;
@@ -191,6 +203,7 @@ interface Message {
 })
 export class AdminMessages {
   private readonly http = inject(HttpClient);
+  private readonly unread = inject(UnreadMessages);
   protected readonly messages = signal<Message[]>([]);
   protected readonly nextCursor = signal<string | null>(null);
   protected readonly expanded = signal<string | null>(null);
@@ -233,5 +246,6 @@ export class AdminMessages {
 
   private setReadAt(id: string, readAt: string | null): void {
     this.messages.update((messages) => messages.map((message) => (message.id === id ? { ...message, readAt } : message)));
+    this.unread.refresh();
   }
 }

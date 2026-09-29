@@ -36,6 +36,12 @@ final readonly class AdminContactController
         return new JsonResponse($this->reader->findPage($page->limit, $page->after));
     }
 
+    #[Route(path: Routes::ADMIN_CONTACT_PATH->value.'/unread-count', name: Routes::ADMIN_CONTACT_NAME->value.'unread_count', methods: [Request::METHOD_GET])]
+    public function unreadCount(): JsonResponse
+    {
+        return new JsonResponse(['count' => $this->reader->countUnread()]);
+    }
+
     #[Route(path: Routes::ADMIN_CONTACT_PATH->value.'/{id}/read', name: Routes::ADMIN_CONTACT_NAME->value.'mark_read', requirements: ['id' => Requirement::UUID], methods: [Request::METHOD_POST])]
     public function markRead(string $id): JsonResponse
     {
