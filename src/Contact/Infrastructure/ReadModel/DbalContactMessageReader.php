@@ -16,13 +16,13 @@ final readonly class DbalContactMessageReader
     /**
      * Newest first: message IDs are UUIDv7, so descending ID order is creation order.
      *
-     * @return array{items: list<array{id: string, name: string, email: string, subject: string, message: string, createdAt: string}>, nextCursor: ?string}
+     * @return array{items: list<array{id: string, name: string, email: string, subject: string, message: string, createdAt: string, readAt: ?string}>, nextCursor: ?string}
      */
     public function findPage(int $limit, ?string $after): array
     {
-        /** @var list<array{id: string, name: string, email: string, subject: string, message: string, created_at: string}> $rows */
+        /** @var list<array{id: string, name: string, email: string, subject: string, message: string, created_at: string, read_at: ?string}> $rows */
         $rows = $this->connection->fetchAllAssociative(
-            'SELECT id, name, email, subject, message, created_at FROM contact_message'.(null === $after ? '' : ' WHERE id < :after').' ORDER BY id DESC LIMIT :limit',
+            'SELECT id, name, email, subject, message, created_at, read_at FROM contact_message'.(null === $after ? '' : ' WHERE id < :after').' ORDER BY id DESC LIMIT :limit',
             ['limit' => $limit + 1] + (null === $after ? [] : ['after' => $after]),
             ['limit' => ParameterType::INTEGER]
         );
@@ -37,6 +37,7 @@ final readonly class DbalContactMessageReader
             'subject' => $row['subject'],
             'message' => $row['message'],
             'createdAt' => new \DateTimeImmutable($row['created_at'])->format(DATE_ATOM),
+            'readAt' => null === $row['read_at'] ? null : new \DateTimeImmutable($row['read_at'])->format(DATE_ATOM),
         ], $rows);
 
         $lastItem = end($items);

@@ -9,6 +9,7 @@ interface Message {
   subject: string;
   message: string;
   createdAt: string;
+  readAt: string | null;
 }
 
 @Component({
@@ -22,18 +23,26 @@ interface Message {
           <tr>
             <th>From</th>
             <th>Subject</th>
+            <th>Status</th>
             <th>Received</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           @for (message of messages(); track message.id) {
-            <tr class="row" (click)="toggle(message.id)">
+            <tr class="row" [class.unread]="!message.readAt" (click)="toggle(message)">
               <td>
                 <strong>{{ message.name }}</strong>
                 <span class="muted">{{ message.email }}</span>
               </td>
-              <td>{{ message.subject }}</td>
+              <td class="subject">{{ message.subject }}</td>
+              <td>
+                @if (message.readAt) {
+                  <span class="nv-badge read" [title]="'Read ' + (message.readAt | date: 'medium')">Read</span>
+                } @else {
+                  <span class="nv-badge">New</span>
+                }
+              </td>
               <td class="muted">{{ message.createdAt | date: 'medium' }}</td>
               <td class="right">
                 <span class="chevron material-symbols-rounded" [class.open]="expanded() === message.id" aria-hidden="true">expand_more</span>
@@ -41,18 +50,24 @@ interface Message {
             </tr>
             @if (expanded() === message.id) {
               <tr class="body">
-                <td colspan="4">
+                <td colspan="5">
                   <p>{{ message.message }}</p>
-                  <a class="nv-btn" [href]="'mailto:' + message.email + '?subject=Re: ' + message.subject">
-                    <span class="material-symbols-rounded" aria-hidden="true">mail</span>
-                    Reply by email
-                  </a>
+                  <div class="actions">
+                    <a class="nv-btn" [href]="'mailto:' + message.email + '?subject=Re: ' + message.subject">
+                      <span class="material-symbols-rounded" aria-hidden="true">mail</span>
+                      Reply by email
+                    </a>
+                    <button class="nv-btn nv-btn-outline" type="button" (click)="markUnread(message)">
+                      <span class="material-symbols-rounded" aria-hidden="true">mark_email_unread</span>
+                      Mark as unread
+                    </button>
+                  </div>
                 </td>
               </tr>
             }
           } @empty {
             <tr>
-              <td class="empty" colspan="4">No messages yet.</td>
+              <td class="empty" colspan="5">No messages yet.</td>
             </tr>
           }
         </tbody>
@@ -131,6 +146,29 @@ interface Message {
       white-space: pre-line;
     }
 
+    .unread td {
+      background: var(--nv-surface);
+    }
+
+    .unread .subject,
+    .unread strong {
+      font-weight: 800;
+    }
+
+    .unread td:first-child {
+      box-shadow: inset 3px 0 0 var(--nv-primary);
+    }
+
+    .nv-badge.read {
+      background: var(--nv-bg);
+      color: var(--nv-muted);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+    }
+
     .body .nv-btn {
       text-decoration: none;
     }
@@ -171,7 +209,29 @@ export class AdminMessages {
       });
   }
 
-  protected toggle(id: string): void {
-    this.expanded.set(this.expanded() === id ? null : id);
+  // Opening a message marks it as read.
+  protected toggle(message: Message): void {
+    if (this.expanded() === message.id) {
+      this.expanded.set(null);
+      return;
+    }
+
+    this.expanded.set(message.id);
+    if (!message.readAt) {
+      this.http
+        .post<void>(`/api/admin/contact-message/${message.id}/read`, null)
+        .subscribe(() => this.setReadAt(message.id, new Date().toISOString()));
+    }
+  }
+
+  protected markUnread(message: Message): void {
+    this.http.delete<void>(`/api/admin/contact-message/${message.id}/read`).subscribe(() => {
+      this.setReadAt(message.id, null);
+      this.expanded.set(null);
+    });
+  }
+
+  private setReadAt(id: string, readAt: string | null): void {
+    this.messages.update((messages) => messages.map((message) => (message.id === id ? { ...message, readAt } : message)));
   }
 }

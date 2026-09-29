@@ -25,11 +25,23 @@ class ContactMessage
         private string $message,
         #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
         private \DateTimeImmutable $createdAt,
+        #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+        private ?\DateTimeImmutable $readAt = null,
     ) {
     }
 
     public function getId(): string
     {
         return $this->id;
+    }
+
+    public function markRead(): void
+    {
+        $this->readAt ??= new \DateTimeImmutable();
+    }
+
+    public function markUnread(): void
+    {
+        $this->readAt = null;
     }
 }
