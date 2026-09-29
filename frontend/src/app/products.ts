@@ -251,7 +251,7 @@ export class Products {
   protected add(product: Product): void {
     this.adding.set(product.id);
     this.error.set('');
-    this.cart.add(product.id).subscribe({
+    this.cart.add(product.id, 1).subscribe({
       next: () => this.adding.set(null),
       error: (error: HttpErrorResponse) => {
         this.adding.set(null);

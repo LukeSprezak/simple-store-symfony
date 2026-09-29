@@ -43,11 +43,11 @@ export class CartService {
     });
   }
 
-  add(productId: string): Observable<void> {
+  add(productId: string, quantity: number): Observable<void> {
     const cartId = this.cartId();
     const url = cartId ? `/api/cart/add-product/${cartId}` : '/api/cart/add-product';
 
-    return this.http.post<{ cartId: string }>(url, { productId, quantity: 1 }).pipe(
+    return this.http.post<{ cartId: string }>(url, { productId, quantity }).pipe(
       map(({ cartId }) => {
         localStorage.setItem(CART_KEY, cartId);
         this.cartId.set(cartId);

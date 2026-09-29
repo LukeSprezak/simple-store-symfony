@@ -1,6 +1,6 @@
 import { CurrencyPipe } from '@angular/common';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CartService } from './cart';
 
@@ -66,10 +66,24 @@ interface ProductDetail {
 
         <aside class="buy panel">
           <strong class="price">{{ product.priceInCents / 100 | currency }}</strong>
+          @if (maxQuantity() > 0) {
+            <div class="quantity">
+              <span>Quantity</span>
+              <div class="stepper">
+                <button type="button" aria-label="Decrease quantity" [disabled]="quantity() === 1" (click)="quantity.set(quantity() - 1)">
+                  <span class="material-symbols-rounded" aria-hidden="true">remove</span>
+                </button>
+                <output aria-live="polite">{{ quantity() }}</output>
+                <button type="button" aria-label="Increase quantity" [disabled]="quantity() >= maxQuantity()" (click)="quantity.set(quantity() + 1)">
+                  <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                </button>
+              </div>
+            </div>
+          }
           <button
             class="btn btn-primary"
             type="button"
-            [disabled]="product.stockQuantity === 0 || adding()"
+            [disabled]="quantity() > maxQuantity() || adding()"
             (click)="add(product)"
           >
             <span class="material-symbols-rounded" aria-hidden="true">add_shopping_cart</span>
@@ -80,11 +94,19 @@ interface ProductDetail {
               <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
               Added to your cart.
             </p>
+          } @else if (product.stockQuantity > 0 && maxQuantity() === 0) {
+            <p class="note">
+              <span class="material-symbols-rounded" aria-hidden="true">shopping_cart</span>
+              You already have the maximum of 10 in your cart.
+            </p>
           } @else if (product.stockQuantity > 0) {
             <p class="note">
               <span class="material-symbols-rounded" aria-hidden="true">check_circle</span>
               Available now · stock is reserved once it's in your cart
             </p>
+          }
+          @if (inCart()) {
+            <p class="note">In your cart: {{ inCart() }}</p>
           }
           @if (error()) {
             <p class="error">{{ error() }}</p>
@@ -238,6 +260,44 @@ interface ProductDetail {
       font: 700 36px Ubuntu, sans-serif;
     }
 
+    .quantity {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+    }
+
+    .stepper {
+      display: flex;
+      align-items: center;
+      border: 1px solid var(--text);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      background: var(--surface);
+    }
+
+    .stepper button {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border: 0;
+      background: none;
+      color: var(--primary);
+      cursor: pointer;
+    }
+
+    .stepper button:disabled {
+      color: var(--border);
+      cursor: not-allowed;
+    }
+
+    .stepper output {
+      min-width: 32px;
+      font: 700 18px Ubuntu, sans-serif;
+      text-align: center;
+    }
+
     .buy > .btn {
       height: 52px;
       font-size: 16px;
@@ -313,6 +373,12 @@ export class ProductPage implements OnInit {
   protected readonly adding = signal(false);
   protected readonly added = signal(false);
   protected readonly error = signal('');
+  protected readonly quantity = signal(1);
+  protected readonly inCart = computed(
+    () => this.cart.cart()?.items.find((item) => item.productId === this.product()?.id)?.quantity ?? 0,
+  );
+  // The API caps a cart at 10 units per product, counting what is already in it (CartLimits::MAX_QUANTITY_PER_PRODUCT).
+  protected readonly maxQuantity = computed(() => Math.min(10 - this.inCart(), this.product()?.stockQuantity ?? 0));
 
   ngOnInit(): void {
     this.http.get<ProductDetail>(`/api/product/${this.id()}`).subscribe({
@@ -325,10 +391,11 @@ export class ProductPage implements OnInit {
     this.adding.set(true);
     this.added.set(false);
     this.error.set('');
-    this.cart.add(product.id).subscribe({
+    this.cart.add(product.id, this.quantity()).subscribe({
       next: () => {
         this.adding.set(false);
         this.added.set(true);
+        this.quantity.set(1);
       },
       error: (error: HttpErrorResponse) => {
         this.adding.set(false);
