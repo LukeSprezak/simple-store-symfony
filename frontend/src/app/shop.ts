@@ -2,10 +2,11 @@ import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthService } from './auth';
 import { CartService } from './cart';
+import { Footer } from './footer';
 
 @Component({
   selector: 'app-shop',
-  imports: [RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [Footer, RouterLink, RouterLinkActive, RouterOutlet],
   template: `
     <header class="header">
       <a class="logo" routerLink="/">
@@ -22,21 +23,35 @@ import { CartService } from './cart';
             }
           </a>
           <a routerLink="/orders" routerLinkActive="active">Orders</a>
+          <a routerLink="/contact" routerLinkActive="active">Contact</a>
         </nav>
         <div class="account">
           <a class="btn icon-btn" routerLink="/settings" routerLinkActive="active" title="Settings" aria-label="Settings">
             <span class="material-symbols-rounded" aria-hidden="true">settings</span>
           </a>
           <button class="btn" type="button" (click)="logout()">
-          <span class="material-symbols-rounded" aria-hidden="true">logout</span>
-          Log out
+            <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+            Log out
           </button>
         </div>
       }
     </header>
-    <router-outlet />
+    <div class="page">
+      <router-outlet />
+    </div>
+    <app-footer />
   `,
   styles: `
+    :host {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .page {
+      flex: 1;
+    }
+
     .header {
       display: flex;
       align-items: center;

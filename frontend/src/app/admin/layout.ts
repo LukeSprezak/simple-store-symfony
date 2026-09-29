@@ -22,6 +22,7 @@ import { AdminAuthService } from '../auth';
       <aside class="sidebar">
         <p class="section">Resources</p>
         <a routerLink="/admin/orders" routerLinkActive="active">Orders</a>
+        <a routerLink="/admin/messages" routerLinkActive="active">Messages</a>
         <p class="section">Account</p>
         <a routerLink="/admin/settings" routerLinkActive="active">Settings</a>
       </aside>

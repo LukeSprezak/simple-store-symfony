@@ -35,4 +35,9 @@ enum Routes: string
     case ACCOUNT_NAME = 'api_account_';
     case ADMIN_ACCOUNT_PATH = '/api/admin/me';
     case ADMIN_ACCOUNT_NAME = 'api_admin_account_';
+    // Contact
+    case CONTACT_PATH = '/api/contact';
+    case CONTACT_NAME = 'api_contact_';
+    case ADMIN_CONTACT_PATH = '/api/admin/contact-message';
+    case ADMIN_CONTACT_NAME = 'api_admin_contact_';
 }

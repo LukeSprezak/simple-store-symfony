@@ -381,6 +381,10 @@ export class ProductPage implements OnInit {
   protected readonly maxQuantity = computed(() => Math.min(10 - this.inCart(), this.product()?.stockQuantity ?? 0));
 
   ngOnInit(): void {
+    this.loadProduct();
+  }
+
+  private loadProduct(): void {
     this.http.get<ProductDetail>(`/api/product/${this.id()}`).subscribe({
       next: (product) => this.product.set(product),
       error: () => this.notFound.set(true),
@@ -396,6 +400,8 @@ export class ProductPage implements OnInit {
         this.adding.set(false);
         this.added.set(true);
         this.quantity.set(1);
+        // Adding reserves stock, so the available quantity has changed.
+        this.loadProduct();
       },
       error: (error: HttpErrorResponse) => {
         this.adding.set(false);

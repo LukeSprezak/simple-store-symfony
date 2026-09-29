@@ -1,0 +1,143 @@
+import { Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
+
+@Component({
+  selector: 'app-footer',
+  imports: [RouterLink],
+  template: `
+    <footer>
+      <div class="inner">
+        <div class="top">
+          <div class="brand">
+            <a class="logo" routerLink="/">
+              <span class="logo-mark"></span>
+              Example Shop
+            </a>
+            <p>Tech gear for your desk and beyond — ordered in minutes, tracked until delivery.</p>
+          </div>
+          <nav class="columns">
+            <div>
+              <h4>Shop</h4>
+              <a routerLink="/">Products</a>
+              <a routerLink="/cart">Cart</a>
+              <a routerLink="/orders">Orders</a>
+            </div>
+            <div>
+              <h4>Account</h4>
+              <a routerLink="/settings">Settings</a>
+              <a routerLink="/login">Log in</a>
+            </div>
+            <div>
+              <h4>Help</h4>
+              <a routerLink="/contact">Contact</a>
+              <a href="mailto:support@example.com">Email us</a>
+            </div>
+          </nav>
+        </div>
+        <div class="contact">
+          <h4>Contact</h4>
+          <a href="mailto:support@example.com">support&#64;example.com</a>
+        </div>
+        <div class="bottom">
+          <a routerLink="/contact">Contact</a>
+          <span>© {{ year }} Example Shop. All rights reserved.</span>
+        </div>
+      </div>
+    </footer>
+  `,
+  styles: `
+    footer {
+      padding: 56px 0 24px;
+      background: var(--text);
+      color: #c7d2fe;
+      font-size: 14px;
+    }
+
+    .inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .top {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 48px;
+      padding-bottom: 40px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
+      font: 500 22px Ubuntu, sans-serif;
+      text-decoration: none;
+    }
+
+    .logo-mark {
+      width: 22px;
+      height: 22px;
+      border: 4px solid #a5b4fc;
+      border-radius: 5px;
+      transform: rotate(45deg);
+    }
+
+    .brand p {
+      max-width: 320px;
+      margin: 16px 0 0;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .columns div {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    h4 {
+      margin: 0 0 8px;
+      color: #a5b4fc;
+      font: 600 11px 'Open Sans', sans-serif;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    a {
+      color: #e0e7ff;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: #fff;
+    }
+
+    .contact {
+      padding: 24px 0;
+      border-top: 1px solid rgb(255 255 255 / 0.12);
+    }
+
+    .bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding-top: 24px;
+      border-top: 1px solid rgb(255 255 255 / 0.12);
+      font-size: 12px;
+    }
+
+    @media (max-width: 800px) {
+      .top {
+        grid-template-columns: 1fr;
+      }
+    }
+  `,
+})
+export class Footer {
+  protected readonly year = new Date().getFullYear();
+}

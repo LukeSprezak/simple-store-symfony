@@ -49,6 +49,13 @@ doctrine:
                 prefix: 'App\Product\Domain\Model'
                 alias: App\Product\Domain
 
+            App\Contact:
+                type: attribute
+                is_bundle: false
+                dir: '%kernel.project_dir%/src/Contact/Infrastructure/Doctrine/Entity'
+                prefix: 'App\Contact\Infrastructure\Doctrine\Entity'
+                alias: App\Contact
+
             App\User:
                 type: attribute
                 is_bundle: false

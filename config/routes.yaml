@@ -16,6 +16,12 @@ product:
         namespace: App\Product\UI\Controller
     type: attribute
 
+contact:
+    resource:
+        path: ../src/Contact/UI/Controller/
+        namespace: App\Contact\UI\Controller
+    type: attribute
+
 user:
     resource:
         path: ../src/User/UI/Controller/
